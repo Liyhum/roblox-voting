@@ -29,6 +29,8 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
   const [robloxData, setRobloxData] = useState<{
     displayName?: string;
     avatarUrl?: string;
+    isInGroup?: boolean;
+    roleName?: string;
   } | null>(null);
   const [robloxError, setRobloxError] = useState("");
 
@@ -58,6 +60,8 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
           setRobloxData({
             displayName: data.displayName,
             avatarUrl: data.avatarUrl,
+            isInGroup: Boolean(data.isInGroup),
+            roleName: data.roleName || "",
           });
         } else {
           setRobloxData(null);
@@ -112,6 +116,11 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
 
     if (!selectedFile) {
       setErrorMessage("Please upload a photo of your avatar outfit.");
+      return;
+    }
+
+    if (robloxData && !robloxData.isInGroup) {
+      setErrorMessage("You must join our official Roblox group 'FEMME'S STUDIO' to submit your avatar.");
       return;
     }
 
@@ -236,31 +245,55 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
               )}
             </div>
 
-            {/* Live Roblox Profile Preview */}
+            {/* Live Roblox Profile Preview with Group Verification */}
             {robloxData && (
-              <div className="flex items-center gap-3.5 p-3.5 bg-zinc-950/90 border border-white/10 rounded-2xl shadow-inner">
-                {robloxData.avatarUrl ? (
-                  <img
-                    src={robloxData.avatarUrl}
-                    alt={username}
-                    className="w-12 h-12 rounded-xl border border-[#00f2fe]/40 bg-zinc-900 object-cover shadow-md shadow-[#00f2fe]/20"
-                  />
-                ) : (
-                  <div className="w-12 h-12 rounded-xl bg-zinc-900 flex items-center justify-center">
-                    <User className="w-6 h-6 text-zinc-400" />
+              <div className="space-y-2">
+                <div className="flex items-center gap-3.5 p-3.5 bg-zinc-950/90 border border-white/10 rounded-2xl shadow-inner">
+                  {robloxData.avatarUrl ? (
+                    <img
+                      src={robloxData.avatarUrl}
+                      alt={username}
+                      className="w-12 h-12 rounded-xl border border-white/20 bg-zinc-900 object-cover shadow-md"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-xl bg-zinc-900 border border-white/10 flex items-center justify-center">
+                      <User className="w-6 h-6 text-zinc-400" />
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-black text-sm text-white truncate">
+                        {robloxData.displayName || username}
+                      </span>
+                      {robloxData.isInGroup ? (
+                        <span className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-md font-black uppercase tracking-wider">
+                          Group Member
+                        </span>
+                      ) : (
+                        <span className="text-[10px] bg-amber-500/15 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-md font-black uppercase tracking-wider">
+                          Not in Group
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-zinc-400 font-mono">@{username}</p>
+                  </div>
+                </div>
+
+                {!robloxData.isInGroup && (
+                  <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center justify-between text-xs">
+                    <span className="text-amber-300 font-semibold text-[11px]">
+                      Must join <b>FEMME'S STUDIO</b> to submit
+                    </span>
+                    <a
+                      href="https://www.roblox.com/groups/740188661"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-2.5 py-1 rounded-lg bg-gradient-to-r from-[#ff007f] to-rose-600 text-white font-bold text-[10px] uppercase tracking-wider shadow-md hover:brightness-110"
+                    >
+                      Join Group &rarr;
+                    </a>
                   </div>
                 )}
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="font-black text-sm text-white truncate">
-                      {robloxData.displayName || username}
-                    </span>
-                    <span className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-md font-black uppercase tracking-wider">
-                      Model Verified
-                    </span>
-                  </div>
-                  <p className="text-xs text-zinc-400 font-mono">@{username}</p>
-                </div>
               </div>
             )}
 

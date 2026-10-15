@@ -93,11 +93,36 @@ export async function GET(request: Request) {
       // fallback to userInfo.picture
     }
 
+    // 4. Verify Group Membership (740188661 - FEMME'S STUDIO)
+    let isInGroup = false;
+    let roleName = "";
+    try {
+      const groupRes = await fetch(
+        `https://groups.roblox.com/v1/users/${userId}/groups/roles`,
+        { cache: "no-store" }
+      );
+      if (groupRes.ok) {
+        const groupData = await groupRes.json();
+        const found = groupData.data?.find(
+          (g: { group?: { id?: number }; role?: { name?: string } }) =>
+            g.group?.id === 740188661
+        );
+        if (found) {
+          isInGroup = true;
+          roleName = found.role?.name || "Member";
+        }
+      }
+    } catch {
+      // ignore
+    }
+
     const sessionPayload = {
       id: userId,
       username,
       displayName,
       avatarUrl,
+      isInGroup,
+      roleName,
       verifiedAt: Date.now(),
     };
 

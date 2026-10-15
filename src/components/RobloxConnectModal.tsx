@@ -9,6 +9,8 @@ import {
   Sparkles,
   ShieldCheck,
   ExternalLink,
+  Users,
+  RefreshCw,
 } from "lucide-react";
 
 export interface ConnectedRobloxUser {
@@ -16,6 +18,8 @@ export interface ConnectedRobloxUser {
   username: string;
   displayName: string;
   avatarUrl: string;
+  isInGroup?: boolean;
+  roleName?: string;
 }
 
 interface RobloxConnectModalProps {
@@ -46,37 +50,44 @@ export function RobloxConnectModal({
     }
   }, [isOpen]);
 
-  // Debounce lookup
-  useEffect(() => {
-    const trimmed = usernameInput.trim();
+  const verifyUser = async (nameToVerify: string) => {
+    const trimmed = nameToVerify.trim();
     if (!trimmed || trimmed.length < 3) {
       setRobloxData(null);
       setError("");
       return;
     }
 
-    const timer = setTimeout(async () => {
-      setIsVerifying(true);
-      setError("");
-      try {
-        const res = await fetch(`/api/roblox-avatar?username=${encodeURIComponent(trimmed)}`);
-        const data = await res.json();
-        if (res.ok && data.name) {
-          setRobloxData({
-            id: data.id,
-            username: data.name,
-            displayName: data.displayName || data.name,
-            avatarUrl: data.avatarUrl,
-          });
-        } else {
-          setRobloxData(null);
-          setError("Roblox account not found. Please double-check your username.");
-        }
-      } catch {
+    setIsVerifying(true);
+    setError("");
+    try {
+      const res = await fetch(`/api/roblox-avatar?username=${encodeURIComponent(trimmed)}`);
+      const data = await res.json();
+      if (res.ok && data.name) {
+        setRobloxData({
+          id: data.id,
+          username: data.name,
+          displayName: data.displayName || data.name,
+          avatarUrl: data.avatarUrl,
+          isInGroup: Boolean(data.isInGroup),
+          roleName: data.roleName || "",
+        });
+      } else {
         setRobloxData(null);
-      } finally {
-        setIsVerifying(false);
+        setError("Roblox account not found. Please double-check your username.");
       }
+    } catch {
+      setRobloxData(null);
+      setError("Failed to verify Roblox account. Please try again.");
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  // Debounce lookup
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      verifyUser(usernameInput);
     }, 500);
 
     return () => clearTimeout(timer);
@@ -86,6 +97,10 @@ export function RobloxConnectModal({
 
   const handleManualConfirm = () => {
     if (!robloxData) return;
+    if (!robloxData.isInGroup) {
+      setError("You must join our official Roblox Group before you can vote.");
+      return;
+    }
     localStorage.setItem("trec_connected_roblox_user", JSON.stringify(robloxData));
     onConnected(robloxData);
     onClose();
@@ -126,7 +141,7 @@ export function RobloxConnectModal({
 
           <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#ff007f]/15 text-[#ff007f] text-[10px] font-black uppercase tracking-widest border border-[#ff007f]/30 mb-2">
             <Sparkles className="w-3 h-3" />
-            Official Verification
+            Group Member Verification
           </div>
 
           <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight uppercase italic">
@@ -134,57 +149,49 @@ export function RobloxConnectModal({
           </h3>
           <p className="text-xs text-zinc-400 mt-1 max-w-xs mx-auto">
             {pendingVoteContestantName
-              ? `Connect your Roblox account to cast your vote for @${pendingVoteContestantName}`
-              : "Connect your official Roblox account to vote in the Fashion Show"}
+              ? `Cast your vote for @${pendingVoteContestantName}`
+              : "Verify your account and group membership to vote"}
           </p>
         </div>
 
         <div className="space-y-4">
-          {/* Official Roblox Login Button */}
-          {isOAuthConfigured ? (
-            <button
-              onClick={handleOfficialRobloxLogin}
-              className="w-full py-4 px-6 rounded-2xl font-black text-xs sm:text-sm tracking-wider uppercase text-white bg-gradient-to-r from-emerald-600 via-teal-600 to-[#00f2fe] hover:brightness-110 shadow-xl shadow-emerald-600/30 transition-all flex items-center justify-center gap-2.5 active:scale-95 group"
-            >
-              <img
-                src="/trec-kl/icon.png"
-                alt="Roblox"
-                className="w-5 h-5 rounded-lg group-hover:scale-110 transition-transform"
-              />
-              <span>Log in with Official Roblox</span>
-              <ExternalLink className="w-4 h-4 text-white/80" />
-            </button>
-          ) : (
-            <div className="p-3 bg-zinc-950/80 border border-white/10 rounded-2xl text-left space-y-1">
-              <p className="text-[11px] font-bold text-amber-400 flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5" /> Roblox OAuth Setup Available
-              </p>
-              <p className="text-[10px] text-zinc-400">
-                To enable 1-click official Roblox login, enter <code className="text-zinc-200">ROBLOX_CLIENT_ID</code> in <code className="text-zinc-200">.env.local</code>. Meanwhile, you can connect via username below:
-              </p>
-            </div>
+          {/* Official Roblox Login Button if OAuth active */}
+          {isOAuthConfigured && (
+            <>
+              <button
+                onClick={handleOfficialRobloxLogin}
+                className="w-full py-4 px-6 rounded-2xl font-black text-xs sm:text-sm tracking-wider uppercase text-white bg-gradient-to-r from-emerald-600 via-teal-600 to-[#00f2fe] hover:brightness-110 shadow-xl shadow-emerald-600/30 transition-all flex items-center justify-center gap-2.5 active:scale-95 group"
+              >
+                <img
+                  src="/trec-kl/icon.png"
+                  alt="Roblox"
+                  className="w-5 h-5 rounded-lg group-hover:scale-110 transition-transform"
+                />
+                <span>Log in with Official Roblox</span>
+                <ExternalLink className="w-4 h-4 text-white/80" />
+              </button>
+
+              <div className="flex items-center gap-3 my-2">
+                <div className="flex-1 h-[1px] bg-white/10" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                  Or Connect with Username
+                </span>
+                <div className="flex-1 h-[1px] bg-white/10" />
+              </div>
+            </>
           )}
 
-          {/* Divider */}
-          <div className="flex items-center gap-3 my-2">
-            <div className="flex-1 h-[1px] bg-white/10" />
-            <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-              {isOAuthConfigured ? "Or Verify with Username" : "Connect via Username"}
-            </span>
-            <div className="flex-1 h-[1px] bg-white/10" />
-          </div>
-
-          {/* Manual Username Input */}
+          {/* Username Input */}
           <div>
             <label className="block text-xs font-black uppercase tracking-wider text-zinc-300 mb-1.5">
-              Your Roblox Username
+              Roblox Username
             </label>
             <div className="relative">
               <input
                 type="text"
                 value={usernameInput}
                 onChange={(e) => setUsernameInput(e.target.value)}
-                placeholder="e.g. Builderman"
+                placeholder="e.g. YourRobloxUsername"
                 className="w-full px-4 py-3 bg-zinc-950 border border-white/15 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:border-[#00f2fe] focus:ring-1 focus:ring-[#00f2fe] text-sm font-medium transition-all"
               />
               {isVerifying && (
@@ -195,31 +202,89 @@ export function RobloxConnectModal({
             </div>
           </div>
 
-          {/* Preview Verified Account */}
+          {/* Account & Group Membership Status */}
           {robloxData && (
-            <div className="flex items-center gap-3.5 p-3.5 bg-zinc-950/90 border border-emerald-500/30 rounded-2xl shadow-inner">
-              {robloxData.avatarUrl ? (
-                <img
-                  src={robloxData.avatarUrl}
-                  alt={robloxData.username}
-                  className="w-12 h-12 rounded-xl border border-emerald-500/50 bg-zinc-900 object-cover shadow-md shadow-emerald-500/20"
-                />
+            <div className="space-y-3">
+              {/* User profile row */}
+              <div className="flex items-center gap-3.5 p-3.5 bg-zinc-950/90 border border-white/10 rounded-2xl shadow-inner">
+                {robloxData.avatarUrl ? (
+                  <img
+                    src={robloxData.avatarUrl}
+                    alt={robloxData.username}
+                    className="w-12 h-12 rounded-xl border border-white/20 bg-zinc-900 object-cover shadow-md"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-xl bg-zinc-900 border border-white/10 flex items-center justify-center">
+                    <CheckCircle2 className="w-6 h-6 text-zinc-400" />
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-black text-sm text-white truncate">
+                      {robloxData.displayName}
+                    </span>
+                  </div>
+                  <p className="text-xs text-zinc-400 font-mono">@{robloxData.username}</p>
+                </div>
+              </div>
+
+              {/* Group Check Result */}
+              {robloxData.isInGroup ? (
+                <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <div>
+                      <p className="text-xs font-black text-emerald-300">
+                        FEMME'S STUDIO Member
+                      </p>
+                      <p className="text-[10px] text-zinc-400">
+                        Role: {robloxData.roleName || "Member"} &bull; Eligible to Vote
+                      </p>
+                    </div>
+                  </div>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                    Verified
+                  </span>
+                </div>
               ) : (
-                <div className="w-12 h-12 rounded-xl bg-zinc-900 border border-emerald-500/50 flex items-center justify-center">
-                  <CheckCircle2 className="w-6 h-6 text-emerald-400" />
+                <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl space-y-3">
+                  <div className="flex items-start gap-2.5">
+                    <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-xs font-black text-amber-300 uppercase tracking-wide">
+                        Group Membership Required
+                      </p>
+                      <p className="text-[11px] text-zinc-300 mt-0.5">
+                        You must join our official Roblox group <b>FEMME'S STUDIO</b> to vote!
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Direct Link to Join Group */}
+                  <div className="flex items-center gap-2 pt-1">
+                    <a
+                      href="https://www.roblox.com/groups/740188661"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#ff007f] to-rose-600 hover:brightness-110 text-white font-black text-[11px] tracking-wider uppercase text-center flex items-center justify-center gap-1.5 shadow-md shadow-[#ff007f]/20 transition-all"
+                    >
+                      <Users className="w-3.5 h-3.5" />
+                      <span>Join FEMME'S STUDIO</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+
+                    <button
+                      type="button"
+                      onClick={() => verifyUser(usernameInput)}
+                      disabled={isVerifying}
+                      className="p-2.5 rounded-xl bg-zinc-900 border border-white/15 text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors"
+                      title="Re-check Membership"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${isVerifying ? "animate-spin" : ""}`} />
+                    </button>
+                  </div>
                 </div>
               )}
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5">
-                  <span className="font-black text-sm text-white truncate">
-                    {robloxData.displayName}
-                  </span>
-                  <span className="text-[9px] bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-1.5 py-0.2 rounded font-black uppercase tracking-wider">
-                    Ready to Vote
-                  </span>
-                </div>
-                <p className="text-xs text-zinc-400 font-mono">@{robloxData.username}</p>
-              </div>
             </div>
           )}
 
@@ -232,15 +297,23 @@ export function RobloxConnectModal({
           {/* Confirm Button */}
           <button
             onClick={handleManualConfirm}
-            disabled={!robloxData}
-            className="w-full py-3.5 px-6 rounded-2xl font-black text-xs sm:text-sm tracking-wider uppercase text-white bg-gradient-to-r from-[#ff007f] via-rose-600 to-[#00f2fe] hover:brightness-110 shadow-xl shadow-[#ff007f]/25 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-95"
+            disabled={!robloxData || !robloxData.isInGroup}
+            className={`w-full py-3.5 px-6 rounded-2xl font-black text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-2 active:scale-95 ${
+              robloxData && robloxData.isInGroup
+                ? "bg-gradient-to-r from-[#ff007f] via-rose-600 to-[#00f2fe] text-white hover:brightness-110 shadow-xl shadow-[#ff007f]/25"
+                : "bg-zinc-800 text-zinc-500 cursor-not-allowed border border-white/5"
+            }`}
           >
             <CheckCircle2 className="w-4 h-4" />
-            <span>Confirm &amp; Connect Username</span>
+            <span>
+              {robloxData && !robloxData.isInGroup
+                ? "Join Group First to Vote"
+                : "Confirm & Connect Account"}
+            </span>
           </button>
 
           <p className="text-[10px] text-zinc-500 text-center font-medium">
-            Protected with anti-fraud encryption. Only public Roblox avatar data is read.
+            Official Group ID: 740188661 (FEMME'S STUDIO &bull; 11.5k+ Members)
           </p>
         </div>
       </div>

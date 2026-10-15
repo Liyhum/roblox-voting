@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 
+export const REQUIRED_GROUP_ID = 740188661; // FEMME'S STUDIO
+export const REQUIRED_GROUP_NAME = "FEMME'S STUDIO";
+export const REQUIRED_GROUP_URL = `https://www.roblox.com/groups/${REQUIRED_GROUP_ID}`;
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const username = searchParams.get("username");
@@ -9,7 +13,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    // 1. Dapatkan Roblox User ID berdasarkan Username
+    // 1. Get Roblox User ID by Username
     const userRes = await fetch("https://users.roblox.com/v1/usernames/users", {
       method: "POST",
       headers: {
@@ -19,7 +23,7 @@ export async function GET(request: Request) {
         usernames: [username],
         excludeBannedUsers: false,
       }),
-      next: { revalidate: 3600 },
+      cache: "no-store",
     });
 
     if (!userRes.ok) {
@@ -34,7 +38,7 @@ export async function GET(request: Request) {
     const robloxUser = userData.data[0];
     const userId = robloxUser.id;
 
-    // 2. Ambil Headshot Avatar Thumbnail
+    // 2. Fetch Headshot Avatar Thumbnail
     const thumbRes = await fetch(
       `https://thumbnails.roblox.com/v1/users/avatar-headshot?userIds=${userId}&size=150x150&format=Png&isCircular=false`,
       { next: { revalidate: 3600 } }
@@ -48,11 +52,40 @@ export async function GET(request: Request) {
       }
     }
 
+    // 3. Verify Membership in official Roblox Group (740188661 - FEMME'S STUDIO)
+    let isInGroup = false;
+    let roleName = "";
+
+    try {
+      const groupRes = await fetch(
+        `https://groups.roblox.com/v1/users/${userId}/groups/roles`,
+        { cache: "no-store" }
+      );
+      if (groupRes.ok) {
+        const groupData = await groupRes.json();
+        const found = groupData.data?.find(
+          (g: { group?: { id?: number }; role?: { name?: string } }) =>
+            g.group?.id === REQUIRED_GROUP_ID
+        );
+        if (found) {
+          isInGroup = true;
+          roleName = found.role?.name || "Member";
+        }
+      }
+    } catch (err) {
+      console.error("Group check error:", err);
+    }
+
     return NextResponse.json({
       id: userId,
       name: robloxUser.name,
       displayName: robloxUser.displayName,
       avatarUrl,
+      isInGroup,
+      roleName,
+      groupId: REQUIRED_GROUP_ID,
+      groupName: REQUIRED_GROUP_NAME,
+      groupUrl: REQUIRED_GROUP_URL,
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Internal Server Error";
