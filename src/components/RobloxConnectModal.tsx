@@ -60,7 +60,7 @@ export function RobloxConnectModal({
           });
         } else {
           setRobloxData(null);
-          setError("Akun Roblox tidak ditemukan. Cek ejaan username kamu.");
+          setError("Roblox account not found. Please double-check your username.");
         }
       } catch {
         setRobloxData(null);
@@ -112,16 +112,16 @@ export function RobloxConnectModal({
 
           <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#ff007f]/15 text-[#ff007f] text-[10px] font-black uppercase tracking-widest border border-[#ff007f]/30 mb-2">
             <Sparkles className="w-3 h-3" />
-            Verifikasi Voter
+            Voter Verification
           </div>
 
           <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight uppercase italic">
-            Sambungkan Akun Roblox
+            Connect Roblox Account
           </h3>
           <p className="text-xs text-zinc-400 mt-1 max-w-xs mx-auto">
             {pendingVoteContestantName
-              ? `Sambungkan akun Roblox kamu untuk memberikan vote ke @${pendingVoteContestantName}`
-              : "Masukkan username Roblox kamu agar vote terhitung sah & resmi oleh juri"}
+              ? `Connect your Roblox account to cast your vote for @${pendingVoteContestantName}`
+              : "Connect your Roblox account to vote officially in the Fashion Show"}
           </p>
         </div>
 
@@ -129,14 +129,14 @@ export function RobloxConnectModal({
         <div className="space-y-4">
           <div>
             <label className="block text-xs font-black uppercase tracking-wider text-zinc-300 mb-1.5">
-              Username Roblox Kamu
+              Your Roblox Username
             </label>
             <div className="relative">
               <input
                 type="text"
                 value={usernameInput}
                 onChange={(e) => setUsernameInput(e.target.value)}
-                placeholder="Contoh: Builderman"
+                placeholder="e.g. Builderman"
                 autoFocus
                 className="w-full px-4 py-3 bg-zinc-950 border border-white/15 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:border-[#00f2fe] focus:ring-1 focus:ring-[#00f2fe] text-sm font-medium transition-all"
               />
@@ -148,7 +148,7 @@ export function RobloxConnectModal({
             </div>
           </div>
 
-          {/* Preview Akun Roblox Terverifikasi */}
+          {/* Preview Verified Roblox Account */}
           {robloxData && (
             <div className="flex items-center gap-3.5 p-3.5 bg-zinc-950/90 border border-emerald-500/30 rounded-2xl shadow-inner">
               {robloxData.avatarUrl ? (
@@ -168,7 +168,7 @@ export function RobloxConnectModal({
                     {robloxData.displayName}
                   </span>
                   <span className="text-[9px] bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-1.5 py-0.2 rounded font-black uppercase tracking-wider">
-                    Siap Vote
+                    Ready to Vote
                   </span>
                 </div>
                 <p className="text-xs text-zinc-400 font-mono">@{robloxData.username}</p>
@@ -189,11 +189,11 @@ export function RobloxConnectModal({
             className="w-full py-3.5 px-6 rounded-2xl font-black text-xs sm:text-sm tracking-wider uppercase text-white bg-gradient-to-r from-[#ff007f] via-rose-600 to-[#00f2fe] hover:brightness-110 shadow-xl shadow-[#ff007f]/25 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-95"
           >
             <CheckCircle2 className="w-4 h-4" />
-            <span>Konfirmasi &amp; Sambungkan Akun</span>
+            <span>Confirm &amp; Connect Account</span>
           </button>
 
           <p className="text-[10px] text-zinc-500 text-center font-medium">
-            Sistem hanya membaca nama &amp; avatar publik Roblox. Tidak memerlukan password.
+            Only public Roblox name and avatar headshot are retrieved. No password required.
           </p>
         </div>
       </div>

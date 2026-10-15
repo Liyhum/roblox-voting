@@ -33,7 +33,7 @@ export function VotingCard({
     e.stopPropagation();
     if (isVoting) return;
 
-    // WAJIB CONNECT KE ROBLOX SEBELUM BISA VOTE!
+    // Connect Roblox required before voting
     if (!isConnected) {
       onRequireConnect(submission.id, submission.roblox_username);
       return;
@@ -65,7 +65,7 @@ export function VotingCard({
   const handleCopy = (e: React.MouseEvent) => {
     e.stopPropagation();
     navigator.clipboard.writeText(
-      `Yuk dukung outfit @${submission.roblox_username} di TREC KL Fashion Show!`
+      `Check out and vote for @${submission.roblox_username}'s outfit on TREC KL Fashion Show!`
     );
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -93,13 +93,13 @@ export function VotingCard({
         </div>
       )}
 
-      {/* Gambar Foto Model Avatar Fashion Show */}
+      {/* Outfit Image */}
       <div
         className="relative aspect-[4/3] w-full bg-zinc-950 overflow-hidden cursor-pointer"
         onClick={() =>
           onImageClick(
             submission.image_url,
-            `Outfit Runway @${submission.roblox_username}`
+            `Runway Outfit by @${submission.roblox_username}`
           )
         }
       >
@@ -115,12 +115,12 @@ export function VotingCard({
         {/* Hover action overlay */}
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-4">
           <span className="text-xs font-semibold text-zinc-200 flex items-center gap-1.5 backdrop-blur-md bg-black/50 px-2.5 py-1 rounded-lg border border-white/10">
-            <Maximize2 className="w-3.5 h-3.5 text-[#00f2fe]" /> Perbesar Foto
+            <Maximize2 className="w-3.5 h-3.5 text-[#00f2fe]" /> View Fullscreen
           </span>
           <button
             onClick={handleCopy}
             className="p-2 rounded-xl bg-zinc-900/90 text-zinc-300 hover:text-white hover:bg-zinc-800 border border-white/10 transition-colors shadow-lg"
-            title="Bagikan"
+            title="Share"
           >
             {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Share2 className="w-4 h-4" />}
           </button>

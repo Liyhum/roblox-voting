@@ -86,8 +86,7 @@ export function Navbar({
             }`}
           >
             <Trophy className="w-4 h-4 text-amber-400" />
-            <span className="hidden sm:inline">Peringkat</span>
-            <span className="sm:hidden">Top</span>
+            <span>Leaderboard</span>
           </button>
 
           <button
@@ -99,8 +98,8 @@ export function Navbar({
             }`}
           >
             <Plus className="w-4 h-4 stroke-[3]" />
-            <span className="hidden sm:inline">Daftar Runway</span>
-            <span className="sm:hidden">Daftar</span>
+            <span className="hidden sm:inline">Submit Outfit</span>
+            <span className="sm:hidden">Submit</span>
           </button>
         </nav>
 
@@ -131,7 +130,7 @@ export function Navbar({
               <button
                 onClick={onDisconnect}
                 className="p-1.5 rounded-lg text-zinc-500 hover:text-rose-400 hover:bg-white/5 transition-colors ml-1"
-                title="Ganti Akun Roblox"
+                title="Switch Roblox Account"
               >
                 <LogOut className="w-3.5 h-3.5" />
               </button>

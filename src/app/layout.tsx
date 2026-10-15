@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TREC KL Awards - Roblox Community Voting",
-  description: "Official Voting Platform for TREC KL Roblox Hangout. Vote for the best street drip, tuned cars, and nightlife moments!",
+  title: "TREC KL Fashion Show - Roblox Avatar & Runway Awards",
+  description: "Official Voting Platform for TREC KL Roblox Fashion Show. Vote for the best runway outfits and avatar drip!",
   icons: {
     icon: "/trec-kl/icon.png",
   },
@@ -26,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className={`${geistSans.variable} ${geistMono.variable} dark`}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} dark`}>
       <body className="min-h-screen bg-[#06070a] text-zinc-100 antialiased selection:bg-[#ff007f] selection:text-white">
         {children}
       </body>

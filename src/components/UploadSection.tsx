@@ -10,10 +10,6 @@ import {
   Loader2,
   X,
   Sparkles,
-  Shirt,
-  Crown,
-  Zap,
-  Palette,
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
@@ -22,17 +18,9 @@ interface UploadSectionProps {
   onSuccess: () => void;
 }
 
-const FASHION_CATEGORIES = [
-  { id: "streetwear", label: "Streetwear Drip", icon: Shirt },
-  { id: "glamour", label: "High Glamour & Party", icon: Crown },
-  { id: "cyberpunk", label: "Cyberpunk & Neon", icon: Zap },
-  { id: "creative", label: "Anime / Cosplay", icon: Palette },
-];
-
 export function UploadSection({ onSuccess }: UploadSectionProps) {
   const [username, setUsername] = useState("");
   const [caption, setCaption] = useState("");
-  const [category, setCategory] = useState("streetwear");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -73,7 +61,7 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
           });
         } else {
           setRobloxData(null);
-          setRobloxError("Akun Roblox tidak ditemukan. Cek kembali username kamu.");
+          setRobloxError("Roblox account not found. Please verify your username.");
         }
       } catch {
         setRobloxData(null);
@@ -91,12 +79,12 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      setErrorMessage("File harus berupa gambar (JPG, PNG, WEBP).");
+      setErrorMessage("File must be an image (JPG, PNG, WEBP).");
       return;
     }
 
     if (file.size > 8 * 1024 * 1024) {
-      setErrorMessage("Ukuran gambar maksimal 8 MB.");
+      setErrorMessage("Image size must be less than 8MB.");
       return;
     }
 
@@ -118,18 +106,18 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
     setErrorMessage("");
 
     if (!username.trim()) {
-      setErrorMessage("Wajib mengisi Username Roblox.");
+      setErrorMessage("Please enter your Roblox username.");
       return;
     }
 
     if (!selectedFile) {
-      setErrorMessage("Wajib mengunggah foto avatar / outfit kamu.");
+      setErrorMessage("Please upload a photo of your avatar outfit.");
       return;
     }
 
     if (!isSupabaseConfigured) {
       setErrorMessage(
-        "Supabase belum terhubung di .env.local. Silakan isi konfigurasi Supabase terlebih dahulu."
+        "Supabase is not configured in .env.local yet. Please configure it to save uploads."
       );
       return;
     }
@@ -140,7 +128,7 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
       const fileExt = selectedFile.name.split(".").pop() || "png";
       const fileName = `${Date.now()}_${username.trim().toLowerCase().replace(/[^a-z0-9]/g, "_")}.${fileExt}`;
 
-      // Upload ke Storage
+      // Upload to Supabase Storage
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from("roblox_images")
         .upload(fileName, selectedFile, {
@@ -152,24 +140,19 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
         throw new Error(`Upload error: ${uploadError.message}`);
       }
 
-      // Ambil Public URL
+      // Get public URL
       const { data: publicUrlData } = supabase.storage
         .from("roblox_images")
         .getPublicUrl(uploadData.path);
 
       const imageUrl = publicUrlData.publicUrl;
 
-      // Format caption dengan kategori fashion
-      const selectedCatObj = FASHION_CATEGORIES.find((c) => c.id === category);
-      const categoryTag = selectedCatObj ? `[${selectedCatObj.label}] ` : "";
-      const finalCaption = caption.trim() ? `${categoryTag}${caption.trim()}` : categoryTag.trim();
-
-      // Insert ke database
+      // Insert to database
       const { error: dbError } = await supabase.from("submissions").insert([
         {
           roblox_username: username.trim(),
           roblox_avatar_url: robloxData?.avatarUrl || null,
-          caption: finalCaption || null,
+          caption: caption.trim() || null,
           image_url: imageUrl,
           votes: 0,
         },
@@ -191,7 +174,7 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
         onSuccess();
       }, 1500);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Terjadi kesalahan";
+      const msg = err instanceof Error ? err.message : "An unexpected error occurred.";
       setErrorMessage(msg);
     } finally {
       setIsSubmitting(false);
@@ -208,13 +191,13 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
       <div className="text-center mb-8 relative z-10">
         <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#ff007f]/15 text-[#ff007f] text-xs font-black uppercase tracking-widest border border-[#ff007f]/30 mb-3">
           <Sparkles className="w-3.5 h-3.5" />
-          TREC KL Fashion Runway Entry
+          TREC KL Runway Entry
         </div>
         <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight uppercase italic">
-          Daftarkan Avatar ke Runway
+          Submit Runway Outfit
         </h2>
         <p className="text-xs sm:text-sm text-zinc-400 mt-2 max-w-md mx-auto">
-          Tunjukkan outfit dan style avatar Roblox terbaikmu di ajang Fashion Show TREC KL untuk dipilih jadi Best Dressed!
+          Showcase your best avatar style at the TREC KL Fashion Show to be crowned Best Dressed!
         </p>
       </div>
 
@@ -224,10 +207,10 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
             <CheckCircle2 className="w-9 h-9" />
           </div>
           <h3 className="text-xl font-black text-white uppercase tracking-wide">
-            Outfit Berhasil Terdaftar di Runway!
+            Outfit Successfully Registered!
           </h3>
           <p className="text-sm text-zinc-400">
-            Avatarmu sudah tampil di galeri voting. Mengalihkan ke runway...
+            Your avatar is now live on the runway. Redirecting to gallery...
           </p>
         </div>
       ) : (
@@ -235,14 +218,14 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
           {/* Input Username */}
           <div className="space-y-2">
             <label className="block text-xs font-black uppercase tracking-wider text-zinc-300">
-              Username Roblox Model <span className="text-[#ff007f]">*</span>
+              Roblox Model Username <span className="text-[#ff007f]">*</span>
             </label>
             <div className="relative">
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Contoh: YourRobloxName"
+                placeholder="e.g. YourRobloxName"
                 className="w-full px-4 py-3 bg-zinc-950/80 border border-white/10 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:border-[#00f2fe] focus:ring-1 focus:ring-[#00f2fe] transition-all font-medium text-sm"
                 required
               />
@@ -288,38 +271,10 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
             )}
           </div>
 
-          {/* Fashion Category Selector */}
-          <div className="space-y-2">
-            <label className="block text-xs font-black uppercase tracking-wider text-zinc-300">
-              Kategori Gaya / Outfit
-            </label>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {FASHION_CATEGORIES.map((cat) => {
-                const IconComponent = cat.icon;
-                const active = category === cat.id;
-                return (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => setCategory(cat.id)}
-                    className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs font-bold transition-all border ${
-                      active
-                        ? "bg-[#ff007f]/20 text-white border-[#ff007f] shadow-lg shadow-[#ff007f]/20"
-                        : "bg-zinc-950/60 text-zinc-400 border-white/5 hover:border-white/20 hover:text-white"
-                    }`}
-                  >
-                    <IconComponent className={`w-4 h-4 ${active ? "text-[#ff007f]" : "text-zinc-500"}`} />
-                    <span className="truncate">{cat.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
           {/* Upload Dropzone */}
           <div className="space-y-2">
             <label className="block text-xs font-black uppercase tracking-wider text-zinc-300">
-              Foto / Screenshot Outfit Avatar <span className="text-[#ff007f]">*</span>
+              Avatar Outfit Photo / Screenshot <span className="text-[#ff007f]">*</span>
             </label>
 
             {previewUrl ? (
@@ -333,7 +288,7 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
                   type="button"
                   onClick={clearFile}
                   className="absolute top-3 right-3 p-2 rounded-xl bg-black/80 hover:bg-black text-white backdrop-blur-md border border-white/20 transition-all hover:scale-105"
-                  title="Ganti Foto"
+                  title="Change Photo"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -347,10 +302,10 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
                   <UploadCloud className="w-6 h-6 text-[#ff007f]" />
                 </div>
                 <p className="text-sm font-bold text-zinc-200">
-                  Pilih screenshot avatar dari game TREC KL
+                  Click to browse or drag &amp; drop screenshot here
                 </p>
                 <p className="text-xs text-zinc-500 mt-1 font-mono">
-                  PNG, JPG, WEBP hingga 8MB
+                  PNG, JPG, WEBP up to 8MB
                 </p>
               </div>
             )}
@@ -367,13 +322,13 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
           {/* Caption */}
           <div className="space-y-2">
             <label className="block text-xs font-black uppercase tracking-wider text-zinc-300">
-              Tema Outfit / Judul Gaya <span className="text-zinc-600 font-normal lowercase">(opsional)</span>
+              Outfit Title / Style Concept <span className="text-zinc-600 font-normal lowercase">(optional)</span>
             </label>
             <input
               type="text"
               value={caption}
               onChange={(e) => setCaption(e.target.value)}
-              placeholder="Contoh: All Black Cyber Gothic Runway Set"
+              placeholder="e.g. Midnight Cyberpunk Gothic Runway Set"
               maxLength={100}
               className="w-full px-4 py-3 bg-zinc-950/80 border border-white/10 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:border-[#00f2fe] focus:ring-1 focus:ring-[#00f2fe] transition-all font-medium text-sm"
             />
@@ -396,12 +351,12 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
             {isSubmitting ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                <span>Mendaftarkan Avatar ke Runway...</span>
+                <span>Registering Outfit to Runway...</span>
               </>
             ) : (
               <>
                 <ImageIcon className="w-5 h-5" />
-                <span>Daftarkan Outfit Sekarang</span>
+                <span>Submit Outfit to Runway</span>
               </>
             )}
           </button>

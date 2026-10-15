@@ -23,43 +23,11 @@ import { SetupGuide } from "@/components/SetupGuide";
 import { RobloxConnectModal, ConnectedRobloxUser } from "@/components/RobloxConnectModal";
 import { supabase, isSupabaseConfigured, Submission } from "@/lib/supabase";
 
-// Dummy demo entries khusus tema Fashion Show Runway TREC KL
-const DUMMY_SUBMISSIONS: Submission[] = [
-  {
-    id: "demo-1",
-    roblox_username: "Alya_CyberRunway",
-    roblox_avatar_url: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-7B74E7917F72FE5358CF7528387F3B01-Png/150/150/AvatarHeadshot/Png/noFilter",
-    caption: "[Cyberpunk & Neon] Neon Pink Cyberpunk Katana Runway Set ✨",
-    image_url: "/trec-kl/thumb2.png",
-    votes: 184,
-    created_at: new Date(Date.now() - 3600000 * 2).toISOString(),
-  },
-  {
-    id: "demo-2",
-    roblox_username: "ZoukGlamour_KL",
-    roblox_avatar_url: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-0196CA8B98EF720ED3F694F1C07C74FF-Png/150/150/AvatarHeadshot/Png/noFilter",
-    caption: "[High Glamour & Party] Midnight Velvet Party Dress & Crown 👑",
-    image_url: "/trec-kl/thumb1.png",
-    votes: 142,
-    created_at: new Date(Date.now() - 3600000 * 6).toISOString(),
-  },
-  {
-    id: "demo-3",
-    roblox_username: "HypeDrip_Roblox",
-    roblox_avatar_url: "https://tr.rbxcdn.com/30DAY-AvatarHeadshot-9B1D6D238CE9C3691DA869BAE5B4C2A3-Png/150/150/AvatarHeadshot/Png/noFilter",
-    caption: "[Streetwear Drip] Oversized Streetwear Hoodie & Sneakerhead 👟",
-    image_url: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1000&q=80",
-    votes: 95,
-    created_at: new Date(Date.now() - 3600000 * 18).toISOString(),
-  },
-];
-
 export default function Home() {
   const [activeTab, setActiveTab] = useState<"gallery" | "upload" | "leaderboard">("gallery");
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortBy, setSortBy] = useState<"votes" | "newest">("votes");
   const [votedIds, setVotedIds] = useState<string[]>([]);
 
@@ -68,10 +36,10 @@ export default function Home() {
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
   const [pendingVoteTarget, setPendingVoteTarget] = useState<{ id: string; name: string } | null>(null);
 
-  // Modal Lightbox gambar
+  // Modal Lightbox
   const [zoomImage, setZoomImage] = useState<{ url: string; title: string } | null>(null);
 
-  // Load connected Roblox user and voted IDs dari localStorage
+  // Load connected Roblox user and voted IDs from localStorage
   useEffect(() => {
     try {
       const storedUser = localStorage.getItem("trec_connected_roblox_user");
@@ -88,12 +56,12 @@ export default function Home() {
     }
   }, []);
 
-  // Fetch submissions
+  // Fetch submissions from Supabase
   const loadSubmissions = useCallback(async () => {
     setLoading(true);
 
     if (!isSupabaseConfigured) {
-      setSubmissions(DUMMY_SUBMISSIONS);
+      setSubmissions([]);
       setLoading(false);
       return;
     }
@@ -105,9 +73,9 @@ export default function Home() {
         .order(sortBy === "votes" ? "votes" : "created_at", { ascending: false });
 
       if (error) {
-        console.error("Gagal mengambil data submissions:", error);
+        console.error("Failed to load submissions:", error);
       } else if (data) {
-        setSubmissions(data.length > 0 ? (data as Submission[]) : DUMMY_SUBMISSIONS);
+        setSubmissions(data as Submission[]);
       }
     } catch (err) {
       console.error("Error loading submissions:", err);
@@ -134,11 +102,11 @@ export default function Home() {
       )
     );
 
-    if (isSupabaseConfigured && !id.startsWith("demo-")) {
+    if (isSupabaseConfigured) {
       try {
         await supabase.rpc("increment_vote", { row_id: id });
       } catch (err) {
-        console.error("Gagal increment vote:", err);
+        console.error("Failed to increment vote:", err);
       }
     }
   };
@@ -181,32 +149,23 @@ export default function Home() {
       )
     );
 
-    if (isSupabaseConfigured && !id.startsWith("demo-")) {
+    if (isSupabaseConfigured) {
       try {
         await supabase.rpc("decrement_vote", { row_id: id });
       } catch (err) {
-        console.error("Gagal decrement vote:", err);
+        console.error("Failed to decrement vote:", err);
       }
     }
   };
 
-  // Filter & Search
+  // Search filtering
   const filteredSubmissions = submissions
     .filter((sub) => {
       const q = searchQuery.toLowerCase();
-      const matchesSearch =
+      return (
         sub.roblox_username.toLowerCase().includes(q) ||
-        (sub.caption && sub.caption.toLowerCase().includes(q));
-
-      if (!matchesSearch) return false;
-
-      if (categoryFilter === "all") return true;
-      if (categoryFilter === "streetwear") return sub.caption?.toLowerCase().includes("streetwear") || sub.caption?.toLowerCase().includes("drip");
-      if (categoryFilter === "glamour") return sub.caption?.toLowerCase().includes("glamour") || sub.caption?.toLowerCase().includes("dress");
-      if (categoryFilter === "cyberpunk") return sub.caption?.toLowerCase().includes("cyberpunk") || sub.caption?.toLowerCase().includes("neon");
-      if (categoryFilter === "creative") return sub.caption?.toLowerCase().includes("anime") || sub.caption?.toLowerCase().includes("cosplay");
-
-      return true;
+        (sub.caption && sub.caption.toLowerCase().includes(q))
+      );
     })
     .sort((a, b) => {
       if (sortBy === "votes") return b.votes - a.votes;
@@ -237,10 +196,10 @@ export default function Home() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         {!isSupabaseConfigured && <SetupGuide />}
 
-        {/* Tab 1: Galeri Voting Fashion Runway */}
+        {/* Tab 1: Runway Fashion Gallery */}
         {activeTab === "gallery" && (
           <div className="space-y-10">
-            {/* Cinematic Hero Showcase Fashion Show */}
+            {/* Cinematic Hero Showcase */}
             <div className="relative rounded-[32px] overflow-hidden border border-white/10 shadow-2xl bg-[#0c0e14]">
               {/* Background with Cinematic Vignette */}
               <div className="absolute inset-0 z-0">
@@ -254,19 +213,19 @@ export default function Home() {
               </div>
 
               {/* Hero Content */}
-              <div className="relative z-10 p-6 sm:p-12 lg:p-16 flex flex-col justify-between min-h-[420px]">
+              <div className="relative z-10 p-6 sm:p-12 lg:p-16 flex flex-col justify-between min-h-[400px]">
                 <div className="max-w-2xl space-y-4">
                   <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#ff007f]/20 border border-[#ff007f]/40 text-[#ff007f] text-xs font-black uppercase tracking-widest backdrop-blur-md">
                     <Sparkles className="w-3.5 h-3.5" />
-                    TREC KL &bull; Runway Fashion Show 2026
+                    TREC KL &bull; Runway Fashion Show
                   </div>
 
                   <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white uppercase italic leading-none">
-                    VOTE AVATAR RUNWAY TER-DRIP!
+                    VOTE THE BEST AVATAR RUNWAY DRIP!
                   </h1>
 
                   <p className="text-sm sm:text-base text-zinc-300 leading-relaxed max-w-xl">
-                    Panggung fashion show paling hype di Roblox Malaysia. Sambungkan akun Roblox kamu, pilih outfit avatar model terbaik, atau daftarkan avatarmu untuk memenangkan gelar <b className="text-amber-400">Best Dressed Model</b>!
+                    The premier fashion show &amp; nightlife hangout on Roblox. Connect your Roblox account, vote for your favorite avatar styles, or submit your outfit to win <b className="text-amber-400">Best Dressed</b>!
                   </p>
                 </div>
 
@@ -278,7 +237,7 @@ export default function Home() {
                       className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#ff007f] to-rose-600 hover:brightness-110 text-white font-black text-xs sm:text-sm tracking-wider uppercase shadow-xl shadow-[#ff007f]/30 transition-all flex items-center gap-2 active:scale-95"
                     >
                       <Plus className="w-4 h-4 stroke-[3]" />
-                      Daftar Runway Fashion
+                      Submit Outfit
                     </button>
 
                     <button
@@ -286,7 +245,7 @@ export default function Home() {
                       className="px-6 py-3 rounded-2xl bg-zinc-900/90 hover:bg-zinc-800 text-zinc-200 border border-white/10 font-black text-xs sm:text-sm tracking-wider uppercase transition-all flex items-center gap-2"
                     >
                       <Trophy className="w-4 h-4 text-amber-400" />
-                      Peringkat Model
+                      Leaderboard
                     </button>
 
                     {!connectedUser && (
@@ -309,7 +268,7 @@ export default function Home() {
                       className="px-4 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white border border-white/10 font-bold text-xs tracking-wider uppercase transition-all flex items-center gap-1.5"
                     >
                       <Gamepad2 className="w-4 h-4 text-[#00f2fe]" />
-                      <span>Masuk Game</span>
+                      <span>Play Game</span>
                       <ExternalLink className="w-3 h-3 text-zinc-500" />
                     </a>
                   </div>
@@ -321,7 +280,7 @@ export default function Home() {
                         {submissions.length}
                       </div>
                       <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-                        Total Model
+                        Total Models
                       </div>
                     </div>
                     <div className="w-[1px] h-8 bg-white/10" />
@@ -330,35 +289,12 @@ export default function Home() {
                         {totalVotesCount.toLocaleString()}
                       </div>
                       <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">
-                        Suara Juri &amp; Voter
+                        Votes Cast
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* Category Fashion Chips Bar */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-              {[
-                { id: "all", label: "Semua Outfit Runway" },
-                { id: "streetwear", label: "🧢 Streetwear Drip" },
-                { id: "glamour", label: "👗 High Glamour & Party" },
-                { id: "cyberpunk", label: "⚡ Cyberpunk & Neon" },
-                { id: "creative", label: "🎨 Anime / Cosplay" },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setCategoryFilter(tab.id)}
-                  className={`px-4 py-2 rounded-2xl text-xs font-black tracking-wider uppercase whitespace-nowrap transition-all border ${
-                    categoryFilter === tab.id
-                      ? "bg-white text-zinc-950 border-white shadow-lg"
-                      : "bg-[#0c0e14]/80 text-zinc-400 border-white/10 hover:border-white/20 hover:text-white"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
             </div>
 
             {/* Filter & Search Bar */}
@@ -370,7 +306,7 @@ export default function Home() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Cari Username model atau gaya outfit..."
+                  placeholder="Search model username or outfit title..."
                   className="w-full pl-11 pr-4 py-2.5 bg-zinc-950/80 border border-white/10 rounded-2xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-[#ff007f] transition-all"
                 />
               </div>
@@ -378,7 +314,7 @@ export default function Home() {
               {/* Sort Controls */}
               <div className="flex items-center gap-2.5">
                 <span className="text-xs font-black uppercase tracking-wider text-zinc-400 hidden sm:inline flex items-center gap-1.5">
-                  <SlidersHorizontal className="w-3.5 h-3.5" /> Urutkan:
+                  <SlidersHorizontal className="w-3.5 h-3.5" /> Sort:
                 </span>
                 <div className="flex bg-zinc-950/90 p-1 rounded-2xl border border-white/10 text-xs">
                   <button
@@ -390,7 +326,7 @@ export default function Home() {
                     }`}
                   >
                     <Flame className="w-3.5 h-3.5 text-amber-300" />
-                    Top Vote
+                    Top Votes
                   </button>
                   <button
                     onClick={() => setSortBy("newest")}
@@ -401,14 +337,14 @@ export default function Home() {
                     }`}
                   >
                     <Clock className="w-3.5 h-3.5 text-[#00f2fe]" />
-                    Terbaru
+                    Newest
                   </button>
                 </div>
 
                 <button
                   onClick={() => loadSubmissions()}
                   className="p-2.5 rounded-2xl bg-zinc-950/90 border border-white/10 text-zinc-400 hover:text-white hover:border-[#ff007f] transition-colors shadow-md"
-                  title="Refresh Data"
+                  title="Refresh List"
                 >
                   <RefreshCw className="w-4 h-4" />
                 </button>
@@ -419,20 +355,24 @@ export default function Home() {
             {loading ? (
               <div className="py-24 text-center">
                 <div className="w-10 h-10 border-2 border-[#ff007f] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-                <p className="text-sm font-semibold text-zinc-400">Memuat model runway TREC KL...</p>
+                <p className="text-sm font-semibold text-zinc-400">Loading runway models...</p>
               </div>
             ) : filteredSubmissions.length === 0 ? (
               <div className="text-center py-20 bg-[#0c0e14]/60 border border-white/10 rounded-3xl p-8 backdrop-blur-xl">
-                <p className="text-zinc-400 text-sm">
+                <Trophy className="w-12 h-12 text-zinc-600 mx-auto mb-3" />
+                <h3 className="text-lg font-black text-white uppercase tracking-wider">
+                  {searchQuery ? "No models match your search" : "The Runway is Ready for You!"}
+                </h3>
+                <p className="text-zinc-400 text-xs sm:text-sm mt-1 max-w-md mx-auto">
                   {searchQuery
-                    ? `Tidak ditemukan model dengan kata kunci "${searchQuery}"`
-                    : "Belum ada outfit yang masuk untuk kategori ini."}
+                    ? `No entries found matching "${searchQuery}". Try a different keyword.`
+                    : "No outfits have been submitted yet. Be the first to register your avatar and win votes!"}
                 </p>
                 <button
                   onClick={() => setActiveTab("upload")}
-                  className="mt-4 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-[#ff007f] to-rose-600 text-white text-xs font-black uppercase tracking-wider"
+                  className="mt-5 px-6 py-3 rounded-2xl bg-gradient-to-r from-[#ff007f] to-rose-600 text-white text-xs font-black uppercase tracking-wider shadow-lg shadow-[#ff007f]/25 hover:brightness-110 transition-all"
                 >
-                  Daftarkan Avatarmu ke Runway!
+                  Submit Your Avatar Now!
                 </button>
               </div>
             ) : (
@@ -442,7 +382,7 @@ export default function Home() {
                     key={sub.id}
                     submission={sub}
                     hasVoted={votedIds.includes(sub.id)}
-                    onVote={() => executeVote(sub.id)}
+                    onVote={() => handleVoteRequest(sub.id, sub.roblox_username)}
                     onUnvote={handleUnvote}
                     onImageClick={(url, title) => setZoomImage({ url, title })}
                     onRequireConnect={(id, contestantName) => {
@@ -488,7 +428,7 @@ export default function Home() {
         pendingVoteContestantName={pendingVoteTarget?.name}
       />
 
-      {/* Lightbox Modal Gambar */}
+      {/* Lightbox Modal */}
       {zoomImage && (
         <div
           className="fixed inset-0 z-50 bg-black/95 backdrop-blur-2xl flex items-center justify-center p-4"
