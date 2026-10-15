@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Trophy, Medal, Crown, Flame, User } from "lucide-react";
+import { Trophy, Medal, Crown, Flame } from "lucide-react";
 import { Submission } from "@/lib/supabase";
 
 interface LeaderboardProps {
@@ -10,16 +10,17 @@ interface LeaderboardProps {
 }
 
 export function Leaderboard({ submissions, onImageClick }: LeaderboardProps) {
-  // Sort submissions by votes descending
   const sorted = [...submissions].sort((a, b) => b.votes - a.votes);
 
   if (sorted.length === 0) {
     return (
-      <div className="text-center py-16 bg-zinc-900/50 border border-zinc-800 rounded-3xl max-w-xl mx-auto p-8">
-        <Trophy className="w-12 h-12 text-zinc-600 mx-auto mb-3" />
-        <h3 className="text-lg font-bold text-zinc-300">Belum Ada Karya Masuk</h3>
-        <p className="text-sm text-zinc-500 mt-1">
-          Jadilah orang pertama yang mengirimkan avatar untuk memimpin papan peringkat!
+      <div className="text-center py-20 bg-[#0c0e14]/80 border border-white/10 rounded-3xl max-w-xl mx-auto p-8 backdrop-blur-xl">
+        <Trophy className="w-14 h-14 text-zinc-600 mx-auto mb-3" />
+        <h3 className="text-lg font-black text-white uppercase tracking-wider">
+          Belum Ada Kontestan Terdaftar
+        </h3>
+        <p className="text-xs sm:text-sm text-zinc-400 mt-1 max-w-sm mx-auto">
+          Jadilah yang pertama mengunggah screenshot di TREC KL untuk memimpin posisi VIP #1!
         </p>
       </div>
     );
@@ -31,31 +32,34 @@ export function Leaderboard({ submissions, onImageClick }: LeaderboardProps) {
   const rest = sorted.slice(3);
 
   return (
-    <div className="space-y-10 max-w-4xl mx-auto">
+    <div className="space-y-12 max-w-5xl mx-auto">
       {/* Title */}
       <div className="text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-bold border border-amber-500/20 mb-2">
-          <Trophy className="w-3.5 h-3.5" />
-          Papan Peringkat Komunitas
+        <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-black uppercase tracking-widest border border-amber-500/30 mb-3">
+          <Crown className="w-3.5 h-3.5" />
+          TREC KL VIP Hall of Fame
         </div>
-        <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-          Peringkat Teratas (Most Voted)
+        <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight uppercase italic">
+          Papan Peringkat Terpopuler
         </h2>
         <p className="text-xs sm:text-sm text-zinc-400 mt-1">
-          Peringkat diperbarui secara langsung berdasarkan jumlah vote komunitas
+          Daftar kontestan dengan perolehan suara terbanyak dari komunitas TREC KL
         </p>
       </div>
 
-      {/* Top 3 Podium Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 items-end pt-4">
+      {/* Top 3 Podium */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 items-end pt-4">
         {/* Rank 2 */}
         {top2 && (
-          <div className="order-2 sm:order-1 bg-zinc-900/90 border border-slate-700/60 rounded-2xl p-5 text-center flex flex-col items-center relative shadow-lg">
-            <div className="w-9 h-9 rounded-full bg-slate-300 text-zinc-950 font-black flex items-center justify-center text-sm shadow-md mb-3">
+          <div className="order-2 sm:order-1 bg-[#0c0e14]/90 backdrop-blur-xl border border-slate-700/50 rounded-3xl p-6 text-center flex flex-col items-center relative shadow-xl hover:border-slate-500 transition-all">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-slate-200 to-zinc-400 text-zinc-950 font-black flex items-center justify-center text-sm shadow-lg mb-3">
               #2
             </div>
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-300 mb-2">
+              Silver VIP
+            </span>
             <div
-              className="w-24 h-24 rounded-2xl overflow-hidden border-2 border-slate-400 mb-3 cursor-pointer shadow-md"
+              className="w-28 h-28 rounded-2xl overflow-hidden border-2 border-slate-400/80 mb-3.5 cursor-pointer shadow-lg group relative"
               onClick={() =>
                 onImageClick(top2.image_url, `Karya @${top2.roblox_username}`)
               }
@@ -63,30 +67,32 @@ export function Leaderboard({ submissions, onImageClick }: LeaderboardProps) {
               <img
                 src={top2.image_url}
                 alt={top2.roblox_username}
-                className="w-full h-full object-cover hover:scale-110 transition-transform"
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
               />
             </div>
-            <h4 className="font-bold text-sm text-white truncate max-w-full">
+            <h4 className="font-black text-base text-white truncate max-w-full">
               @{top2.roblox_username}
             </h4>
-            <div className="mt-2 px-3 py-1 rounded-full bg-slate-800 text-slate-200 text-xs font-bold flex items-center gap-1">
+            <div className="mt-3 px-3.5 py-1.5 rounded-full bg-slate-800 text-slate-200 text-xs font-black flex items-center gap-1.5 border border-white/10 font-mono">
               <Flame className="w-3.5 h-3.5 text-orange-400" />
-              <span>{top2.votes.toLocaleString()} Vote</span>
+              <span>{top2.votes.toLocaleString()} VOTES</span>
             </div>
           </div>
         )}
 
         {/* Rank 1 (Champion) */}
         {top1 && (
-          <div className="order-1 sm:order-2 bg-gradient-to-b from-amber-950/40 via-zinc-900 to-zinc-900 border-2 border-amber-500/60 rounded-2xl p-6 text-center flex flex-col items-center relative shadow-2xl shadow-amber-950/30 -translate-y-2">
-            <div className="absolute -top-4 w-9 h-9 rounded-full bg-amber-400 text-zinc-950 font-black flex items-center justify-center text-sm shadow-xl shadow-amber-400/30">
-              <Crown className="w-5 h-5 text-zinc-950 fill-zinc-950" />
+          <div className="order-1 sm:order-2 bg-gradient-to-b from-amber-950/40 via-[#0c0e14] to-[#0c0e14] backdrop-blur-2xl border-2 border-amber-500/80 rounded-3xl p-7 text-center flex flex-col items-center relative shadow-2xl neon-glow-amber -translate-y-3">
+            <div className="absolute -top-5 w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-400 to-yellow-500 text-zinc-950 font-black flex items-center justify-center text-base shadow-xl shadow-amber-400/40">
+              <Crown className="w-6 h-6 fill-zinc-950 text-zinc-950" />
             </div>
-            <span className="text-[10px] font-black uppercase tracking-wider text-amber-400 mt-2 mb-2">
-              Juara 1 Sementara
+
+            <span className="text-[11px] font-black uppercase tracking-widest text-amber-400 mt-2 mb-2 animate-pulse">
+              👑 KING OF TREC KL
             </span>
+
             <div
-              className="w-32 h-32 rounded-2xl overflow-hidden border-4 border-amber-400 mb-3 cursor-pointer shadow-xl shadow-amber-500/20"
+              className="w-36 h-36 rounded-2xl overflow-hidden border-4 border-amber-400 mb-4 cursor-pointer shadow-2xl shadow-amber-500/30 group relative"
               onClick={() =>
                 onImageClick(top1.image_url, `Karya @${top1.roblox_username}`)
               }
@@ -94,32 +100,37 @@ export function Leaderboard({ submissions, onImageClick }: LeaderboardProps) {
               <img
                 src={top1.image_url}
                 alt={top1.roblox_username}
-                className="w-full h-full object-cover hover:scale-110 transition-transform"
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
               />
             </div>
-            <h4 className="font-black text-base text-amber-200 truncate max-w-full">
+
+            <h4 className="font-black text-lg sm:text-xl text-amber-200 truncate max-w-full">
               @{top1.roblox_username}
             </h4>
             {top1.caption && (
-              <p className="text-xs text-zinc-400 line-clamp-1 italic mt-0.5">
+              <p className="text-xs text-zinc-400 line-clamp-1 italic mt-1 max-w-[200px]">
                 "{top1.caption}"
               </p>
             )}
-            <div className="mt-3 px-4 py-1.5 rounded-full bg-amber-400 text-zinc-950 text-xs font-black flex items-center gap-1.5 shadow-md">
+
+            <div className="mt-4 px-5 py-2 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 text-zinc-950 text-xs font-black flex items-center gap-1.5 shadow-lg shadow-amber-400/25 font-mono">
               <Flame className="w-4 h-4 fill-zinc-950" />
-              <span>{top1.votes.toLocaleString()} VOTE</span>
+              <span>{top1.votes.toLocaleString()} TOTAL VOTES</span>
             </div>
           </div>
         )}
 
         {/* Rank 3 */}
         {top3 && (
-          <div className="order-3 sm:order-3 bg-zinc-900/90 border border-amber-900/60 rounded-2xl p-5 text-center flex flex-col items-center relative shadow-lg">
-            <div className="w-9 h-9 rounded-full bg-amber-700 text-white font-black flex items-center justify-center text-sm shadow-md mb-3">
+          <div className="order-3 sm:order-3 bg-[#0c0e14]/90 backdrop-blur-xl border border-amber-900/60 rounded-3xl p-6 text-center flex flex-col items-center relative shadow-xl hover:border-amber-700 transition-all">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-700 to-orange-800 text-white font-black flex items-center justify-center text-sm shadow-lg mb-3">
               #3
             </div>
+            <span className="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-2">
+              Bronze VIP
+            </span>
             <div
-              className="w-24 h-24 rounded-2xl overflow-hidden border-2 border-amber-700 mb-3 cursor-pointer shadow-md"
+              className="w-28 h-28 rounded-2xl overflow-hidden border-2 border-amber-700 mb-3.5 cursor-pointer shadow-lg group relative"
               onClick={() =>
                 onImageClick(top3.image_url, `Karya @${top3.roblox_username}`)
               }
@@ -127,15 +138,15 @@ export function Leaderboard({ submissions, onImageClick }: LeaderboardProps) {
               <img
                 src={top3.image_url}
                 alt={top3.roblox_username}
-                className="w-full h-full object-cover hover:scale-110 transition-transform"
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
               />
             </div>
-            <h4 className="font-bold text-sm text-white truncate max-w-full">
+            <h4 className="font-black text-base text-white truncate max-w-full">
               @{top3.roblox_username}
             </h4>
-            <div className="mt-2 px-3 py-1 rounded-full bg-amber-950/60 text-amber-300 text-xs font-bold flex items-center gap-1">
+            <div className="mt-3 px-3.5 py-1.5 rounded-full bg-amber-950/60 text-amber-300 text-xs font-black flex items-center gap-1.5 border border-amber-800/40 font-mono">
               <Flame className="w-3.5 h-3.5 text-orange-400" />
-              <span>{top3.votes.toLocaleString()} Vote</span>
+              <span>{top3.votes.toLocaleString()} VOTES</span>
             </div>
           </div>
         )}
@@ -143,27 +154,27 @@ export function Leaderboard({ submissions, onImageClick }: LeaderboardProps) {
 
       {/* Ranks 4+ List */}
       {rest.length > 0 && (
-        <div className="bg-zinc-900/80 border border-zinc-800 rounded-2xl overflow-hidden divide-y divide-zinc-800/80">
-          <div className="p-4 bg-zinc-950/50 flex items-center justify-between text-xs font-bold text-zinc-400 uppercase tracking-wider">
-            <div className="flex items-center gap-4">
+        <div className="bg-[#0c0e14]/80 backdrop-blur-xl border border-white/10 rounded-3xl overflow-hidden divide-y divide-white/10 shadow-2xl">
+          <div className="p-4 bg-zinc-950/60 flex items-center justify-between text-xs font-black text-zinc-400 uppercase tracking-widest">
+            <div className="flex items-center gap-6">
               <span>Posisi</span>
               <span>Peserta</span>
             </div>
-            <span>Perolehan Vote</span>
+            <span>Perolehan Suara</span>
           </div>
 
           {rest.map((sub, index) => (
             <div
               key={sub.id}
-              className="p-4 flex items-center justify-between hover:bg-zinc-800/40 transition-colors"
+              className="p-4.5 flex items-center justify-between hover:bg-white/5 transition-colors"
             >
               <div className="flex items-center gap-4">
-                <span className="w-6 text-sm font-black text-zinc-500 text-center">
+                <span className="w-8 text-sm font-black text-zinc-500 font-mono text-center">
                   #{index + 4}
                 </span>
 
                 <div
-                  className="w-12 h-12 rounded-xl overflow-hidden border border-zinc-700 bg-zinc-950 cursor-pointer shrink-0"
+                  className="w-12 h-12 rounded-2xl overflow-hidden border border-white/15 bg-zinc-950 cursor-pointer shrink-0 shadow-md group relative"
                   onClick={() =>
                     onImageClick(sub.image_url, `Karya @${sub.roblox_username}`)
                   }
@@ -171,24 +182,24 @@ export function Leaderboard({ submissions, onImageClick }: LeaderboardProps) {
                   <img
                     src={sub.image_url}
                     alt={sub.roblox_username}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform"
                   />
                 </div>
 
                 <div>
-                  <h5 className="font-bold text-sm text-zinc-200">
+                  <h5 className="font-black text-sm text-white">
                     @{sub.roblox_username}
                   </h5>
                   {sub.caption && (
-                    <p className="text-xs text-zinc-500 line-clamp-1">
+                    <p className="text-xs text-zinc-400 line-clamp-1 mt-0.5">
                       {sub.caption}
                     </p>
                   )}
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5 font-bold text-sm text-zinc-300">
-                <Medal className="w-4 h-4 text-zinc-500" />
+              <div className="flex items-center gap-2 font-black text-sm text-zinc-300 font-mono">
+                <Medal className="w-4 h-4 text-[#ff007f]" />
                 <span>{sub.votes.toLocaleString()}</span>
               </div>
             </div>

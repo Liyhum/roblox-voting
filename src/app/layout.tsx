@@ -13,8 +13,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Roblox Vote - Pilih Avatar & Karya Terbaik",
-  description: "Web voting karya dan avatar Roblox komunitas. Kirim karyamu dan dapatkan vote!",
+  title: "TREC KL Awards - Roblox Community Voting",
+  description: "Official Voting Platform for TREC KL Roblox Hangout. Vote for the best street drip, tuned cars, and nightlife moments!",
+  icons: {
+    icon: "/trec-kl/icon.png",
+  },
 };
 
 export default function RootLayout({
@@ -24,7 +27,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id" className={`${geistSans.variable} ${geistMono.variable} dark`}>
-      <body className="min-h-screen bg-zinc-950 text-zinc-100 antialiased">{children}</body>
+      <body className="min-h-screen bg-[#06070a] text-zinc-100 antialiased selection:bg-[#ff007f] selection:text-white">
+        {children}
+      </body>
     </html>
   );
 }
