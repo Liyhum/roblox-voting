@@ -499,10 +499,19 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="border-t border-white/10 bg-[#06070a] py-8 mt-16 text-center text-xs text-zinc-500 relative z-10">
-        <div className="max-w-7xl mx-auto px-4 space-y-2">
+        <div className="max-w-7xl mx-auto px-4 space-y-3">
           <p className="font-bold text-zinc-400 uppercase tracking-widest">
             TREC KL Fashion Runway &bull; Roblox Avatar &amp; Outfits Awards
           </p>
+          <div className="flex items-center justify-center gap-4 text-xs font-semibold text-zinc-400">
+            <a href="/privacy" className="hover:text-white transition-colors underline underline-offset-4">
+              Privacy Policy
+            </a>
+            <span className="text-zinc-600">&bull;</span>
+            <a href="/terms" className="hover:text-white transition-colors underline underline-offset-4">
+              Terms of Service
+            </a>
+          </div>
           <p className="text-[11px] text-zinc-600">
             Official Game:{" "}
             <a
