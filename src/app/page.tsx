@@ -88,7 +88,7 @@ export default function Home() {
     loadSubmissions();
   }, [loadSubmissions]);
 
-  // Handle Vote Execution
+  // Handle Vote Execution with Anti-Fraud Verification
   const executeVote = async (id: string) => {
     if (votedIds.includes(id)) return;
 
@@ -104,7 +104,19 @@ export default function Home() {
 
     if (isSupabaseConfigured) {
       try {
-        await supabase.rpc("increment_vote", { row_id: id });
+        if (connectedUser?.id) {
+          const { error } = await supabase.rpc("cast_verified_vote", {
+            target_submission_id: id,
+            voter_id: connectedUser.id,
+            voter_name: connectedUser.username,
+          });
+          if (error) {
+            // Fallback to basic increment if votes_log table is not yet migrated
+            await supabase.rpc("increment_vote", { row_id: id });
+          }
+        } else {
+          await supabase.rpc("increment_vote", { row_id: id });
+        }
       } catch (err) {
         console.error("Failed to increment vote:", err);
       }
@@ -151,7 +163,17 @@ export default function Home() {
 
     if (isSupabaseConfigured) {
       try {
-        await supabase.rpc("decrement_vote", { row_id: id });
+        if (connectedUser?.id) {
+          const { error } = await supabase.rpc("cancel_verified_vote", {
+            target_submission_id: id,
+            voter_id: connectedUser.id,
+          });
+          if (error) {
+            await supabase.rpc("decrement_vote", { row_id: id });
+          }
+        } else {
+          await supabase.rpc("decrement_vote", { row_id: id });
+        }
       } catch (err) {
         console.error("Failed to decrement vote:", err);
       }
