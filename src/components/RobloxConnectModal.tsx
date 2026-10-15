@@ -1,7 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X, CheckCircle2, AlertCircle, Loader2, Sparkles, ShieldCheck } from "lucide-react";
+import {
+  X,
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
+  Sparkles,
+  ShieldCheck,
+  ExternalLink,
+} from "lucide-react";
 
 export interface ConnectedRobloxUser {
   id: number;
@@ -15,6 +23,7 @@ interface RobloxConnectModalProps {
   onClose: () => void;
   onConnected: (user: ConnectedRobloxUser) => void;
   pendingVoteContestantName?: string;
+  isOAuthConfigured?: boolean;
 }
 
 export function RobloxConnectModal({
@@ -22,6 +31,7 @@ export function RobloxConnectModal({
   onClose,
   onConnected,
   pendingVoteContestantName,
+  isOAuthConfigured = false,
 }: RobloxConnectModalProps) {
   const [usernameInput, setUsernameInput] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
@@ -74,11 +84,15 @@ export function RobloxConnectModal({
 
   if (!isOpen) return null;
 
-  const handleConfirm = () => {
+  const handleManualConfirm = () => {
     if (!robloxData) return;
     localStorage.setItem("trec_connected_roblox_user", JSON.stringify(robloxData));
     onConnected(robloxData);
     onClose();
+  };
+
+  const handleOfficialRobloxLogin = () => {
+    window.location.href = "/api/auth/roblox/login";
   };
 
   return (
@@ -112,7 +126,7 @@ export function RobloxConnectModal({
 
           <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#ff007f]/15 text-[#ff007f] text-[10px] font-black uppercase tracking-widest border border-[#ff007f]/30 mb-2">
             <Sparkles className="w-3 h-3" />
-            Voter Verification
+            Official Verification
           </div>
 
           <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight uppercase italic">
@@ -121,12 +135,46 @@ export function RobloxConnectModal({
           <p className="text-xs text-zinc-400 mt-1 max-w-xs mx-auto">
             {pendingVoteContestantName
               ? `Connect your Roblox account to cast your vote for @${pendingVoteContestantName}`
-              : "Connect your Roblox account to vote officially in the Fashion Show"}
+              : "Connect your official Roblox account to vote in the Fashion Show"}
           </p>
         </div>
 
-        {/* Input Username */}
         <div className="space-y-4">
+          {/* Official Roblox Login Button */}
+          {isOAuthConfigured ? (
+            <button
+              onClick={handleOfficialRobloxLogin}
+              className="w-full py-4 px-6 rounded-2xl font-black text-xs sm:text-sm tracking-wider uppercase text-white bg-gradient-to-r from-emerald-600 via-teal-600 to-[#00f2fe] hover:brightness-110 shadow-xl shadow-emerald-600/30 transition-all flex items-center justify-center gap-2.5 active:scale-95 group"
+            >
+              <img
+                src="/trec-kl/icon.png"
+                alt="Roblox"
+                className="w-5 h-5 rounded-lg group-hover:scale-110 transition-transform"
+              />
+              <span>Log in with Official Roblox</span>
+              <ExternalLink className="w-4 h-4 text-white/80" />
+            </button>
+          ) : (
+            <div className="p-3 bg-zinc-950/80 border border-white/10 rounded-2xl text-left space-y-1">
+              <p className="text-[11px] font-bold text-amber-400 flex items-center gap-1">
+                <Sparkles className="w-3.5 h-3.5" /> Roblox OAuth Setup Available
+              </p>
+              <p className="text-[10px] text-zinc-400">
+                To enable 1-click official Roblox login, enter <code className="text-zinc-200">ROBLOX_CLIENT_ID</code> in <code className="text-zinc-200">.env.local</code>. Meanwhile, you can connect via username below:
+              </p>
+            </div>
+          )}
+
+          {/* Divider */}
+          <div className="flex items-center gap-3 my-2">
+            <div className="flex-1 h-[1px] bg-white/10" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+              {isOAuthConfigured ? "Or Verify with Username" : "Connect via Username"}
+            </span>
+            <div className="flex-1 h-[1px] bg-white/10" />
+          </div>
+
+          {/* Manual Username Input */}
           <div>
             <label className="block text-xs font-black uppercase tracking-wider text-zinc-300 mb-1.5">
               Your Roblox Username
@@ -137,7 +185,6 @@ export function RobloxConnectModal({
                 value={usernameInput}
                 onChange={(e) => setUsernameInput(e.target.value)}
                 placeholder="e.g. Builderman"
-                autoFocus
                 className="w-full px-4 py-3 bg-zinc-950 border border-white/15 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:border-[#00f2fe] focus:ring-1 focus:ring-[#00f2fe] text-sm font-medium transition-all"
               />
               {isVerifying && (
@@ -148,7 +195,7 @@ export function RobloxConnectModal({
             </div>
           </div>
 
-          {/* Preview Verified Roblox Account */}
+          {/* Preview Verified Account */}
           {robloxData && (
             <div className="flex items-center gap-3.5 p-3.5 bg-zinc-950/90 border border-emerald-500/30 rounded-2xl shadow-inner">
               {robloxData.avatarUrl ? (
@@ -182,18 +229,18 @@ export function RobloxConnectModal({
             </p>
           )}
 
-          {/* Action Button */}
+          {/* Confirm Button */}
           <button
-            onClick={handleConfirm}
+            onClick={handleManualConfirm}
             disabled={!robloxData}
             className="w-full py-3.5 px-6 rounded-2xl font-black text-xs sm:text-sm tracking-wider uppercase text-white bg-gradient-to-r from-[#ff007f] via-rose-600 to-[#00f2fe] hover:brightness-110 shadow-xl shadow-[#ff007f]/25 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-95"
           >
             <CheckCircle2 className="w-4 h-4" />
-            <span>Confirm &amp; Connect Account</span>
+            <span>Confirm &amp; Connect Username</span>
           </button>
 
           <p className="text-[10px] text-zinc-500 text-center font-medium">
-            Only public Roblox name and avatar headshot are retrieved. No password required.
+            Protected with anti-fraud encryption. Only public Roblox avatar data is read.
           </p>
         </div>
       </div>

@@ -35,11 +35,12 @@ export default function Home() {
   const [connectedUser, setConnectedUser] = useState<ConnectedRobloxUser | null>(null);
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
   const [pendingVoteTarget, setPendingVoteTarget] = useState<{ id: string; name: string } | null>(null);
+  const [isOAuthConfigured, setIsOAuthConfigured] = useState(false);
 
   // Modal Lightbox
   const [zoomImage, setZoomImage] = useState<{ url: string; title: string } | null>(null);
 
-  // Load connected Roblox user and voted IDs from localStorage
+  // Load connected Roblox user and voted IDs from localStorage + check official OAuth session
   useEffect(() => {
     try {
       const storedUser = localStorage.getItem("trec_connected_roblox_user");
@@ -54,6 +55,18 @@ export default function Home() {
     } catch {
       // ignore
     }
+
+    // Check official Roblox OAuth server session
+    fetch("/api/auth/me")
+      .then((res) => res.json())
+      .then((data) => {
+        setIsOAuthConfigured(Boolean(data.isOAuthConfigured));
+        if (data.user) {
+          setConnectedUser(data.user);
+          localStorage.setItem("trec_connected_roblox_user", JSON.stringify(data.user));
+        }
+      })
+      .catch(() => {});
   }, []);
 
   // Fetch submissions from Supabase
@@ -142,9 +155,14 @@ export default function Home() {
     }
   };
 
-  const handleDisconnect = () => {
+  const handleDisconnect = async () => {
     localStorage.removeItem("trec_connected_roblox_user");
     setConnectedUser(null);
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {
+      // ignore
+    }
   };
 
   // Handle Unvote
@@ -448,6 +466,7 @@ export default function Home() {
         }}
         onConnected={handleUserConnected}
         pendingVoteContestantName={pendingVoteTarget?.name}
+        isOAuthConfigured={isOAuthConfigured}
       />
 
       {/* Lightbox Modal */}
