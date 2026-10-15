@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Heart, User, Maximize2, Share2, Check, Sparkles } from "lucide-react";
+import { Heart, User, Maximize2, Share2, Check, Sparkles, Shirt } from "lucide-react";
 import confetti from "canvas-confetti";
 import { Submission } from "@/lib/supabase";
 
@@ -11,6 +11,8 @@ interface VotingCardProps {
   onVote: (id: string) => Promise<void>;
   onUnvote?: (id: string) => Promise<void>;
   onImageClick: (url: string, title: string) => void;
+  onRequireConnect: (id: string, contestantName: string) => void;
+  isConnected: boolean;
   rank?: number;
 }
 
@@ -20,6 +22,8 @@ export function VotingCard({
   onVote,
   onUnvote,
   onImageClick,
+  onRequireConnect,
+  isConnected,
   rank,
 }: VotingCardProps) {
   const [isVoting, setIsVoting] = useState(false);
@@ -28,6 +32,12 @@ export function VotingCard({
   const handleVoteClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (isVoting) return;
+
+    // WAJIB CONNECT KE ROBLOX SEBELUM BISA VOTE!
+    if (!isConnected) {
+      onRequireConnect(submission.id, submission.roblox_username);
+      return;
+    }
 
     setIsVoting(true);
     try {
@@ -38,7 +48,6 @@ export function VotingCard({
         const x = (rect.left + rect.width / 2) / window.innerWidth;
         const y = (rect.top + rect.height / 2) / window.innerHeight;
 
-        // Cyberpunk nightlife confetti
         confetti({
           particleCount: 50,
           spread: 70,
@@ -56,7 +65,7 @@ export function VotingCard({
   const handleCopy = (e: React.MouseEvent) => {
     e.stopPropagation();
     navigator.clipboard.writeText(
-      `Yuk vote foto @${submission.roblox_username} di TREC KL Roblox Awards!`
+      `Yuk dukung outfit @${submission.roblox_username} di TREC KL Fashion Show!`
     );
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -67,12 +76,12 @@ export function VotingCard({
       {/* Glow highlight on top-right */}
       <div className="absolute -top-16 -right-16 w-32 h-32 bg-[#ff007f]/10 rounded-full blur-2xl pointer-events-none group-hover:bg-[#ff007f]/20 transition-all" />
 
-      {/* Rank Badge if provided */}
+      {/* Rank Badge if in Leaderboard or Top 3 */}
       {rank && (
         <div
           className={`absolute top-3.5 left-3.5 z-20 px-3 py-1 rounded-xl text-xs font-black tracking-wider shadow-xl backdrop-blur-md flex items-center gap-1.5 ${
             rank === 1
-              ? "bg-gradient-to-r from-amber-400 to-yellow-500 text-zinc-950 neon-glow-amber border border-amber-300/50"
+              ? "bg-gradient-to-r from-amber-400 to-yellow-500 text-zinc-950 border border-amber-300/50 shadow-amber-400/20"
               : rank === 2
               ? "bg-gradient-to-r from-slate-200 to-zinc-400 text-zinc-950 border border-white/50"
               : rank === 3
@@ -84,24 +93,23 @@ export function VotingCard({
         </div>
       )}
 
-      {/* Gambar Foto dengan Aspect Ratio Mewah */}
+      {/* Gambar Foto Model Avatar Fashion Show */}
       <div
         className="relative aspect-[4/3] w-full bg-zinc-950 overflow-hidden cursor-pointer"
         onClick={() =>
           onImageClick(
             submission.image_url,
-            `Karya TREC KL @${submission.roblox_username}`
+            `Outfit Runway @${submission.roblox_username}`
           )
         }
       >
         <img
           src={submission.image_url}
-          alt={`Karya @${submission.roblox_username}`}
+          alt={`Outfit @${submission.roblox_username}`}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
           loading="lazy"
         />
 
-        {/* Cyber Vignette & Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#0c0e14] via-transparent to-transparent opacity-80" />
 
         {/* Hover action overlay */}
@@ -135,7 +143,7 @@ export function VotingCard({
                 <User className="w-5 h-5 text-zinc-400" />
               </div>
             )}
-            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#0c0e14]" />
+            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-[#ff007f] rounded-full border-2 border-[#0c0e14]" />
           </div>
 
           <div className="min-w-0 flex-1">
@@ -150,8 +158,8 @@ export function VotingCard({
                 {submission.caption}
               </p>
             ) : (
-              <p className="text-[11px] text-zinc-500 uppercase tracking-wider font-semibold">
-                TREC KL Player
+              <p className="text-[11px] text-zinc-500 uppercase tracking-wider font-semibold flex items-center gap-1">
+                <Shirt className="w-3 h-3" /> Runway Model
               </p>
             )}
           </div>

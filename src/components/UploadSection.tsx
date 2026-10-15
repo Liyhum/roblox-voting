@@ -10,10 +10,10 @@ import {
   Loader2,
   X,
   Sparkles,
-  Car,
   Shirt,
-  Users,
-  Music,
+  Crown,
+  Zap,
+  Palette,
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
@@ -22,17 +22,17 @@ interface UploadSectionProps {
   onSuccess: () => void;
 }
 
-const CATEGORIES = [
-  { id: "outfit", label: "Streetwear Drip", icon: Shirt },
-  { id: "car", label: "Car Meet / Ride", icon: Car },
-  { id: "hangout", label: "Club / Hangout", icon: Users },
-  { id: "party", label: "Nightlife Party", icon: Music },
+const FASHION_CATEGORIES = [
+  { id: "streetwear", label: "Streetwear Drip", icon: Shirt },
+  { id: "glamour", label: "High Glamour & Party", icon: Crown },
+  { id: "cyberpunk", label: "Cyberpunk & Neon", icon: Zap },
+  { id: "creative", label: "Anime / Cosplay", icon: Palette },
 ];
 
 export function UploadSection({ onSuccess }: UploadSectionProps) {
   const [username, setUsername] = useState("");
   const [caption, setCaption] = useState("");
-  const [category, setCategory] = useState("outfit");
+  const [category, setCategory] = useState("streetwear");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -123,7 +123,7 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
     }
 
     if (!selectedFile) {
-      setErrorMessage("Wajib mengunggah foto / screenshot karya.");
+      setErrorMessage("Wajib mengunggah foto avatar / outfit kamu.");
       return;
     }
 
@@ -159,8 +159,8 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
 
       const imageUrl = publicUrlData.publicUrl;
 
-      // Format caption dengan kategori
-      const selectedCatObj = CATEGORIES.find((c) => c.id === category);
+      // Format caption dengan kategori fashion
+      const selectedCatObj = FASHION_CATEGORIES.find((c) => c.id === category);
       const categoryTag = selectedCatObj ? `[${selectedCatObj.label}] ` : "";
       const finalCaption = caption.trim() ? `${categoryTag}${caption.trim()}` : categoryTag.trim();
 
@@ -208,13 +208,13 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
       <div className="text-center mb-8 relative z-10">
         <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#ff007f]/15 text-[#ff007f] text-xs font-black uppercase tracking-widest border border-[#ff007f]/30 mb-3">
           <Sparkles className="w-3.5 h-3.5" />
-          TREC KL Community Entry
+          TREC KL Fashion Runway Entry
         </div>
         <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight uppercase italic">
-          Kirim Foto & Drip Kamu
+          Daftarkan Avatar ke Runway
         </h2>
         <p className="text-xs sm:text-sm text-zinc-400 mt-2 max-w-md mx-auto">
-          Tunjukkan outfit terbaik, mobil impian, atau momen hangout kamu di TREC KL untuk divote oleh seluruh pemain!
+          Tunjukkan outfit dan style avatar Roblox terbaikmu di ajang Fashion Show TREC KL untuk dipilih jadi Best Dressed!
         </p>
       </div>
 
@@ -224,10 +224,10 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
             <CheckCircle2 className="w-9 h-9" />
           </div>
           <h3 className="text-xl font-black text-white uppercase tracking-wide">
-            Karya Berhasil Terdaftar!
+            Outfit Berhasil Terdaftar di Runway!
           </h3>
           <p className="text-sm text-zinc-400">
-            Foto kamu sudah tampil di galeri voting. Mengalihkan ke galeri...
+            Avatarmu sudah tampil di galeri voting. Mengalihkan ke runway...
           </p>
         </div>
       ) : (
@@ -235,7 +235,7 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
           {/* Input Username */}
           <div className="space-y-2">
             <label className="block text-xs font-black uppercase tracking-wider text-zinc-300">
-              Username Roblox <span className="text-[#ff007f]">*</span>
+              Username Roblox Model <span className="text-[#ff007f]">*</span>
             </label>
             <div className="relative">
               <input
@@ -273,7 +273,7 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
                       {robloxData.displayName || username}
                     </span>
                     <span className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-md font-black uppercase tracking-wider">
-                      Verified
+                      Model Verified
                     </span>
                   </div>
                   <p className="text-xs text-zinc-400 font-mono">@{username}</p>
@@ -288,13 +288,13 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
             )}
           </div>
 
-          {/* Category Selector */}
+          {/* Fashion Category Selector */}
           <div className="space-y-2">
             <label className="block text-xs font-black uppercase tracking-wider text-zinc-300">
-              Kategori Foto
+              Kategori Gaya / Outfit
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {CATEGORIES.map((cat) => {
+              {FASHION_CATEGORIES.map((cat) => {
                 const IconComponent = cat.icon;
                 const active = category === cat.id;
                 return (
@@ -319,15 +319,15 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
           {/* Upload Dropzone */}
           <div className="space-y-2">
             <label className="block text-xs font-black uppercase tracking-wider text-zinc-300">
-              Upload Screenshot / Foto <span className="text-[#ff007f]">*</span>
+              Foto / Screenshot Outfit Avatar <span className="text-[#ff007f]">*</span>
             </label>
 
             {previewUrl ? (
               <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden border border-white/20 bg-zinc-950 group shadow-2xl">
                 <img
                   src={previewUrl}
-                  alt="Preview"
-                  className="w-full h-full object-cover"
+                  alt="Preview Outfit"
+                  className="w-full h-full object-contain"
                 />
                 <button
                   type="button"
@@ -341,13 +341,13 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
             ) : (
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-white/15 hover:border-[#00f2fe]/60 bg-zinc-950/40 hover:bg-zinc-950/80 rounded-2xl p-8 text-center cursor-pointer transition-all duration-300 group"
+                className="border-2 border-dashed border-white/15 hover:border-[#ff007f]/60 bg-zinc-950/40 hover:bg-zinc-950/80 rounded-2xl p-8 text-center cursor-pointer transition-all duration-300 group"
               >
-                <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-white/10 text-zinc-300 flex items-center justify-center mx-auto mb-3 group-hover:border-[#00f2fe] group-hover:scale-110 transition-all">
-                  <UploadCloud className="w-6 h-6 text-[#00f2fe]" />
+                <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-white/10 text-zinc-300 flex items-center justify-center mx-auto mb-3 group-hover:border-[#ff007f] group-hover:scale-110 transition-all">
+                  <UploadCloud className="w-6 h-6 text-[#ff007f]" />
                 </div>
                 <p className="text-sm font-bold text-zinc-200">
-                  Pilih file screenshot dari game TREC KL
+                  Pilih screenshot avatar dari game TREC KL
                 </p>
                 <p className="text-xs text-zinc-500 mt-1 font-mono">
                   PNG, JPG, WEBP hingga 8MB
@@ -367,13 +367,13 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
           {/* Caption */}
           <div className="space-y-2">
             <label className="block text-xs font-black uppercase tracking-wider text-zinc-300">
-              Judul / Caption Singkat <span className="text-zinc-600 font-normal lowercase">(opsional)</span>
+              Tema Outfit / Judul Gaya <span className="text-zinc-600 font-normal lowercase">(opsional)</span>
             </label>
             <input
               type="text"
               value={caption}
               onChange={(e) => setCaption(e.target.value)}
-              placeholder="Contoh: Malam minggu di TREC KL bareng squad!"
+              placeholder="Contoh: All Black Cyber Gothic Runway Set"
               maxLength={100}
               className="w-full px-4 py-3 bg-zinc-950/80 border border-white/10 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:border-[#00f2fe] focus:ring-1 focus:ring-[#00f2fe] transition-all font-medium text-sm"
             />
@@ -396,12 +396,12 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
             {isSubmitting ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
-                <span>Mengunggah Karya ke TREC KL...</span>
+                <span>Mendaftarkan Avatar ke Runway...</span>
               </>
             ) : (
               <>
                 <ImageIcon className="w-5 h-5" />
-                <span>Kirim Partisipasi Sekarang</span>
+                <span>Daftarkan Outfit Sekarang</span>
               </>
             )}
           </button>

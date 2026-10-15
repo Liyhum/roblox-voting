@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Trophy, Medal, Crown, Flame } from "lucide-react";
+import { Trophy, Medal, Crown, Flame, Sparkles } from "lucide-react";
 import { Submission } from "@/lib/supabase";
 
 interface LeaderboardProps {
@@ -17,10 +17,10 @@ export function Leaderboard({ submissions, onImageClick }: LeaderboardProps) {
       <div className="text-center py-20 bg-[#0c0e14]/80 border border-white/10 rounded-3xl max-w-xl mx-auto p-8 backdrop-blur-xl">
         <Trophy className="w-14 h-14 text-zinc-600 mx-auto mb-3" />
         <h3 className="text-lg font-black text-white uppercase tracking-wider">
-          Belum Ada Kontestan Terdaftar
+          Belum Ada Model di Runway
         </h3>
         <p className="text-xs sm:text-sm text-zinc-400 mt-1 max-w-sm mx-auto">
-          Jadilah yang pertama mengunggah screenshot di TREC KL untuk memimpin posisi VIP #1!
+          Jadilah yang pertama mendaftarkan outfit di TREC KL Fashion Show untuk memimpin posisi #1 Best Dressed!
         </p>
       </div>
     );
@@ -37,13 +37,13 @@ export function Leaderboard({ submissions, onImageClick }: LeaderboardProps) {
       <div className="text-center">
         <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-black uppercase tracking-widest border border-amber-500/30 mb-3">
           <Crown className="w-3.5 h-3.5" />
-          TREC KL VIP Hall of Fame
+          TREC KL Runway Podium
         </div>
         <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight uppercase italic">
-          Papan Peringkat Terpopuler
+          Peringkat Best Dressed Model
         </h2>
         <p className="text-xs sm:text-sm text-zinc-400 mt-1">
-          Daftar kontestan dengan perolehan suara terbanyak dari komunitas TREC KL
+          Model avatar dengan perolehan suara komunitas terbanyak di panggung fashion show TREC KL
         </p>
       </div>
 
@@ -56,12 +56,12 @@ export function Leaderboard({ submissions, onImageClick }: LeaderboardProps) {
               #2
             </div>
             <span className="text-[10px] font-black uppercase tracking-widest text-slate-300 mb-2">
-              Silver VIP
+              Silver Runway Star
             </span>
             <div
               className="w-28 h-28 rounded-2xl overflow-hidden border-2 border-slate-400/80 mb-3.5 cursor-pointer shadow-lg group relative"
               onClick={() =>
-                onImageClick(top2.image_url, `Karya @${top2.roblox_username}`)
+                onImageClick(top2.image_url, `Outfit @${top2.roblox_username}`)
               }
             >
               <img
@@ -82,19 +82,19 @@ export function Leaderboard({ submissions, onImageClick }: LeaderboardProps) {
 
         {/* Rank 1 (Champion) */}
         {top1 && (
-          <div className="order-1 sm:order-2 bg-gradient-to-b from-amber-950/40 via-[#0c0e14] to-[#0c0e14] backdrop-blur-2xl border-2 border-amber-500/80 rounded-3xl p-7 text-center flex flex-col items-center relative shadow-2xl neon-glow-amber -translate-y-3">
+          <div className="order-1 sm:order-2 bg-gradient-to-b from-amber-950/40 via-[#0c0e14] to-[#0c0e14] backdrop-blur-2xl border-2 border-amber-500/80 rounded-3xl p-7 text-center flex flex-col items-center relative shadow-2xl -translate-y-3">
             <div className="absolute -top-5 w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-400 to-yellow-500 text-zinc-950 font-black flex items-center justify-center text-base shadow-xl shadow-amber-400/40">
               <Crown className="w-6 h-6 fill-zinc-950 text-zinc-950" />
             </div>
 
-            <span className="text-[11px] font-black uppercase tracking-widest text-amber-400 mt-2 mb-2 animate-pulse">
-              👑 KING OF TREC KL
+            <span className="text-[11px] font-black uppercase tracking-widest text-amber-400 mt-2 mb-2 animate-pulse flex items-center gap-1">
+              <Sparkles className="w-3.5 h-3.5" /> 👑 BEST DRESSED CHAMPION
             </span>
 
             <div
               className="w-36 h-36 rounded-2xl overflow-hidden border-4 border-amber-400 mb-4 cursor-pointer shadow-2xl shadow-amber-500/30 group relative"
               onClick={() =>
-                onImageClick(top1.image_url, `Karya @${top1.roblox_username}`)
+                onImageClick(top1.image_url, `Outfit @${top1.roblox_username}`)
               }
             >
               <img
@@ -127,12 +127,12 @@ export function Leaderboard({ submissions, onImageClick }: LeaderboardProps) {
               #3
             </div>
             <span className="text-[10px] font-black uppercase tracking-widest text-amber-400 mb-2">
-              Bronze VIP
+              Bronze Runway Icon
             </span>
             <div
               className="w-28 h-28 rounded-2xl overflow-hidden border-2 border-amber-700 mb-3.5 cursor-pointer shadow-lg group relative"
               onClick={() =>
-                onImageClick(top3.image_url, `Karya @${top3.roblox_username}`)
+                onImageClick(top3.image_url, `Outfit @${top3.roblox_username}`)
               }
             >
               <img
@@ -158,7 +158,7 @@ export function Leaderboard({ submissions, onImageClick }: LeaderboardProps) {
           <div className="p-4 bg-zinc-950/60 flex items-center justify-between text-xs font-black text-zinc-400 uppercase tracking-widest">
             <div className="flex items-center gap-6">
               <span>Posisi</span>
-              <span>Peserta</span>
+              <span>Model &amp; Outfit</span>
             </div>
             <span>Perolehan Suara</span>
           </div>
@@ -176,7 +176,7 @@ export function Leaderboard({ submissions, onImageClick }: LeaderboardProps) {
                 <div
                   className="w-12 h-12 rounded-2xl overflow-hidden border border-white/15 bg-zinc-950 cursor-pointer shrink-0 shadow-md group relative"
                   onClick={() =>
-                    onImageClick(sub.image_url, `Karya @${sub.roblox_username}`)
+                    onImageClick(sub.image_url, `Outfit @${sub.roblox_username}`)
                   }
                 >
                   <img
