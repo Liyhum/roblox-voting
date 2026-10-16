@@ -26,6 +26,7 @@ import { Leaderboard } from "@/components/Leaderboard";
 import { SetupGuide } from "@/components/SetupGuide";
 import { RobloxConnectModal, ConnectedRobloxUser } from "@/components/RobloxConnectModal";
 import { TikTokPlayer, TikTokIcon } from "@/components/TikTokPlayer";
+import { CountdownTimer } from "@/components/CountdownTimer";
 import { supabase, isSupabaseConfigured, Submission } from "@/lib/supabase";
 
 export default function Home() {
@@ -407,6 +408,9 @@ export default function Home() {
                 </div>
               </div>
             </div>
+
+            {/* Event Countdown Timer */}
+            <CountdownTimer />
 
             {/* Account Quota Status Banner */}
             {connectedUser && (
