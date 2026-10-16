@@ -174,6 +174,16 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
       return;
     }
 
+    if (!tiktokUrl.trim()) {
+      setErrorMessage("Mohon masukkan link video TikTok outfit avatar Anda (Wajib).");
+      return;
+    }
+
+    if (!isValidTikTokUrl(tiktokUrl.trim())) {
+      setErrorMessage("Link TikTok tidak valid. Mohon masukkan link TikTok yang benar (contoh: https://www.tiktok.com/@username/video/... atau https://vt.tiktok.com/...).");
+      return;
+    }
+
     if (robloxData && !robloxData.isInGroup) {
       setErrorMessage("You must join our official Roblox group 'FEMME'S STUDIO' to submit your avatar.");
       return;
@@ -429,7 +439,7 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
               <label className="text-xs font-black uppercase tracking-wider text-zinc-300 flex items-center gap-1.5">
                 <TikTokIcon className="w-3.5 h-3.5 text-[#ff007f]" />
                 <span>Link Video TikTok Outfit</span>
-                <span className="text-zinc-500 font-normal lowercase">(opsional &bull; rekomendasi)</span>
+                <span className="text-[#ff007f]">*</span>
               </label>
               {tiktokStatus === "valid" && (
                 <span className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-md font-black uppercase tracking-wider flex items-center gap-1 shadow-sm">
@@ -445,6 +455,7 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
                 value={tiktokUrl}
                 onChange={(e) => setTiktokUrl(e.target.value)}
                 placeholder="https://www.tiktok.com/@username/video/... atau https://vt.tiktok.com/..."
+                required
                 className={`w-full px-4 py-3 bg-zinc-950/80 border rounded-2xl text-white placeholder-zinc-600 focus:outline-none transition-all font-medium text-sm ${
                   tiktokStatus === "valid"
                     ? "border-emerald-500/50 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400"
