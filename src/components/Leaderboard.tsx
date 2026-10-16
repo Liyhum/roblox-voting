@@ -3,10 +3,11 @@
 import React from "react";
 import { Trophy, Medal, Crown, Flame, Sparkles } from "lucide-react";
 import { Submission } from "@/lib/supabase";
+import { TikTokIcon } from "./TikTokPlayer";
 
 interface LeaderboardProps {
   submissions: Submission[];
-  onImageClick: (url: string, title: string) => void;
+  onImageClick: (url: string, title: string, tiktokUrl?: string | null) => void;
 }
 
 export function Leaderboard({ submissions, onImageClick }: LeaderboardProps) {
@@ -61,7 +62,7 @@ export function Leaderboard({ submissions, onImageClick }: LeaderboardProps) {
             <div
               className="w-28 h-28 rounded-2xl overflow-hidden border-2 border-slate-400/80 mb-3.5 cursor-pointer shadow-lg group relative"
               onClick={() =>
-                onImageClick(top2.image_url, `Outfit by @${top2.roblox_username}`)
+                onImageClick(top2.image_url, `Outfit by @${top2.roblox_username}`, top2.tiktok_url)
               }
             >
               <img
@@ -69,6 +70,11 @@ export function Leaderboard({ submissions, onImageClick }: LeaderboardProps) {
                 alt={top2.roblox_username}
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
               />
+              {top2.tiktok_url && (
+                <div className="absolute top-1.5 right-1.5 p-1 rounded-md bg-black/80 backdrop-blur-md border border-white/20">
+                  <TikTokIcon className="w-3 h-3 text-[#ff007f]" />
+                </div>
+              )}
             </div>
             <h4 className="font-black text-base text-white truncate max-w-full">
               @{top2.roblox_username}
@@ -94,7 +100,7 @@ export function Leaderboard({ submissions, onImageClick }: LeaderboardProps) {
             <div
               className="w-36 h-36 rounded-2xl overflow-hidden border-4 border-amber-400 mb-4 cursor-pointer shadow-2xl shadow-amber-500/30 group relative"
               onClick={() =>
-                onImageClick(top1.image_url, `Outfit by @${top1.roblox_username}`)
+                onImageClick(top1.image_url, `Outfit by @${top1.roblox_username}`, top1.tiktok_url)
               }
             >
               <img
@@ -102,6 +108,12 @@ export function Leaderboard({ submissions, onImageClick }: LeaderboardProps) {
                 alt={top1.roblox_username}
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
               />
+              {top1.tiktok_url && (
+                <div className="absolute top-2 right-2 px-2 py-1 rounded-lg bg-black/80 backdrop-blur-md border border-white/20 flex items-center gap-1">
+                  <TikTokIcon className="w-3.5 h-3.5 text-[#ff007f]" />
+                  <span className="text-[10px] font-bold text-white uppercase">Video</span>
+                </div>
+              )}
             </div>
 
             <h4 className="font-black text-lg sm:text-xl text-amber-200 truncate max-w-full">
@@ -132,7 +144,7 @@ export function Leaderboard({ submissions, onImageClick }: LeaderboardProps) {
             <div
               className="w-28 h-28 rounded-2xl overflow-hidden border-2 border-amber-700 mb-3.5 cursor-pointer shadow-lg group relative"
               onClick={() =>
-                onImageClick(top3.image_url, `Outfit by @${top3.roblox_username}`)
+                onImageClick(top3.image_url, `Outfit by @${top3.roblox_username}`, top3.tiktok_url)
               }
             >
               <img
@@ -140,6 +152,11 @@ export function Leaderboard({ submissions, onImageClick }: LeaderboardProps) {
                 alt={top3.roblox_username}
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
               />
+              {top3.tiktok_url && (
+                <div className="absolute top-1.5 right-1.5 p-1 rounded-md bg-black/80 backdrop-blur-md border border-white/20">
+                  <TikTokIcon className="w-3 h-3 text-[#ff007f]" />
+                </div>
+              )}
             </div>
             <h4 className="font-black text-base text-white truncate max-w-full">
               @{top3.roblox_username}
@@ -176,7 +193,7 @@ export function Leaderboard({ submissions, onImageClick }: LeaderboardProps) {
                 <div
                   className="w-12 h-12 rounded-2xl overflow-hidden border border-white/15 bg-zinc-950 cursor-pointer shrink-0 shadow-md group relative"
                   onClick={() =>
-                    onImageClick(sub.image_url, `Outfit by @${sub.roblox_username}`)
+                    onImageClick(sub.image_url, `Outfit by @${sub.roblox_username}`, sub.tiktok_url)
                   }
                 >
                   <img
@@ -184,12 +201,25 @@ export function Leaderboard({ submissions, onImageClick }: LeaderboardProps) {
                     alt={sub.roblox_username}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform"
                   />
+                  {sub.tiktok_url && (
+                    <div className="absolute top-1 right-1 p-0.5 rounded-sm bg-black/80">
+                      <TikTokIcon className="w-2.5 h-2.5 text-[#ff007f]" />
+                    </div>
+                  )}
                 </div>
 
                 <div>
-                  <h5 className="font-black text-sm text-white">
-                    @{sub.roblox_username}
-                  </h5>
+                  <div className="flex items-center gap-2">
+                    <h5 className="font-black text-sm text-white">
+                      @{sub.roblox_username}
+                    </h5>
+                    {sub.tiktok_url && (
+                      <span className="text-[9px] font-bold text-zinc-400 bg-zinc-900 border border-white/10 px-1.5 py-0.5 rounded flex items-center gap-1">
+                        <TikTokIcon className="w-2.5 h-2.5 text-[#ff007f]" />
+                        <span>TikTok</span>
+                      </span>
+                    )}
+                  </div>
                   {sub.caption && (
                     <p className="text-xs text-zinc-400 line-clamp-1 mt-0.5">
                       {sub.caption}

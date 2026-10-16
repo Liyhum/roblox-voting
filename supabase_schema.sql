@@ -15,9 +15,13 @@ create table if not exists public.submissions (
   roblox_avatar_url text,
   caption text,
   image_url text not null,
+  tiktok_url text,
   votes integer default 0 not null,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
+
+-- MIGRATION: Jika tabel submissions sudah dibuat sebelumnya, jalankan baris ini di SQL Editor Supabase:
+alter table public.submissions add column if not exists tiktok_url text;
 
 -- Indexes for lightning fast queries
 create index if not exists idx_submissions_votes on public.submissions(votes desc);

@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { TikTokIcon } from "./TikTokPlayer";
+import { isValidTikTokUrl, extractTikTokVideoId } from "@/lib/tiktok";
 
 interface UploadSectionProps {
   onSuccess: () => void;
@@ -23,6 +25,11 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
   const [caption, setCaption] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  // TikTok video state
+  const [tiktokUrl, setTiktokUrl] = useState("");
+  const [tiktokStatus, setTiktokStatus] = useState<"idle" | "validating" | "valid" | "invalid">("idle");
+  const [tiktokInfo, setTiktokInfo] = useState<{ videoId?: string | null; message?: string } | null>(null);
 
   // Roblox user verification state
   const [isCheckingRoblox, setIsCheckingRoblox] = useState(false);
@@ -40,6 +47,54 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
   const [success, setSuccess] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Debounced TikTok link validator
+  useEffect(() => {
+    const trimmed = tiktokUrl.trim();
+    if (!trimmed) {
+      setTiktokStatus("idle");
+      setTiktokInfo(null);
+      return;
+    }
+
+    if (!isValidTikTokUrl(trimmed)) {
+      setTiktokStatus("invalid");
+      setTiktokInfo({ message: "URL harus diawali https:// dan berasal dari domain tiktok.com" });
+      return;
+    }
+
+    // Direct numeric video ID in URL
+    const directId = extractTikTokVideoId(trimmed);
+    if (directId) {
+      setTiktokStatus("valid");
+      setTiktokInfo({ videoId: directId, message: "Video TikTok terdeteksi!" });
+      return;
+    }
+
+    // Short links: resolve via API
+    setTiktokStatus("validating");
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/tiktok-resolve?url=${encodeURIComponent(trimmed)}`);
+        const data = await res.json();
+        if (data.valid) {
+          setTiktokStatus("valid");
+          setTiktokInfo({
+            videoId: data.videoId,
+            message: data.videoId ? "Video TikTok terverifikasi!" : "Link TikTok valid!",
+          });
+        } else {
+          setTiktokStatus("invalid");
+          setTiktokInfo({ message: data.error || "Link TikTok tidak dapat diverifikasi" });
+        }
+      } catch {
+        setTiktokStatus("valid");
+        setTiktokInfo({ message: "Link TikTok disimpan" });
+      }
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, [tiktokUrl]);
 
   // Debounced Roblox Avatar lookup
   useEffect(() => {
@@ -157,15 +212,31 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
       const imageUrl = publicUrlData.publicUrl;
 
       // Insert to database
-      const { error: dbError } = await supabase.from("submissions").insert([
-        {
-          roblox_username: username.trim(),
-          roblox_avatar_url: robloxData?.avatarUrl || null,
-          caption: caption.trim() || null,
-          image_url: imageUrl,
-          votes: 0,
-        },
-      ]);
+      const payload: Record<string, unknown> = {
+        roblox_username: username.trim(),
+        roblox_avatar_url: robloxData?.avatarUrl || null,
+        caption: caption.trim() || null,
+        image_url: imageUrl,
+        votes: 0,
+      };
+
+      if (tiktokUrl.trim()) {
+        payload.tiktok_url = tiktokUrl.trim();
+      }
+
+      let { error: dbError } = await supabase.from("submissions").insert([payload]);
+
+      // Graceful fallback if tiktok_url column hasn't been migrated yet in Supabase
+      if (dbError && dbError.message && dbError.message.toLowerCase().includes("tiktok_url")) {
+        delete payload.tiktok_url;
+        const retryResult = await supabase.from("submissions").insert([payload]);
+        if (!retryResult.error) {
+          dbError = null;
+          console.warn("tiktok_url column not yet created in Supabase submissions table.");
+        } else {
+          dbError = retryResult.error;
+        }
+      }
 
       if (dbError) {
         throw new Error(`Database error: ${dbError.message}`);
@@ -350,6 +421,62 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
               onChange={handleFileChange}
               className="hidden"
             />
+          </div>
+
+          {/* TikTok Video URL */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-black uppercase tracking-wider text-zinc-300 flex items-center gap-1.5">
+                <TikTokIcon className="w-3.5 h-3.5 text-[#ff007f]" />
+                <span>Link Video TikTok Outfit</span>
+                <span className="text-zinc-500 font-normal lowercase">(opsional &bull; rekomendasi)</span>
+              </label>
+              {tiktokStatus === "valid" && (
+                <span className="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-md font-black uppercase tracking-wider flex items-center gap-1 shadow-sm">
+                  <CheckCircle2 className="w-3 h-3" />
+                  <span>Siap di Runway</span>
+                </span>
+              )}
+            </div>
+
+            <div className="relative">
+              <input
+                type="url"
+                value={tiktokUrl}
+                onChange={(e) => setTiktokUrl(e.target.value)}
+                placeholder="https://www.tiktok.com/@username/video/... atau https://vt.tiktok.com/..."
+                className={`w-full px-4 py-3 bg-zinc-950/80 border rounded-2xl text-white placeholder-zinc-600 focus:outline-none transition-all font-medium text-sm ${
+                  tiktokStatus === "valid"
+                    ? "border-emerald-500/50 focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400"
+                    : tiktokStatus === "invalid"
+                    ? "border-rose-500/50 focus:border-rose-400"
+                    : "border-white/10 focus:border-[#00f2fe] focus:ring-1 focus:ring-[#00f2fe]"
+                }`}
+              />
+              {tiktokStatus === "validating" && (
+                <div className="absolute right-4 top-3.5">
+                  <Loader2 className="w-5 h-5 text-[#00f2fe] animate-spin" />
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 text-[11px] text-zinc-500">
+              <p className="flex items-center gap-1">
+                <Sparkles className="w-3 h-3 text-[#ff007f] shrink-0" />
+                <span>Video catwalk / showcase TikTok akan langsung diputar di runway show!</span>
+              </p>
+              {tiktokInfo?.message && (
+                <span
+                  className={
+                    tiktokStatus === "invalid"
+                      ? "text-rose-400 font-medium"
+                      : "text-emerald-400 font-medium"
+                  }
+                >
+                  {tiktokInfo.message}
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Caption */}

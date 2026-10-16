@@ -1,16 +1,26 @@
 "use client";
 
 import React, { useState } from "react";
-import { Heart, User, Maximize2, Share2, Check, Sparkles, Shirt } from "lucide-react";
+import {
+  Heart,
+  User,
+  Maximize2,
+  Share2,
+  Check,
+  Sparkles,
+  Shirt,
+  Image as ImageIcon,
+} from "lucide-react";
 import confetti from "canvas-confetti";
 import { Submission } from "@/lib/supabase";
+import { TikTokPlayer, TikTokIcon } from "./TikTokPlayer";
 
 interface VotingCardProps {
   submission: Submission;
   hasVoted: boolean;
   onVote: (id: string) => Promise<void>;
   onUnvote?: (id: string) => Promise<void>;
-  onImageClick: (url: string, title: string) => void;
+  onImageClick: (url: string, title: string, tiktokUrl?: string | null) => void;
   onRequireConnect: (id: string, contestantName: string) => void;
   isConnected: boolean;
   rank?: number;
@@ -28,6 +38,9 @@ export function VotingCard({
 }: VotingCardProps) {
   const [isVoting, setIsVoting] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [mediaMode, setMediaMode] = useState<"photo" | "tiktok">("photo");
+
+  const hasTikTok = Boolean(submission.tiktok_url);
 
   const handleVoteClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -76,55 +89,129 @@ export function VotingCard({
       {/* Glow highlight on top-right */}
       <div className="absolute -top-16 -right-16 w-32 h-32 bg-[#ff007f]/10 rounded-full blur-2xl pointer-events-none group-hover:bg-[#ff007f]/20 transition-all" />
 
-      {/* Rank Badge if in Leaderboard or Top 3 */}
-      {rank && (
-        <div
-          className={`absolute top-3.5 left-3.5 z-20 px-3 py-1 rounded-xl text-xs font-black tracking-wider shadow-xl backdrop-blur-md flex items-center gap-1.5 ${
-            rank === 1
-              ? "bg-gradient-to-r from-amber-400 to-yellow-500 text-zinc-950 border border-amber-300/50 shadow-amber-400/20"
-              : rank === 2
-              ? "bg-gradient-to-r from-slate-200 to-zinc-400 text-zinc-950 border border-white/50"
-              : rank === 3
-              ? "bg-gradient-to-r from-amber-700 to-orange-800 text-white border border-amber-500/40"
-              : "bg-zinc-900/90 text-zinc-300 border border-white/10"
-          }`}
-        >
-          <span>RANK #{rank}</span>
+      {/* Top Media Badges & Controls Header */}
+      <div className="absolute top-3 left-3 right-3 z-30 flex items-center justify-between pointer-events-none">
+        {/* Left: Rank Badge or Media Count */}
+        <div className="pointer-events-auto flex items-center gap-1.5">
+          {rank ? (
+            <div
+              className={`px-3 py-1 rounded-xl text-xs font-black tracking-wider shadow-xl backdrop-blur-md flex items-center gap-1.5 ${
+                rank === 1
+                  ? "bg-gradient-to-r from-amber-400 to-yellow-500 text-zinc-950 border border-amber-300/50 shadow-amber-400/20"
+                  : rank === 2
+                  ? "bg-gradient-to-r from-slate-200 to-zinc-400 text-zinc-950 border border-white/50"
+                  : rank === 3
+                  ? "bg-gradient-to-r from-amber-700 to-orange-800 text-white border border-amber-500/40"
+                  : "bg-zinc-900/90 text-zinc-300 border border-white/10"
+              }`}
+            >
+              <span>RANK #{rank}</span>
+            </div>
+          ) : hasTikTok ? (
+            <div className="px-2.5 py-1 rounded-xl bg-black/70 backdrop-blur-md border border-white/15 text-[10px] font-black uppercase tracking-wider text-zinc-200 flex items-center gap-1.5 shadow-lg">
+              <span className="w-2 h-2 rounded-full bg-[#00f2fe] animate-pulse" />
+              <span>Foto + TikTok</span>
+            </div>
+          ) : null}
         </div>
-      )}
 
-      {/* Outfit Image */}
+        {/* Right: Media Switcher Tabs (Only if TikTok exists) */}
+        {hasTikTok && (
+          <div className="pointer-events-auto flex items-center bg-black/80 backdrop-blur-md p-1 rounded-xl border border-white/20 shadow-xl">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setMediaMode("photo");
+              }}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all ${
+                mediaMode === "photo"
+                  ? "bg-white/20 text-white shadow-sm"
+                  : "text-zinc-400 hover:text-white"
+              }`}
+            >
+              <ImageIcon className="w-3 h-3" />
+              <span>Foto</span>
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setMediaMode("tiktok");
+              }}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all ${
+                mediaMode === "tiktok"
+                  ? "bg-gradient-to-r from-[#ff007f] to-rose-600 text-white shadow-md shadow-[#ff007f]/40"
+                  : "text-zinc-400 hover:text-[#00f2fe]"
+              }`}
+            >
+              <TikTokIcon className="w-3.5 h-3.5" />
+              <span>TikTok</span>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Outfit Media Display (Photo or TikTok Video) */}
       <div
-        className="relative aspect-[4/3] w-full bg-zinc-950 overflow-hidden cursor-pointer"
-        onClick={() =>
-          onImageClick(
-            submission.image_url,
-            `Runway Outfit by @${submission.roblox_username}`
-          )
-        }
+        className={`relative w-full bg-zinc-950 overflow-hidden transition-all duration-300 ${
+          mediaMode === "tiktok" ? "aspect-[9/13] min-h-[420px]" : "aspect-[4/3]"
+        }`}
       >
-        <img
-          src={submission.image_url}
-          alt={`Outfit @${submission.roblox_username}`}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-          loading="lazy"
-        />
-
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0c0e14] via-transparent to-transparent opacity-80" />
-
-        {/* Hover action overlay */}
-        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-4">
-          <span className="text-xs font-semibold text-zinc-200 flex items-center gap-1.5 backdrop-blur-md bg-black/50 px-2.5 py-1 rounded-lg border border-white/10">
-            <Maximize2 className="w-3.5 h-3.5 text-[#00f2fe]" /> View Fullscreen
-          </span>
-          <button
-            onClick={handleCopy}
-            className="p-2 rounded-xl bg-zinc-900/90 text-zinc-300 hover:text-white hover:bg-zinc-800 border border-white/10 transition-colors shadow-lg"
-            title="Share"
+        {mediaMode === "tiktok" && submission.tiktok_url ? (
+          <div className="w-full h-full pt-12 pb-2 px-2 bg-black flex flex-col items-center justify-center">
+            <TikTokPlayer url={submission.tiktok_url} compact={false} />
+            <button
+              type="button"
+              onClick={() =>
+                onImageClick(
+                  submission.image_url,
+                  `Runway Outfit by @${submission.roblox_username}`,
+                  submission.tiktok_url
+                )
+              }
+              className="mt-2 text-[11px] font-bold text-zinc-400 hover:text-white flex items-center gap-1.5 p-1 transition-colors"
+            >
+              <Maximize2 className="w-3 h-3 text-[#00f2fe]" />
+              <span>Buka Layar Penuh</span>
+            </button>
+          </div>
+        ) : (
+          <div
+            className="w-full h-full relative cursor-pointer"
+            onClick={() =>
+              onImageClick(
+                submission.image_url,
+                `Runway Outfit by @${submission.roblox_username}`,
+                submission.tiktok_url
+              )
+            }
           >
-            {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Share2 className="w-4 h-4" />}
-          </button>
-        </div>
+            <img
+              src={submission.image_url}
+              alt={`Outfit @${submission.roblox_username}`}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+              loading="lazy"
+            />
+
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0c0e14] via-transparent to-transparent opacity-80" />
+
+            {/* Hover action overlay */}
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-4">
+              <span className="text-xs font-semibold text-zinc-200 flex items-center gap-1.5 backdrop-blur-md bg-black/50 px-2.5 py-1 rounded-lg border border-white/10">
+                <Maximize2 className="w-3.5 h-3.5 text-[#00f2fe]" /> View Fullscreen
+              </span>
+              <button
+                type="button"
+                onClick={handleCopy}
+                className="p-2 rounded-xl bg-zinc-900/90 text-zinc-300 hover:text-white hover:bg-zinc-800 border border-white/10 transition-colors shadow-lg"
+                title="Share"
+              >
+                {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Share2 className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Info Card Content */}
@@ -147,11 +234,27 @@ export function VotingCard({
           </div>
 
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5">
-              <h4 className="font-black text-sm text-white tracking-wide truncate group-hover:text-[#00f2fe] transition-colors">
-                @{submission.roblox_username}
-              </h4>
-              <Sparkles className="w-3 h-3 text-[#ff007f] shrink-0" />
+            <div className="flex items-center gap-1.5 justify-between">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <h4 className="font-black text-sm text-white tracking-wide truncate group-hover:text-[#00f2fe] transition-colors">
+                  @{submission.roblox_username}
+                </h4>
+                <Sparkles className="w-3 h-3 text-[#ff007f] shrink-0" />
+              </div>
+
+              {submission.tiktok_url && (
+                <a
+                  href={submission.tiktok_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-900 border border-white/10 text-[10px] font-black text-zinc-300 hover:text-white hover:border-[#ff007f] transition-all shrink-0"
+                  title="Lihat di TikTok"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <TikTokIcon className="w-2.5 h-2.5 text-[#ff007f]" />
+                  <span>TikTok</span>
+                </a>
+              )}
             </div>
             {submission.caption ? (
               <p className="text-xs text-zinc-400 line-clamp-1 mt-0.5 font-medium">

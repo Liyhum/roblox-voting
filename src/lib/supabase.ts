@@ -24,6 +24,8 @@ export interface Submission {
   roblox_avatar_url?: string | null;
   caption?: string | null;
   image_url: string;
+  tiktok_url?: string | null;
   votes: number;
   created_at: string;
 }
+

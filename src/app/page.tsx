@@ -14,6 +14,7 @@ import {
   Trophy,
   ExternalLink,
   ShieldCheck,
+  Image as ImageIcon,
 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { VotingCard } from "@/components/VotingCard";
@@ -21,6 +22,7 @@ import { UploadSection } from "@/components/UploadSection";
 import { Leaderboard } from "@/components/Leaderboard";
 import { SetupGuide } from "@/components/SetupGuide";
 import { RobloxConnectModal, ConnectedRobloxUser } from "@/components/RobloxConnectModal";
+import { TikTokPlayer, TikTokIcon } from "@/components/TikTokPlayer";
 import { supabase, isSupabaseConfigured, Submission } from "@/lib/supabase";
 
 export default function Home() {
@@ -37,8 +39,13 @@ export default function Home() {
   const [pendingVoteTarget, setPendingVoteTarget] = useState<{ id: string; name: string } | null>(null);
   const [isOAuthConfigured, setIsOAuthConfigured] = useState(false);
 
-  // Modal Lightbox
-  const [zoomImage, setZoomImage] = useState<{ url: string; title: string } | null>(null);
+  // Modal Lightbox for 2 Media (Foto + TikTok Video)
+  const [zoomModal, setZoomModal] = useState<{
+    url: string;
+    title: string;
+    tiktokUrl?: string | null;
+  } | null>(null);
+  const [modalMediaTab, setModalMediaTab] = useState<"photo" | "tiktok">("photo");
 
   // Load connected Roblox user and voted IDs from localStorage + check official OAuth session
   useEffect(() => {
@@ -424,7 +431,10 @@ export default function Home() {
                     hasVoted={votedIds.includes(sub.id)}
                     onVote={() => handleVoteRequest(sub.id, sub.roblox_username)}
                     onUnvote={handleUnvote}
-                    onImageClick={(url, title) => setZoomImage({ url, title })}
+                    onImageClick={(url, title, tiktokUrl) => {
+                      setZoomModal({ url, title, tiktokUrl });
+                      setModalMediaTab("photo");
+                    }}
                     onRequireConnect={(id, contestantName) => {
                       setPendingVoteTarget({ id, name: contestantName });
                       setIsConnectModalOpen(true);
@@ -452,7 +462,10 @@ export default function Home() {
         {activeTab === "leaderboard" && (
           <Leaderboard
             submissions={submissions}
-            onImageClick={(url, title) => setZoomImage({ url, title })}
+            onImageClick={(url, title, tiktokUrl) => {
+              setZoomModal({ url, title, tiktokUrl });
+              setModalMediaTab("photo");
+            }}
           />
         )}
       </main>
@@ -469,30 +482,91 @@ export default function Home() {
         isOAuthConfigured={isOAuthConfigured}
       />
 
-      {/* Lightbox Modal */}
-      {zoomImage && (
+      {/* Lightbox Modal (2 Media: Foto + Video TikTok) */}
+      {zoomModal && (
         <div
-          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-2xl flex items-center justify-center p-4"
-          onClick={() => setZoomImage(null)}
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-2xl flex items-center justify-center p-4 sm:p-6"
+          onClick={() => setZoomModal(null)}
         >
           <div
-            className="relative max-w-4xl w-full max-h-[90vh] flex flex-col items-center"
+            className="relative max-w-4xl w-full flex flex-col items-center"
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              onClick={() => setZoomImage(null)}
-              className="absolute -top-12 right-0 p-2.5 rounded-full bg-zinc-800 text-white hover:bg-[#ff007f] transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-            <img
-              src={zoomImage.url}
-              alt={zoomImage.title}
-              className="max-h-[80vh] w-auto rounded-3xl object-contain shadow-2xl border border-white/20"
-            />
-            <p className="text-sm font-black uppercase tracking-wider text-zinc-300 mt-4 text-center">
-              {zoomImage.title}
-            </p>
+            {/* Top Bar: Close Button + Media Selector if TikTok exists */}
+            <div className="w-full flex items-center justify-between pb-4">
+              {zoomModal.tiktokUrl ? (
+                <div className="flex items-center bg-zinc-900/90 backdrop-blur-md p-1 rounded-2xl border border-white/20 shadow-xl">
+                  <button
+                    type="button"
+                    onClick={() => setModalMediaTab("photo")}
+                    className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                      modalMediaTab === "photo"
+                        ? "bg-white/20 text-white shadow-md"
+                        : "text-zinc-400 hover:text-white"
+                    }`}
+                  >
+                    <ImageIcon className="w-3.5 h-3.5" />
+                    <span>📸 Foto Full</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setModalMediaTab("tiktok")}
+                    className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                      modalMediaTab === "tiktok"
+                        ? "bg-gradient-to-r from-[#ff007f] to-rose-600 text-white shadow-md shadow-[#ff007f]/40"
+                        : "text-zinc-400 hover:text-[#00f2fe]"
+                    }`}
+                  >
+                    <TikTokIcon className="w-3.5 h-3.5" />
+                    <span>🎬 Video TikTok</span>
+                  </button>
+                </div>
+              ) : (
+                <div />
+              )}
+
+              <button
+                onClick={() => setZoomModal(null)}
+                className="p-2.5 rounded-full bg-zinc-800 text-white hover:bg-[#ff007f] transition-all hover:scale-105 shadow-xl border border-white/10"
+                title="Tutup"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Media Body */}
+            {modalMediaTab === "tiktok" && zoomModal.tiktokUrl ? (
+              <div className="w-full max-w-md h-[580px] max-h-[75vh] rounded-3xl overflow-hidden shadow-2xl border border-white/20 bg-zinc-950 flex flex-col items-center justify-center">
+                <TikTokPlayer url={zoomModal.tiktokUrl} compact={false} />
+              </div>
+            ) : (
+              <div className="relative flex items-center justify-center max-h-[75vh]">
+                <img
+                  src={zoomModal.url}
+                  alt={zoomModal.title}
+                  className="max-h-[75vh] w-auto rounded-3xl object-contain shadow-2xl border border-white/20"
+                />
+              </div>
+            )}
+
+            {/* Title & Quick Action */}
+            <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 w-full max-w-xl text-center sm:text-left">
+              <p className="text-sm font-black uppercase tracking-wider text-zinc-300">
+                {zoomModal.title}
+              </p>
+
+              {zoomModal.tiktokUrl && (
+                <a
+                  href={zoomModal.tiktokUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/60 hover:bg-[#ff007f] text-white text-xs font-bold border border-white/20 transition-all shadow-md hover:scale-105"
+                >
+                  <TikTokIcon className="w-3.5 h-3.5" />
+                  <span>Buka di Aplikasi TikTok &rarr;</span>
+                </a>
+              )}
+            </div>
           </div>
         </div>
       )}
