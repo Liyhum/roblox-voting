@@ -61,7 +61,7 @@ create policy "Allow public read votes_log"
   on public.votes_log for select
   using (true);
 
--- 3. Secure Atomic Vote RPC (Enforces Anti-Double Voting)
+-- 3. Secure Atomic Vote RPC (Enforces Anti-Double Voting & Strict 2-Vote Total Quota)
 create or replace function public.cast_verified_vote(
   target_submission_id uuid,
   voter_id bigint,
@@ -73,8 +73,21 @@ security definer
 as $$
 declare
   already_voted boolean;
+  user_vote_count integer;
 begin
-  -- Check if user already voted for this outfit
+  -- 1. Check if user already reached the strict 2-vote limit for the fashion show
+  select count(*) from public.votes_log
+  where voter_roblox_id = voter_id
+  into user_vote_count;
+
+  if user_vote_count >= 2 then
+    return json_build_object(
+      'success', false, 
+      'message', 'Vote quota reached! Each Roblox account is strictly limited to 2 permanent votes.'
+    );
+  end if;
+
+  -- 2. Check if user already voted for this specific outfit
   select exists(
     select 1 from public.votes_log
     where submission_id = target_submission_id and voter_roblox_id = voter_id
@@ -84,11 +97,11 @@ begin
     return json_build_object('success', false, 'message', 'You have already voted for this outfit!');
   end if;
 
-  -- Insert vote log
+  -- 3. Insert vote log (Permanent record)
   insert into public.votes_log (submission_id, voter_roblox_id, voter_roblox_username)
   values (target_submission_id, voter_id, voter_name);
 
-  -- Safely increment vote count
+  -- 4. Safely increment vote count
   update public.submissions
   set votes = votes + 1
   where id = target_submission_id;

@@ -15,7 +15,10 @@ import {
   ExternalLink,
   ShieldCheck,
   Image as ImageIcon,
+  AlertTriangle,
+  Heart,
 } from "lucide-react";
+import confetti from "canvas-confetti";
 import { Navbar } from "@/components/Navbar";
 import { VotingCard } from "@/components/VotingCard";
 import { UploadSection } from "@/components/UploadSection";
@@ -47,17 +50,30 @@ export default function Home() {
   } | null>(null);
   const [modalMediaTab, setModalMediaTab] = useState<"photo" | "tiktok">("photo");
 
-  // Load connected Roblox user and voted IDs from localStorage + check official OAuth session
+  // Quota Exceeded Modal (Max 2 Votes per Roblox account)
+  const [isQuotaModalOpen, setIsQuotaModalOpen] = useState(false);
+
+  // Vote Confirmation Target (English Confirmation Modal)
+  const [confirmVoteTarget, setConfirmVoteTarget] = useState<{
+    id: string;
+    name: string;
+    avatarUrl?: string;
+  } | null>(null);
+  const [isSubmittingVote, setIsSubmittingVote] = useState(false);
+
+  // Helper for user-specific vote storage key
+  const getVoteStorageKey = useCallback((username?: string) => {
+    return username
+      ? `trec_kl_voted_${username.trim().toLowerCase()}`
+      : "trec_kl_voted_guest";
+  }, []);
+
+  // Load connected Roblox user and voted IDs
   useEffect(() => {
     try {
       const storedUser = localStorage.getItem("trec_connected_roblox_user");
       if (storedUser) {
         setConnectedUser(JSON.parse(storedUser));
-      }
-
-      const storedVotes = localStorage.getItem("trec_kl_voted_submissions");
-      if (storedVotes) {
-        setVotedIds(JSON.parse(storedVotes));
       }
     } catch {
       // ignore
@@ -75,6 +91,36 @@ export default function Home() {
       })
       .catch(() => {});
   }, []);
+
+  // Sync votes whenever connected user changes
+  useEffect(() => {
+    const key = getVoteStorageKey(connectedUser?.username);
+    try {
+      const storedVotes = localStorage.getItem(key);
+      if (storedVotes) {
+        setVotedIds(JSON.parse(storedVotes));
+      } else {
+        setVotedIds([]);
+      }
+    } catch {
+      setVotedIds([]);
+    }
+
+    // If Supabase is configured and user is connected, sync from votes_log if available
+    if (isSupabaseConfigured && connectedUser?.id) {
+      supabase
+        .from("votes_log")
+        .select("submission_id")
+        .eq("voter_roblox_id", connectedUser.id)
+        .then(({ data, error }) => {
+          if (!error && data && data.length > 0) {
+            const ids = data.map((row: { submission_id: string }) => row.submission_id);
+            setVotedIds(ids);
+            localStorage.setItem(key, JSON.stringify(ids));
+          }
+        });
+    }
+  }, [connectedUser, getVoteStorageKey]);
 
   // Fetch submissions from Supabase
   const loadSubmissions = useCallback(async () => {
@@ -108,13 +154,45 @@ export default function Home() {
     loadSubmissions();
   }, [loadSubmissions]);
 
-  // Handle Vote Execution with Anti-Fraud Verification
-  const executeVote = async (id: string) => {
-    if (votedIds.includes(id)) return;
+  // Handle Vote Request from card or leaderboard
+  const handleVoteRequest = (id: string, contestantName: string, avatarUrl?: string) => {
+    if (!connectedUser) {
+      setPendingVoteTarget({ id, name: contestantName, avatarUrl } as { id: string; name: string });
+      setIsConnectModalOpen(true);
+      return;
+    }
 
+    if (votedIds.includes(id)) {
+      return;
+    }
+
+    // STRICT CHECK: Maximum 2 votes per Roblox account
+    if (votedIds.length >= 2) {
+      setIsQuotaModalOpen(true);
+      return;
+    }
+
+    // Open English Vote Confirmation Modal (Permanent Vote Notice)
+    setConfirmVoteTarget({ id, name: contestantName, avatarUrl });
+  };
+
+  // Execute vote after user confirms in the English confirmation modal
+  const executeConfirmedVote = async () => {
+    if (!confirmVoteTarget) return;
+    const { id, name } = confirmVoteTarget;
+
+    if (votedIds.includes(id) || votedIds.length >= 2) {
+      setConfirmVoteTarget(null);
+      return;
+    }
+
+    setIsSubmittingVote(true);
+    const key = getVoteStorageKey(connectedUser?.username);
     const nextVoted = [...votedIds, id];
+
+    // Optimistic update
     setVotedIds(nextVoted);
-    localStorage.setItem("trec_kl_voted_submissions", JSON.stringify(nextVoted));
+    localStorage.setItem(key, JSON.stringify(nextVoted));
 
     setSubmissions((prev) =>
       prev.map((item) =>
@@ -122,14 +200,36 @@ export default function Home() {
       )
     );
 
-    if (isSupabaseConfigured) {
-      try {
+    // Celebration confetti
+    confetti({
+      particleCount: 80,
+      spread: 80,
+      origin: { y: 0.6 },
+      colors: ["#ff007f", "#00f2fe", "#ffbe0b", "#a855f7"],
+    });
+
+    try {
+      if (isSupabaseConfigured) {
         if (connectedUser?.id) {
-          const { error } = await supabase.rpc("cast_verified_vote", {
+          const { data, error } = await supabase.rpc("cast_verified_vote", {
             target_submission_id: id,
             voter_id: connectedUser.id,
             voter_name: connectedUser.username,
           });
+
+          if (data && data.success === false) {
+            alert(data.message || "Vote quota reached (Maximum 2 votes per account).");
+            // Rollback optimistic update
+            setVotedIds(votedIds);
+            localStorage.setItem(key, JSON.stringify(votedIds));
+            setSubmissions((prev) =>
+              prev.map((item) =>
+                item.id === id ? { ...item, votes: Math.max(0, item.votes - 1) } : item
+              )
+            );
+            return;
+          }
+
           if (error) {
             // Fallback to basic increment if votes_log table is not yet migrated
             await supabase.rpc("increment_vote", { row_id: id });
@@ -137,28 +237,25 @@ export default function Home() {
         } else {
           await supabase.rpc("increment_vote", { row_id: id });
         }
-      } catch (err) {
-        console.error("Failed to increment vote:", err);
       }
+    } catch (err) {
+      console.error("Failed to cast vote:", err);
+    } finally {
+      setIsSubmittingVote(false);
+      setConfirmVoteTarget(null);
     }
-  };
-
-  // Called when user clicks vote button on card
-  const handleVoteRequest = async (id: string, contestantName: string) => {
-    if (!connectedUser) {
-      setPendingVoteTarget({ id, name: contestantName });
-      setIsConnectModalOpen(true);
-      return;
-    }
-    await executeVote(id);
   };
 
   // Callback after user connects Roblox account
   const handleUserConnected = async (user: ConnectedRobloxUser) => {
     setConnectedUser(user);
     if (pendingVoteTarget) {
-      await executeVote(pendingVoteTarget.id);
+      // Trigger confirmation modal for pending vote target
+      const target = pendingVoteTarget;
       setPendingVoteTarget(null);
+      setTimeout(() => {
+        handleVoteRequest(target.id, target.name);
+      }, 300);
     }
   };
 
@@ -169,39 +266,6 @@ export default function Home() {
       await fetch("/api/auth/logout", { method: "POST" });
     } catch {
       // ignore
-    }
-  };
-
-  // Handle Unvote
-  const handleUnvote = async (id: string) => {
-    if (!votedIds.includes(id)) return;
-
-    const nextVoted = votedIds.filter((item) => item !== id);
-    setVotedIds(nextVoted);
-    localStorage.setItem("trec_kl_voted_submissions", JSON.stringify(nextVoted));
-
-    setSubmissions((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, votes: Math.max(0, item.votes - 1) } : item
-      )
-    );
-
-    if (isSupabaseConfigured) {
-      try {
-        if (connectedUser?.id) {
-          const { error } = await supabase.rpc("cancel_verified_vote", {
-            target_submission_id: id,
-            voter_id: connectedUser.id,
-          });
-          if (error) {
-            await supabase.rpc("decrement_vote", { row_id: id });
-          }
-        } else {
-          await supabase.rpc("decrement_vote", { row_id: id });
-        }
-      } catch (err) {
-        console.error("Failed to decrement vote:", err);
-      }
     }
   };
 
@@ -344,6 +408,52 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Account Quota Status Banner */}
+            {connectedUser && (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-5 py-3.5 rounded-2xl bg-gradient-to-r from-zinc-900/90 via-zinc-950/90 to-zinc-900/90 border border-white/10 backdrop-blur-md">
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-xs shadow-md border ${
+                      votedIds.length >= 2
+                        ? "bg-amber-500/20 text-amber-400 border-amber-500/40"
+                        : "bg-[#ff007f]/20 text-[#ff007f] border-[#ff007f]/40"
+                    }`}
+                  >
+                    {votedIds.length}/2
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-white flex items-center gap-2">
+                      <span>Voting Quota:</span>
+                      <span
+                        className={
+                          votedIds.length >= 2
+                            ? "text-amber-400 font-extrabold"
+                            : "text-[#00f2fe] font-extrabold"
+                        }
+                      >
+                        {votedIds.length === 0
+                          ? "2 Votes Remaining"
+                          : votedIds.length === 1
+                          ? "1 Vote Remaining"
+                          : "0 Votes Left (Quota Full)"}
+                      </span>
+                    </p>
+                    <p className="text-[11px] text-zinc-400">
+                      Signed in as{" "}
+                      <span className="text-white font-semibold">@{connectedUser.username}</span>{" "}
+                      &bull; ⚠️ <span className="text-zinc-300">Votes are permanent and cannot be undone</span>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-white/5 border border-white/10 text-zinc-400">
+                    Max 2 Votes / Account
+                  </span>
+                </div>
+              </div>
+            )}
+
             {/* Filter & Search Bar */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-[#0c0e14]/80 border border-white/10 p-3.5 sm:p-4 rounded-3xl backdrop-blur-xl">
               {/* Search */}
@@ -429,8 +539,9 @@ export default function Home() {
                     key={sub.id}
                     submission={sub}
                     hasVoted={votedIds.includes(sub.id)}
-                    onVote={() => handleVoteRequest(sub.id, sub.roblox_username)}
-                    onUnvote={handleUnvote}
+                    isQuotaFull={votedIds.length >= 2}
+                    onVote={(id, name, avatarUrl) => handleVoteRequest(id, name, avatarUrl)}
+                    onQuotaExceeded={() => setIsQuotaModalOpen(true)}
                     onImageClick={(url, title, tiktokUrl) => {
                       setZoomModal({ url, title, tiktokUrl });
                       setModalMediaTab("photo");
@@ -567,6 +678,147 @@ export default function Home() {
                 </a>
               )}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* English Vote Confirmation Modal (Permanent & Non-refundable) */}
+      {confirmVoteTarget && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => {
+            if (!isSubmittingVote) setConfirmVoteTarget(null);
+          }}
+        >
+          <div
+            className="relative w-full max-w-md bg-gradient-to-b from-[#13151f] to-[#0a0b10] border border-white/20 rounded-3xl p-6 sm:p-7 shadow-2xl text-center space-y-5 animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Top Icon Badge */}
+            <div className="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-tr from-[#ff007f]/20 to-rose-500/10 border border-[#ff007f]/40 flex items-center justify-center text-[#ff007f] shadow-lg shadow-[#ff007f]/20">
+              <Heart className="w-8 h-8 fill-[#ff007f] animate-pulse" />
+            </div>
+
+            {/* Header Text */}
+            <div className="space-y-1.5">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[10px] font-black uppercase tracking-widest">
+                <AlertTriangle className="w-3.5 h-3.5" />
+                Permanent Vote Notice
+              </span>
+              <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight uppercase">
+                Confirm Your Vote?
+              </h3>
+              <p className="text-xs sm:text-sm text-zinc-300">
+                You are about to cast your vote for:
+              </p>
+              <div className="py-2.5 px-4 rounded-2xl bg-white/5 border border-white/10 font-black text-[#ff007f] text-base sm:text-lg tracking-wide uppercase">
+                @{confirmVoteTarget.name}
+              </div>
+            </div>
+
+            {/* Strict Notice Box in English */}
+            <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-left space-y-2">
+              <div className="flex items-start gap-2.5">
+                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <div className="text-[11px] sm:text-xs text-amber-200/90 leading-relaxed space-y-1">
+                  <p className="font-extrabold text-amber-300 uppercase tracking-wider text-[10px]">
+                    Cannot Be Undone / Unvoted
+                  </p>
+                  <ul className="list-disc pl-4 space-y-0.5 text-zinc-300">
+                    <li>
+                      This vote is <strong className="text-white">permanent</strong> and cannot be unvoted or changed later.
+                    </li>
+                    <li>
+                      Each Roblox account is strictly limited to <strong className="text-white">2 votes total</strong>.
+                    </li>
+                    <li>
+                      This action will use{" "}
+                      <strong className="text-[#00f2fe]">
+                        Vote {votedIds.length + 1} of 2
+                      </strong>{" "}
+                      for your account.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-3 pt-1">
+              <button
+                type="button"
+                disabled={isSubmittingVote}
+                onClick={() => setConfirmVoteTarget(null)}
+                className="flex-1 py-3 px-4 rounded-2xl bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white text-xs font-black uppercase tracking-wider transition-all border border-white/10 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isSubmittingVote}
+                onClick={executeConfirmedVote}
+                className="flex-1 py-3 px-4 rounded-2xl bg-gradient-to-r from-[#ff007f] to-rose-600 hover:brightness-110 text-white text-xs font-black uppercase tracking-wider transition-all shadow-lg shadow-[#ff007f]/30 flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {isSubmittingVote ? (
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Submitting...</span>
+                  </>
+                ) : (
+                  <>
+                    <Heart className="w-3.5 h-3.5 fill-white" />
+                    <span>Yes, Confirm Vote</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* English Quota Exceeded Modal */}
+      {isQuotaModalOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => setIsQuotaModalOpen(false)}
+        >
+          <div
+            className="relative w-full max-w-md bg-gradient-to-b from-[#13151f] to-[#0a0b10] border border-white/20 rounded-3xl p-6 sm:p-7 shadow-2xl text-center space-y-5 animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-16 h-16 mx-auto rounded-3xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-lg shadow-amber-500/20">
+              <AlertTriangle className="w-8 h-8" />
+            </div>
+
+            <div className="space-y-1.5">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[10px] font-black uppercase tracking-widest">
+                Vote Limit Reached
+              </span>
+              <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight uppercase">
+                Quota Full (2/2 Votes Used)
+              </h3>
+              <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed pt-1">
+                You have already used all <strong className="text-white">2 available votes</strong> for your account.
+              </p>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-xs text-zinc-300 text-left space-y-1.5">
+              <p className="font-bold text-white flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                Votes are permanent:
+              </p>
+              <p className="text-[11px] text-zinc-400 pl-3.5 leading-relaxed">
+                Votes cannot be undone, swapped, or refunded. Thank you for participating in the TREC KL Fashion Runway!
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setIsQuotaModalOpen(false)}
+              className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-[#ff007f] to-rose-600 hover:brightness-110 text-white text-xs font-black uppercase tracking-wider transition-all shadow-lg shadow-[#ff007f]/30"
+            >
+              I Understand
+            </button>
           </div>
         </div>
       )}

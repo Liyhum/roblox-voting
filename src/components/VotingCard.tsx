@@ -18,10 +18,11 @@ import { TikTokPlayer, TikTokIcon } from "./TikTokPlayer";
 interface VotingCardProps {
   submission: Submission;
   hasVoted: boolean;
-  onVote: (id: string) => Promise<void>;
-  onUnvote?: (id: string) => Promise<void>;
+  isQuotaFull?: boolean;
+  onVote: (id: string, contestantName: string, avatarUrl?: string) => void;
   onImageClick: (url: string, title: string, tiktokUrl?: string | null) => void;
   onRequireConnect: (id: string, contestantName: string) => void;
+  onQuotaExceeded?: () => void;
   isConnected: boolean;
   rank?: number;
 }
@@ -29,22 +30,24 @@ interface VotingCardProps {
 export function VotingCard({
   submission,
   hasVoted,
+  isQuotaFull,
   onVote,
-  onUnvote,
   onImageClick,
   onRequireConnect,
+  onQuotaExceeded,
   isConnected,
   rank,
 }: VotingCardProps) {
-  const [isVoting, setIsVoting] = useState(false);
   const [copied, setCopied] = useState(false);
   const [mediaMode, setMediaMode] = useState<"photo" | "tiktok">("photo");
 
   const hasTikTok = Boolean(submission.tiktok_url);
 
-  const handleVoteClick = async (e: React.MouseEvent) => {
+  const handleVoteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isVoting) return;
+
+    // Votes are permanent! Once voted, clicking does nothing
+    if (hasVoted) return;
 
     // Connect Roblox required before voting
     if (!isConnected) {
@@ -52,27 +55,14 @@ export function VotingCard({
       return;
     }
 
-    setIsVoting(true);
-    try {
-      if (hasVoted && onUnvote) {
-        await onUnvote(submission.id);
-      } else if (!hasVoted) {
-        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-        const x = (rect.left + rect.width / 2) / window.innerWidth;
-        const y = (rect.top + rect.height / 2) / window.innerHeight;
-
-        confetti({
-          particleCount: 50,
-          spread: 70,
-          origin: { x, y },
-          colors: ["#ff007f", "#00f2fe", "#ffbe0b", "#a855f7"],
-        });
-
-        await onVote(submission.id);
-      }
-    } finally {
-      setIsVoting(false);
+    // Check if user has already reached their 2-vote quota
+    if (isQuotaFull) {
+      if (onQuotaExceeded) onQuotaExceeded();
+      return;
     }
+
+    // Trigger vote confirmation modal
+    onVote(submission.id, submission.roblox_username, submission.image_url);
   };
 
   const handleCopy = (e: React.MouseEvent) => {
@@ -283,19 +273,32 @@ export function VotingCard({
 
           <button
             onClick={handleVoteClick}
-            disabled={isVoting}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-black tracking-wider uppercase transition-all duration-300 active:scale-95 ${
+            disabled={hasVoted}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-black tracking-wider uppercase transition-all duration-300 ${
               hasVoted
-                ? "bg-[#ff007f]/20 text-[#ff007f] border border-[#ff007f]/50 hover:bg-[#ff007f]/30"
-                : "bg-gradient-to-r from-[#ff007f] via-rose-500 to-[#00f2fe] text-white hover:brightness-110 shadow-lg shadow-[#ff007f]/25"
+                ? "bg-[#ff007f]/20 text-[#ff007f] border border-[#ff007f]/40 cursor-default opacity-90 shadow-none"
+                : isQuotaFull
+                ? "bg-zinc-900 border border-amber-500/40 text-amber-300 hover:bg-zinc-800 active:scale-95"
+                : "bg-gradient-to-r from-[#ff007f] via-rose-500 to-[#00f2fe] text-white hover:brightness-110 shadow-lg shadow-[#ff007f]/25 active:scale-95"
             }`}
+            title={
+              hasVoted
+                ? "Your vote has been cast and is permanent"
+                : isQuotaFull
+                ? "Quota full: Maximum 2 votes per account reached"
+                : "Vote for this runway outfit"
+            }
           >
             <Heart
               className={`w-4 h-4 transition-all ${
-                hasVoted ? "fill-[#ff007f] text-[#ff007f] scale-110" : "text-white group-hover:scale-110"
+                hasVoted
+                  ? "fill-[#ff007f] text-[#ff007f]"
+                  : isQuotaFull
+                  ? "text-amber-400"
+                  : "text-white group-hover:scale-110"
               }`}
             />
-            <span>{hasVoted ? "VOTED" : "VOTE"}</span>
+            <span>{hasVoted ? "VOTED" : isQuotaFull ? "MAX 2/2" : "VOTE"}</span>
           </button>
         </div>
       </div>
