@@ -18,10 +18,11 @@ import { isValidTikTokUrl, extractTikTokVideoId } from "@/lib/tiktok";
 
 interface UploadSectionProps {
   onSuccess: () => void;
+  connectedUsername?: string;
 }
 
-export function UploadSection({ onSuccess }: UploadSectionProps) {
-  const [username, setUsername] = useState("");
+export function UploadSection({ onSuccess, connectedUsername }: UploadSectionProps) {
+  const [username, setUsername] = useState(connectedUsername || "");
   const [caption, setCaption] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -41,12 +42,27 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
   } | null>(null);
   const [robloxError, setRobloxError] = useState("");
 
+  // Duplicate submission check state (1 USN = 1 Submit Rule)
+  const [isCheckingDuplicate, setIsCheckingDuplicate] = useState(false);
+  const [duplicateSubmission, setDuplicateSubmission] = useState<{
+    id: string;
+    roblox_username: string;
+    caption?: string | null;
+  } | null>(null);
+
   // Upload status
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [success, setSuccess] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync connected username if user connects account later
+  useEffect(() => {
+    if (connectedUsername && !username) {
+      setUsername(connectedUsername);
+    }
+  }, [connectedUsername, username]);
 
   // Debounced TikTok link validator
   useEffect(() => {
@@ -96,18 +112,44 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
     return () => clearTimeout(timer);
   }, [tiktokUrl]);
 
-  // Debounced Roblox Avatar lookup
+  // Debounced Roblox Avatar lookup & Duplicate Submission Verification
   useEffect(() => {
     const trimmed = username.trim();
     if (!trimmed || trimmed.length < 3) {
       setRobloxData(null);
       setRobloxError("");
+      setDuplicateSubmission(null);
       return;
     }
 
     const timer = setTimeout(async () => {
       setIsCheckingRoblox(true);
+      setIsCheckingDuplicate(true);
       setRobloxError("");
+      setDuplicateSubmission(null);
+
+      // 1. Strict Check: Has this username already submitted an outfit? (1 USN = 1 Submit)
+      if (isSupabaseConfigured) {
+        try {
+          const { data: existing } = await supabase
+            .from("submissions")
+            .select("id, roblox_username, caption")
+            .ilike("roblox_username", trimmed)
+            .limit(1);
+
+          if (existing && existing.length > 0) {
+            setDuplicateSubmission(existing[0]);
+          }
+        } catch (e) {
+          console.error("Duplicate check error:", e);
+        } finally {
+          setIsCheckingDuplicate(false);
+        }
+      } else {
+        setIsCheckingDuplicate(false);
+      }
+
+      // 2. Fetch Roblox Avatar and Verify Group Membership
       try {
         const res = await fetch(`/api/roblox-avatar?username=${encodeURIComponent(trimmed)}`);
         const data = await res.json();
@@ -189,6 +231,13 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
       return;
     }
 
+    if (duplicateSubmission) {
+      setErrorMessage(
+        `Akun Roblox @${duplicateSubmission.roblox_username} sudah terdaftar pada runway! Aturan: 1 akun Roblox (USN) hanya boleh 1 kali submit.`
+      );
+      return;
+    }
+
     if (!isSupabaseConfigured) {
       setErrorMessage(
         "Supabase is not configured in .env.local yet. Please configure it to save uploads."
@@ -199,6 +248,20 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
     setIsSubmitting(true);
 
     try {
+      // 1. Double check in Supabase before uploading image to prevent duplicate submissions
+      const { data: existingCheck } = await supabase
+        .from("submissions")
+        .select("id, roblox_username")
+        .ilike("roblox_username", username.trim())
+        .limit(1);
+
+      if (existingCheck && existingCheck.length > 0) {
+        setDuplicateSubmission(existingCheck[0]);
+        throw new Error(
+          `Akun Roblox @${existingCheck[0].roblox_username} sudah pernah mendaftar! Setiap username hanya boleh mengirim 1 outfit (1 USN = 1 Submit).`
+        );
+      }
+
       const fileExt = selectedFile.name.split(".").pop() || "png";
       const fileName = `${Date.now()}_${username.trim().toLowerCase().replace(/[^a-z0-9]/g, "_")}.${fileExt}`;
 
@@ -249,6 +312,15 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
       }
 
       if (dbError) {
+        if (
+          dbError.code === "23505" ||
+          dbError.message?.toLowerCase().includes("unique") ||
+          dbError.message?.toLowerCase().includes("duplicate")
+        ) {
+          throw new Error(
+            `Akun Roblox @${username.trim()} sudah pernah mendaftar! Setiap akun hanya boleh 1 kali submit.`
+          );
+        }
         throw new Error(`Database error: ${dbError.message}`);
       }
 
@@ -307,19 +379,28 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
         <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
           {/* Input Username */}
           <div className="space-y-2">
-            <label className="block text-xs font-black uppercase tracking-wider text-zinc-300">
-              Roblox Model Username <span className="text-[#ff007f]">*</span>
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-black uppercase tracking-wider text-zinc-300">
+                Roblox Model Username <span className="text-[#ff007f]">*</span>
+              </label>
+              <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-zinc-400">
+                Limit: 1 Outfit / USN
+              </span>
+            </div>
             <div className="relative">
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="e.g. YourRobloxName"
-                className="w-full px-4 py-3 bg-zinc-950/80 border border-white/10 rounded-2xl text-white placeholder-zinc-600 focus:outline-none focus:border-[#00f2fe] focus:ring-1 focus:ring-[#00f2fe] transition-all font-medium text-sm"
+                className={`w-full px-4 py-3 bg-zinc-950/80 border rounded-2xl text-white placeholder-zinc-600 focus:outline-none transition-all font-medium text-sm ${
+                  duplicateSubmission
+                    ? "border-rose-500/60 focus:border-rose-500"
+                    : "border-white/10 focus:border-[#00f2fe] focus:ring-1 focus:ring-[#00f2fe]"
+                }`}
                 required
               />
-              {isCheckingRoblox && (
+              {(isCheckingRoblox || isCheckingDuplicate) && (
                 <div className="absolute right-4 top-3.5">
                   <Loader2 className="w-5 h-5 text-[#00f2fe] animate-spin" />
                 </div>
@@ -375,6 +456,26 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
                     </a>
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Duplicate Submission Warning Alert (1 USN = 1 Submit Rule) */}
+            {duplicateSubmission && (
+              <div className="p-3.5 bg-rose-500/15 border border-rose-500/40 rounded-2xl flex items-start gap-3 text-xs shadow-lg animate-in fade-in duration-200">
+                <AlertCircle className="w-5 h-5 text-rose-400 shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-black text-rose-300 uppercase tracking-wider text-[11px]">
+                      Username Sudah Pernah Terdaftar!
+                    </span>
+                    <span className="text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/30 px-2 py-0.5 rounded-md font-black uppercase">
+                      1 USN = 1 Submit
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-zinc-300 leading-relaxed">
+                    Akun Roblox <strong className="text-white">@{duplicateSubmission.roblox_username}</strong> sudah memiliki outfit yang terdaftar di runway. Setiap akun Roblox hanya diperbolehkan mengirim <strong>1 model busana</strong>.
+                  </p>
+                </div>
               </div>
             )}
 
@@ -516,13 +617,22 @@ export function UploadSection({ onSuccess }: UploadSectionProps) {
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={isSubmitting}
-            className="w-full py-4 px-6 rounded-2xl font-black text-xs sm:text-sm tracking-widest uppercase text-white bg-gradient-to-r from-[#ff007f] via-rose-600 to-[#00f2fe] hover:brightness-110 shadow-2xl shadow-[#ff007f]/30 transition-all duration-300 flex items-center justify-center gap-2.5 disabled:opacity-50 active:scale-[0.98]"
+            disabled={isSubmitting || Boolean(duplicateSubmission) || Boolean(robloxData && !robloxData.isInGroup)}
+            className={`w-full py-4 px-6 rounded-2xl font-black text-xs sm:text-sm tracking-widest uppercase transition-all duration-300 flex items-center justify-center gap-2.5 active:scale-[0.98] ${
+              duplicateSubmission
+                ? "bg-zinc-800 text-zinc-400 border border-white/10 cursor-not-allowed"
+                : "bg-gradient-to-r from-[#ff007f] via-rose-600 to-[#00f2fe] text-white hover:brightness-110 shadow-2xl shadow-[#ff007f]/30 disabled:opacity-50"
+            }`}
           >
             {isSubmitting ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin" />
                 <span>Registering Outfit to Runway...</span>
+              </>
+            ) : duplicateSubmission ? (
+              <>
+                <AlertCircle className="w-5 h-5 text-rose-400" />
+                <span>Username Sudah Terdaftar (Batas 1 Outfit)</span>
               </>
             ) : (
               <>

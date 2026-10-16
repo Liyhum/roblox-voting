@@ -562,6 +562,7 @@ export default function Home() {
         {/* Tab 2: Upload Form */}
         {activeTab === "upload" && (
           <UploadSection
+            connectedUsername={connectedUser?.username}
             onSuccess={() => {
               loadSubmissions();
               setActiveTab("gallery");

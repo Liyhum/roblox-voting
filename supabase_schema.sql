@@ -27,6 +27,9 @@ alter table public.submissions add column if not exists tiktok_url text;
 create index if not exists idx_submissions_votes on public.submissions(votes desc);
 create index if not exists idx_submissions_created_at on public.submissions(created_at desc);
 
+-- 1 USN = 1 SUBMIT: Mencegah 1 akun Roblox mendaftar lebih dari 1 kali (Case-insensitive)
+create unique index if not exists idx_submissions_unique_username on public.submissions (lower(trim(roblox_username)));
+
 -- Enable RLS
 alter table public.submissions enable row level security;
 
