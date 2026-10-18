@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { checkRateLimit } from "@/lib/rate-limit";
 
-export const REQUIRED_GROUP_ID = 740188661; // FEMME'S STUDIO
-export const REQUIRED_GROUP_NAME = "FEMME'S STUDIO";
-export const REQUIRED_GROUP_URL = `https://www.roblox.com/groups/${REQUIRED_GROUP_ID}`;
+const REQUIRED_GROUP_ID = 740188661; // FEMME'S STUDIO
+const REQUIRED_GROUP_NAME = "FEMME'S STUDIO";
+const REQUIRED_GROUP_URL = `https://www.roblox.com/groups/${REQUIRED_GROUP_ID}`;
 
 export async function GET(request: Request) {
   // Rate limiting: Max 40 requests per minute per IP
