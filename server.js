@@ -8,10 +8,21 @@ const app = next({ dev, dir: __dirname });
 const handle = app.getRequestHandler();
 
 app.prepare().then(() => {
-  createServer((req, res) => {
+  const server = createServer((req, res) => {
     handle(req, res);
-  }).listen(port, (err) => {
+  });
+
+  server.listen(port, (err) => {
     if (err) throw err;
-    console.log(`> Ready on http://localhost:${port}`);
+    console.log(`> Ready on ${port}`);
+  });
+
+  process.on("SIGTERM", () => {
+    console.log("SIGTERM received, exiting");
+    server.close(() => process.exit(0));
+  });
+
+  process.on("SIGINT", () => {
+    server.close(() => process.exit(0));
   });
 });
