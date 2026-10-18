@@ -1,10 +1,28 @@
 import { NextResponse } from "next/server";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export const REQUIRED_GROUP_ID = 740188661; // FEMME'S STUDIO
 export const REQUIRED_GROUP_NAME = "FEMME'S STUDIO";
 export const REQUIRED_GROUP_URL = `https://www.roblox.com/groups/${REQUIRED_GROUP_ID}`;
 
 export async function GET(request: Request) {
+  // Rate limiting: Max 40 requests per minute per IP
+  const rateResult = checkRateLimit(request, {
+    keyPrefix: "roblox_avatar",
+    limit: 40,
+    windowMs: 60 * 1000,
+  });
+
+  if (!rateResult.success) {
+    return NextResponse.json(
+      { error: "Too many avatar lookup requests. Please slow down." },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rateResult.retryAfterSeconds) },
+      }
+    );
+  }
+
   const { searchParams } = new URL(request.url);
   const username = searchParams.get("username");
 

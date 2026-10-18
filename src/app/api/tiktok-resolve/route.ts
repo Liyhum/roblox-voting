@@ -1,9 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { extractTikTokVideoId, isValidTikTokUrl, getTikTokEmbedUrl } from "@/lib/tiktok";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
+  // Rate limiting: Max 30 requests per minute per IP
+  const rateResult = checkRateLimit(req, {
+    keyPrefix: "tiktok_resolve",
+    limit: 30,
+    windowMs: 60 * 1000,
+  });
+
+  if (!rateResult.success) {
+    return NextResponse.json(
+      { error: "Too many TikTok URL resolution requests. Please slow down." },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rateResult.retryAfterSeconds) },
+      }
+    );
+  }
+
   const { searchParams } = new URL(req.url);
   const rawUrl = searchParams.get("url");
 

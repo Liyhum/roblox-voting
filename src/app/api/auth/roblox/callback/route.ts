@@ -4,6 +4,7 @@ import {
   ROBLOX_CLIENT_SECRET,
   getAppBaseUrl,
 } from "@/lib/roblox-oauth";
+import { createSignedSession } from "@/lib/session";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -128,9 +129,19 @@ export async function GET(request: Request) {
 
     const response = NextResponse.redirect(`${baseUrl}/?auth=success`);
 
-    // Set secure user session cookie
+    // 1. Set cryptographically signed HTTP-only session cookie (Server-trusted, Anti-tampering)
+    const signedToken = createSignedSession(sessionPayload);
+    response.cookies.set("roblox_session_token", signedToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 30, // 30 days
+      path: "/",
+    });
+
+    // 2. Set client-accessible session cache for immediate React state hydration
     response.cookies.set("roblox_user_session", JSON.stringify(sessionPayload), {
-      httpOnly: false, // Accessible to client so React state can hydrate immediately
+      httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 30, // 30 days

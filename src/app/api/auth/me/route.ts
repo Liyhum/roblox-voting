@@ -1,22 +1,21 @@
 import { NextResponse } from "next/server";
 import { isRobloxOAuthConfigured } from "@/lib/roblox-oauth";
+import { getSessionFromRequest } from "@/lib/session";
 
 export async function GET(request: Request) {
-  const cookieHeader = request.headers.get("cookie") || "";
-  const match = cookieHeader.match(/roblox_user_session=([^;]+)/);
+  // Securely verify session using HMAC signature
+  const user = getSessionFromRequest(request);
 
-  let user = null;
-  if (match) {
-    try {
-      const decoded = decodeURIComponent(match[1]);
-      user = JSON.parse(decoded);
-    } catch {
-      // invalid cookie json
-    }
-  }
-
-  return NextResponse.json({
+  const response = NextResponse.json({
     user,
     isOAuthConfigured: isRobloxOAuthConfigured,
   });
+
+  // If session is invalid or tampered, ensure legacy cookie is cleaned up
+  if (!user) {
+    response.cookies.delete("roblox_session_token");
+    response.cookies.delete("roblox_user_session");
+  }
+
+  return response;
 }

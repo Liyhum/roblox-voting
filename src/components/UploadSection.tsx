@@ -248,80 +248,26 @@ export function UploadSection({ onSuccess, connectedUsername }: UploadSectionPro
     setIsSubmitting(true);
 
     try {
-      // 1. Double check in Supabase before uploading image to prevent duplicate submissions
-      const { data: existingCheck } = await supabase
-        .from("submissions")
-        .select("id, roblox_username")
-        .ilike("roblox_username", username.trim())
-        .limit(1);
-
-      if (existingCheck && existingCheck.length > 0) {
-        setDuplicateSubmission(existingCheck[0]);
-        throw new Error(
-          `Akun Roblox @${existingCheck[0].roblox_username} sudah pernah mendaftar! Setiap username hanya boleh mengirim 1 outfit (1 USN = 1 Submit).`
-        );
-      }
-
-      const fileExt = selectedFile.name.split(".").pop() || "png";
-      const fileName = `${Date.now()}_${username.trim().toLowerCase().replace(/[^a-z0-9]/g, "_")}.${fileExt}`;
-
-      // Upload to Supabase Storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from("roblox_images")
-        .upload(fileName, selectedFile, {
-          cacheControl: "3600",
-          upsert: false,
-        });
-
-      if (uploadError) {
-        throw new Error(`Upload error: ${uploadError.message}`);
-      }
-
-      // Get public URL
-      const { data: publicUrlData } = supabase.storage
-        .from("roblox_images")
-        .getPublicUrl(uploadData.path);
-
-      const imageUrl = publicUrlData.publicUrl;
-
-      // Insert to database
-      const payload: Record<string, unknown> = {
-        roblox_username: username.trim(),
-        roblox_avatar_url: robloxData?.avatarUrl || null,
-        caption: caption.trim() || null,
-        image_url: imageUrl,
-        votes: 0,
-      };
-
+      const formData = new FormData();
+      formData.append("username", username.trim());
+      formData.append("caption", caption.trim());
       if (tiktokUrl.trim()) {
-        payload.tiktok_url = tiktokUrl.trim();
+        formData.append("tiktokUrl", tiktokUrl.trim());
       }
-
-      let { error: dbError } = await supabase.from("submissions").insert([payload]);
-
-      // Graceful fallback if tiktok_url column hasn't been migrated yet in Supabase
-      if (dbError && dbError.message && dbError.message.toLowerCase().includes("tiktok_url")) {
-        delete payload.tiktok_url;
-        const retryResult = await supabase.from("submissions").insert([payload]);
-        if (!retryResult.error) {
-          dbError = null;
-          console.warn("tiktok_url column not yet created in Supabase submissions table.");
-        } else {
-          dbError = retryResult.error;
-        }
+      if (robloxData?.avatarUrl) {
+        formData.append("avatarUrl", robloxData.avatarUrl);
       }
+      formData.append("file", selectedFile);
 
-      if (dbError) {
-        if (
-          dbError.code === "23505" ||
-          dbError.message?.toLowerCase().includes("unique") ||
-          dbError.message?.toLowerCase().includes("duplicate")
-        ) {
-          throw new Error(
-            `Akun Roblox @${username.trim()} sudah pernah mendaftar! Setiap akun hanya boleh 1 kali submit.`
-          );
-        }
-        throw new Error(`Database error: ${dbError.message}`);
+      const res = await fetch("/api/submissions", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || data.success === false) {
+        throw new Error(data.message || "Gagal mengunggah outfit. Silakan coba lagi.");
       }
 
       setSuccess(true);

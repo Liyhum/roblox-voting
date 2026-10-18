@@ -1,8 +1,26 @@
 import { NextResponse } from "next/server";
 import { ROBLOX_CLIENT_ID, getAppBaseUrl, isRobloxOAuthConfigured } from "@/lib/roblox-oauth";
+import { checkRateLimit } from "@/lib/rate-limit";
 import crypto from "crypto";
 
 export async function GET(request: Request) {
+  // Rate limiting: Max 15 login requests per minute per IP
+  const rateResult = checkRateLimit(request, {
+    keyPrefix: "roblox_login",
+    limit: 15,
+    windowMs: 60 * 1000,
+  });
+
+  if (!rateResult.success) {
+    return NextResponse.json(
+      { error: "Too many login attempts. Please wait a moment." },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rateResult.retryAfterSeconds) },
+      }
+    );
+  }
+
   if (!isRobloxOAuthConfigured) {
     return NextResponse.json(
       { error: "Roblox OAuth is not configured yet. Please add ROBLOX_CLIENT_ID and ROBLOX_CLIENT_SECRET to .env.local" },

@@ -180,3 +180,21 @@ drop policy if exists "Public can upload roblox_images" on storage.objects;
 create policy "Public can upload roblox_images"
   on storage.objects for insert
   with check (bucket_id = 'roblox_images');
+
+-- ==============================================================================
+-- 7. SECURITY HARDENING: ANTI-MANIPULATIF & ANTI-BOT RPC PERMISSIONS
+-- Mencegah hacker / bot menembak langsung function cast_verified_vote dari curl/Postman
+-- Hanya backend server (dengan Service Role Key) yang diizinkan memanggil fungsi ini!
+-- ==============================================================================
+revoke execute on function public.cast_verified_vote(uuid, bigint, text) from public;
+revoke execute on function public.cast_verified_vote(uuid, bigint, text) from anon;
+grant execute on function public.cast_verified_vote(uuid, bigint, text) to service_role;
+
+revoke execute on function public.increment_vote(uuid) from public;
+revoke execute on function public.increment_vote(uuid) from anon;
+grant execute on function public.increment_vote(uuid) to service_role;
+
+revoke execute on function public.decrement_vote(uuid) from public;
+revoke execute on function public.decrement_vote(uuid) from anon;
+grant execute on function public.decrement_vote(uuid) to service_role;
+

@@ -1,5 +1,20 @@
 import type { NextConfig } from "next";
 
+const cspHeader = `
+  default-src 'self';
+  script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.tiktok.com;
+  style-src 'self' 'unsafe-inline';
+  img-src 'self' blob: data: https://*.supabase.co https://*.rbxcdn.com https://*.roblox.com;
+  font-src 'self' data:;
+  frame-src 'self' https://www.tiktok.com;
+  connect-src 'self' https://*.supabase.co https://apis.roblox.com https://thumbnails.roblox.com https://groups.roblox.com https://users.roblox.com https://www.tiktok.com;
+  object-src 'none';
+  base-uri 'self';
+  form-action 'self' https://apis.roblox.com;
+  frame-ancestors 'none';
+  upgrade-insecure-requests;
+`.replace(/\s{2,}/g, " ").trim();
+
 const securityHeaders = [
   {
     key: "X-DNS-Prefetch-Control",
@@ -11,7 +26,7 @@ const securityHeaders = [
   },
   {
     key: "X-Frame-Options",
-    value: "DENY",
+    value: "SAMEORIGIN",
   },
   {
     key: "X-Content-Type-Options",
@@ -25,9 +40,16 @@ const securityHeaders = [
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=()",
   },
+  {
+    key: "Content-Security-Policy",
+    value: cspHeader,
+  },
 ];
 
 const nextConfig: NextConfig = {
+  // Standalone output produces a self-contained bundle for Dewaweb VPS / Node.js
+  output: "standalone",
+  poweredByHeader: false,
   images: {
     remotePatterns: [
       {
@@ -37,6 +59,10 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "**.rbxcdn.com",
+      },
+      {
+        protocol: "https",
+        hostname: "**.roblox.com",
       },
     ],
   },

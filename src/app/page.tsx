@@ -210,37 +210,38 @@ export default function Home() {
     });
 
     try {
-      if (isSupabaseConfigured) {
-        if (connectedUser?.id) {
-          const { data, error } = await supabase.rpc("cast_verified_vote", {
-            target_submission_id: id,
-            voter_id: connectedUser.id,
-            voter_name: connectedUser.username,
-          });
+      const res = await fetch("/api/vote", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ submissionId: id }),
+      });
 
-          if (data && data.success === false) {
-            alert(data.message || "Vote quota reached (Maximum 2 votes per account).");
-            // Rollback optimistic update
-            setVotedIds(votedIds);
-            localStorage.setItem(key, JSON.stringify(votedIds));
-            setSubmissions((prev) =>
-              prev.map((item) =>
-                item.id === id ? { ...item, votes: Math.max(0, item.votes - 1) } : item
-              )
-            );
-            return;
-          }
+      const resData = await res.json();
 
-          if (error) {
-            // Fallback to basic increment if votes_log table is not yet migrated
-            await supabase.rpc("increment_vote", { row_id: id });
-          }
-        } else {
-          await supabase.rpc("increment_vote", { row_id: id });
-        }
+      if (!res.ok || resData.success === false) {
+        alert(resData.message || "Gagal mencatat vote. Batas kuota mungkin telah tercapai.");
+        // Rollback optimistic update
+        setVotedIds(votedIds);
+        localStorage.setItem(key, JSON.stringify(votedIds));
+        setSubmissions((prev) =>
+          prev.map((item) =>
+            item.id === id ? { ...item, votes: Math.max(0, item.votes - 1) } : item
+          )
+        );
+        return;
       }
     } catch (err) {
       console.error("Failed to cast vote:", err);
+      // Rollback optimistic update on network failure
+      setVotedIds(votedIds);
+      localStorage.setItem(key, JSON.stringify(votedIds));
+      setSubmissions((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, votes: Math.max(0, item.votes - 1) } : item
+        )
+      );
     } finally {
       setIsSubmittingVote(false);
       setConfirmVoteTarget(null);
