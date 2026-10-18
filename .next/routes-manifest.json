@@ -141,6 +141,18 @@
       "regex": "^/terms(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/terms(?:/)?$"
+    },
+    {
+      "page": "/topup",
+      "regex": "^/topup(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/topup(?:/)?$"
+    },
+    {
+      "page": "/voting",
+      "regex": "^/voting(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/voting(?:/)?$"
     }
   ],
   "dataRoutes": [],

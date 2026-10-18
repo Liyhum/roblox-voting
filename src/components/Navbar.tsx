@@ -1,7 +1,6 @@
-"use client";
-
 import React from "react";
-import { Flame, Trophy, Plus, Gamepad2, ShieldCheck, LogOut } from "lucide-react";
+import Link from "next/link";
+import { Flame, Trophy, Plus, Gamepad2, ShieldCheck, LogOut, Home as HomeIcon, Coins } from "lucide-react";
 import { ConnectedRobloxUser } from "./RobloxConnectModal";
 
 interface NavbarProps {
@@ -28,9 +27,9 @@ export function Navbar({
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-3">
         {/* Brand with TREC KL Icon */}
-        <div
-          onClick={() => setActiveTab("gallery")}
-          className="flex items-center gap-3 cursor-pointer group shrink-0"
+        <Link
+          href="/"
+          className="flex items-center gap-3 group shrink-0"
         >
           <div className="relative">
             <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl overflow-hidden border-2 border-white/20 p-0.5 group-hover:border-[#ff007f] transition-all duration-300 shadow-lg shadow-[#ff007f]/20">
@@ -56,10 +55,19 @@ export function Navbar({
               Runway &amp; Avatar Awards
             </p>
           </div>
-        </div>
+        </Link>
 
         {/* Navigation Tabs */}
         <nav className="flex items-center gap-1 sm:gap-2 bg-zinc-900/90 p-1.5 rounded-2xl border border-white/10 shadow-2xl backdrop-blur-md">
+          <Link
+            href="/"
+            className="flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all text-zinc-400 hover:text-white hover:bg-white/5"
+            title="Kembali ke Beranda"
+          >
+            <HomeIcon className="w-4 h-4 text-[#00f2fe]" />
+            <span className="hidden md:inline">Home</span>
+          </Link>
+
           <button
             onClick={() => setActiveTab("gallery")}
             className={`flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all ${
@@ -101,6 +109,17 @@ export function Navbar({
             <span className="hidden sm:inline">Submit Outfit</span>
             <span className="sm:hidden">Submit</span>
           </button>
+
+          <Link
+            href="/topup"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all text-amber-300 hover:text-amber-200 hover:bg-amber-500/10 border border-amber-500/30 group"
+          >
+            <Coins className="w-4 h-4 text-amber-400" />
+            <span className="hidden lg:inline">Top Up</span>
+            <span className="px-1.5 py-0.2 text-[8px] font-black uppercase rounded bg-amber-500/30 text-amber-300 border border-amber-400/50">
+              Maint
+            </span>
+          </Link>
         </nav>
 
         {/* User Roblox Connection Status & CTA */}

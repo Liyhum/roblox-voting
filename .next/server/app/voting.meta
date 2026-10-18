@@ -1,0 +1,34 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/voting/layout,_N_T_/voting/page,_N_T_/voting"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/voting/__PAGE__"
+  ],
+  "prefetchHints": {
+    "hints": 64,
+    "slots": {
+      "children": {
+        "hints": 96,
+        "slots": {
+          "children": {
+            "hints": 160,
+            "slots": null
+          }
+        }
+      }
+    }
+  },
+  "routeCache": {
+    "key": "/route-cache/APP_PAGE/81354942e28f6243dc576381b4a43a69d338606483a2d8e39296125dc7c87bea/$/voting",
+    "owner": {
+      "kind": "APP_PAGE",
+      "sourceRoute": "/voting/page"
+    },
+    "isFallback": false
+  }
+}

@@ -12,5 +12,7 @@
   "/favicon.ico/route": "/favicon.ico",
   "/page": "/",
   "/privacy/page": "/privacy",
-  "/terms/page": "/terms"
+  "/terms/page": "/terms",
+  "/topup/page": "/topup",
+  "/voting/page": "/voting"
 }

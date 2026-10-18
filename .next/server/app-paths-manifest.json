@@ -12,5 +12,7 @@
   "/favicon.ico/route": "app/favicon.ico/route.js",
   "/page": "app/page.js",
   "/privacy/page": "app/privacy/page.js",
-  "/terms/page": "app/terms/page.js"
+  "/terms/page": "app/terms/page.js",
+  "/topup/page": "app/topup/page.js",
+  "/voting/page": "app/voting/page.js"
 }
