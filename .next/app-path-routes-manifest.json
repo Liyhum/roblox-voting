@@ -1,15 +1,15 @@
 {
-  "/_not-found/page": "/_not-found",
   "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
   "/api/auth/logout/route": "/api/auth/logout",
   "/api/auth/me/route": "/api/auth/me",
   "/api/auth/roblox/callback/route": "/api/auth/roblox/callback",
   "/api/auth/roblox/login/route": "/api/auth/roblox/login",
   "/api/roblox-avatar/route": "/api/roblox-avatar",
   "/api/submissions/route": "/api/submissions",
+  "/api/tiktok-resolve/route": "/api/tiktok-resolve",
   "/api/vote/route": "/api/vote",
   "/favicon.ico/route": "/favicon.ico",
-  "/api/tiktok-resolve/route": "/api/tiktok-resolve",
   "/page": "/",
   "/privacy/page": "/privacy",
   "/terms/page": "/terms"

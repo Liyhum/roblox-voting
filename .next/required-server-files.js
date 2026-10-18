@@ -360,8 +360,7 @@ self.__SERVER_FILES_MANIFEST={
       "root": "D:\\ZeerutRoblox\\roblox-voting-web"
     },
     "repoRoot": "D:\\ZeerutRoblox\\roblox-voting-web",
-    "distDirRoot": ".next",
-    "supportsImmutableAssets": false
+    "distDirRoot": ".next"
   },
   "appDir": "D:\\ZeerutRoblox\\roblox-voting-web",
   "relativeAppDir": "",
@@ -375,8 +374,6 @@ self.__SERVER_FILES_MANIFEST={
     ".next\\server\\functions-config-manifest.json",
     ".next\\server\\middleware-manifest.json",
     ".next\\server\\middleware-build-manifest.js",
-    ".next\\server\\middleware-react-loadable-manifest.js",
-    ".next\\react-loadable-manifest.json",
     ".next\\server\\app-paths-manifest.json",
     ".next\\app-path-routes-manifest.json",
     ".next\\server\\server-reference-manifest.js",
