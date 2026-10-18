@@ -13,8 +13,11 @@
 # testing
 /coverage
 
-# next.js
-/.next/
+# next.js (include production build, exclude cache & standalone)
+/.next/cache/
+/.next/dev/
+/.next/diagnostics/
+/.next/standalone/
 /out/
 
 # production

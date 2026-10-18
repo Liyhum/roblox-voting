@@ -1,0 +1,1 @@
+globalThis.__RSC_MANIFEST=(globalThis.__RSC_MANIFEST||{});globalThis.__RSC_MANIFEST["/api/auth/roblox/login/route"]={"moduleLoading":{"prefix":"/_next/"},"ssrModuleMapping":{},"edgeSSRModuleMapping":{},"clientModules":{},"entryCSSFiles":{"D:\\ZeerutRoblox\\roblox-voting-web\\src\\app\\api\\auth\\roblox\\login\\route":[]},"rscModuleMapping":{},"edgeRscModuleMapping":{}};
