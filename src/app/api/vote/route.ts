@@ -46,35 +46,8 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // 3. Cryptographic Session Verification
-  const user = getSessionFromRequest(req);
-  if (!user || !user.id || !user.username) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Kamu harus login dengan akun Roblox terlebih dahulu untuk melakukan voting!",
-      },
-      { status: 401 }
-    );
-  }
-
-  // 4. Validate Voting Deadline
-  const endDateStr = process.env.NEXT_PUBLIC_VOTING_END_DATE;
-  if (endDateStr) {
-    const endTimestamp = new Date(endDateStr).getTime();
-    if (!isNaN(endTimestamp) && Date.now() >= endTimestamp) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Voting Fashion Show telah resmi ditutup. Terima kasih atas partisipasimu!",
-        },
-        { status: 400 }
-      );
-    }
-  }
-
-  // 5. Parse and Validate Request Body
-  let body: { submissionId?: string };
+  // 3. Parse and Validate Request Body
+  let body: { submissionId?: string; voterUsername?: string; voterId?: number | string };
   try {
     body = await req.json();
   } catch {
@@ -84,7 +57,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { submissionId } = body;
+  const { submissionId, voterUsername, voterId } = body;
   if (!submissionId || !UUID_REGEX.test(submissionId)) {
     return NextResponse.json(
       { success: false, message: "Invalid submission ID parameter." },
@@ -92,9 +65,56 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // 4. Identify Voter (from session cookie OR submitted username)
+  const sessionUser = getSessionFromRequest(req);
+  let effectiveVoterId: number = 0;
+  let effectiveVoterName: string = "";
+
+  if (sessionUser && sessionUser.id && sessionUser.username) {
+    effectiveVoterId = sessionUser.id;
+    effectiveVoterName = sessionUser.username;
+  } else if (voterUsername && typeof voterUsername === "string" && voterUsername.trim().length >= 3) {
+    effectiveVoterName = voterUsername.trim();
+    if (voterId && Number(voterId) > 0) {
+      effectiveVoterId = Number(voterId);
+    } else {
+      // Deterministic numeric hash from username
+      let hash = 0;
+      const lower = effectiveVoterName.toLowerCase();
+      for (let i = 0; i < lower.length; i++) {
+        hash = (hash << 5) - hash + lower.charCodeAt(i);
+        hash |= 0;
+      }
+      effectiveVoterId = Math.abs(hash) || 1;
+    }
+  } else {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Please enter your Roblox username to cast a vote.",
+      },
+      { status: 400 }
+    );
+  }
+
+  // 5. Validate Voting Deadline
+  const endDateStr = process.env.NEXT_PUBLIC_VOTING_END_DATE;
+  if (endDateStr) {
+    const endTimestamp = new Date(endDateStr).getTime();
+    if (!isNaN(endTimestamp) && Date.now() >= endTimestamp) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Voting has officially closed. Thank you for participating!",
+        },
+        { status: 400 }
+      );
+    }
+  }
+
   if (!isServerSupabaseConfigured) {
     return NextResponse.json(
-      { success: false, message: "Database Supabase belum dikonfigurasi di server." },
+      { success: false, message: "Database Supabase is not configured on the server." },
       { status: 503 }
     );
   }
@@ -103,8 +123,8 @@ export async function POST(req: NextRequest) {
     // 6. Execute atomic verified vote via Supabase RPC
     const { data, error } = await supabaseServer.rpc("cast_verified_vote", {
       target_submission_id: submissionId,
-      voter_id: user.id,
-      voter_name: user.username,
+      voter_id: effectiveVoterId,
+      voter_name: effectiveVoterName,
     });
 
     if (error) {

@@ -169,8 +169,8 @@ export function Navbar({
                 className="h-9 sm:h-10 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 rounded-xl text-xs font-bold uppercase tracking-wider text-zinc-200 bg-white/5 hover:bg-white/10 border border-white/15 hover:border-[#00f2fe] transition-all whitespace-nowrap shrink-0 shadow-sm"
               >
                 <ShieldCheck className="w-4 h-4 text-[#00f2fe]" />
-                <span className="hidden sm:inline">Connect Roblox</span>
-                <span className="sm:hidden">Connect</span>
+                <span className="hidden sm:inline">Set Username</span>
+                <span className="sm:hidden">Username</span>
               </button>
             )}
 

@@ -215,7 +215,11 @@ export default function Home() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ submissionId: id }),
+        body: JSON.stringify({
+          submissionId: id,
+          voterUsername: connectedUser?.username,
+          voterId: connectedUser?.id,
+        }),
       });
 
       const resData = await res.json();
