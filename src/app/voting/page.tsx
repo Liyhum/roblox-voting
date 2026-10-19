@@ -221,7 +221,7 @@ export default function Home() {
       const resData = await res.json();
 
       if (!res.ok || resData.success === false) {
-        alert(resData.message || "Gagal mencatat vote. Batas kuota mungkin telah tercapai.");
+        alert(resData.message || "Failed to record vote. Your 2-vote quota may have been reached.");
         // Rollback optimistic update
         setVotedIds(votedIds);
         localStorage.setItem(key, JSON.stringify(votedIds));
@@ -623,7 +623,7 @@ export default function Home() {
                     }`}
                   >
                     <ImageIcon className="w-3.5 h-3.5" />
-                    <span>📸 Foto Full</span>
+                    <span>📸 Full Photo</span>
                   </button>
                   <button
                     type="button"
@@ -635,7 +635,7 @@ export default function Home() {
                     }`}
                   >
                     <TikTokIcon className="w-3.5 h-3.5" />
-                    <span>🎬 Video TikTok</span>
+                    <span>🎬 TikTok Video</span>
                   </button>
                 </div>
               ) : (
@@ -645,7 +645,7 @@ export default function Home() {
               <button
                 onClick={() => setZoomModal(null)}
                 className="p-2.5 rounded-full bg-zinc-800 text-white hover:bg-[#ff007f] transition-all hover:scale-105 shadow-xl border border-white/10"
-                title="Tutup"
+                title="Close"
               >
                 <X className="w-5 h-5" />
               </button>

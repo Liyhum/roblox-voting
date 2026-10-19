@@ -100,7 +100,7 @@ export function VotingCard({
           ) : hasTikTok ? (
             <div className="px-2.5 py-1 rounded-xl bg-black/70 backdrop-blur-md border border-white/15 text-[10px] font-black uppercase tracking-wider text-zinc-200 flex items-center gap-1.5 shadow-lg">
               <span className="w-2 h-2 rounded-full bg-[#00f2fe] animate-pulse" />
-              <span>Foto + TikTok</span>
+              <span>Photo + TikTok</span>
             </div>
           ) : null}
         </div>
@@ -121,7 +121,7 @@ export function VotingCard({
               }`}
             >
               <ImageIcon className="w-3 h-3" />
-              <span>Foto</span>
+              <span>Photo</span>
             </button>
             <button
               type="button"

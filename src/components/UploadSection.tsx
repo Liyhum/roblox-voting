@@ -75,7 +75,7 @@ export function UploadSection({ onSuccess, connectedUsername }: UploadSectionPro
 
     if (!isValidTikTokUrl(trimmed)) {
       setTiktokStatus("invalid");
-      setTiktokInfo({ message: "URL harus diawali https:// dan berasal dari domain tiktok.com" });
+      setTiktokInfo({ message: "URL must start with https:// and come from tiktok.com" });
       return;
     }
 
@@ -83,7 +83,7 @@ export function UploadSection({ onSuccess, connectedUsername }: UploadSectionPro
     const directId = extractTikTokVideoId(trimmed);
     if (directId) {
       setTiktokStatus("valid");
-      setTiktokInfo({ videoId: directId, message: "Video TikTok terdeteksi!" });
+      setTiktokInfo({ videoId: directId, message: "TikTok video detected!" });
       return;
     }
 
@@ -97,15 +97,15 @@ export function UploadSection({ onSuccess, connectedUsername }: UploadSectionPro
           setTiktokStatus("valid");
           setTiktokInfo({
             videoId: data.videoId,
-            message: data.videoId ? "Video TikTok terverifikasi!" : "Link TikTok valid!",
+            message: data.videoId ? "TikTok video verified!" : "Valid TikTok link!",
           });
         } else {
           setTiktokStatus("invalid");
-          setTiktokInfo({ message: data.error || "Link TikTok tidak dapat diverifikasi" });
+          setTiktokInfo({ message: data.error || "Could not verify TikTok link" });
         }
       } catch {
         setTiktokStatus("valid");
-        setTiktokInfo({ message: "Link TikTok disimpan" });
+        setTiktokInfo({ message: "TikTok link saved" });
       }
     }, 600);
 
@@ -217,12 +217,12 @@ export function UploadSection({ onSuccess, connectedUsername }: UploadSectionPro
     }
 
     if (!tiktokUrl.trim()) {
-      setErrorMessage("Mohon masukkan link video TikTok outfit avatar Anda (Wajib).");
+      setErrorMessage("Please enter your avatar outfit TikTok video URL (Required).");
       return;
     }
 
     if (!isValidTikTokUrl(tiktokUrl.trim())) {
-      setErrorMessage("Link TikTok tidak valid. Mohon masukkan link TikTok yang benar (contoh: https://www.tiktok.com/@username/video/... atau https://vt.tiktok.com/...).");
+      setErrorMessage("Invalid TikTok URL. Please enter a valid TikTok link (e.g., https://www.tiktok.com/@username/video/... or https://vt.tiktok.com/...).");
       return;
     }
 
@@ -233,7 +233,7 @@ export function UploadSection({ onSuccess, connectedUsername }: UploadSectionPro
 
     if (duplicateSubmission) {
       setErrorMessage(
-        `Akun Roblox @${duplicateSubmission.roblox_username} sudah terdaftar pada runway! Aturan: 1 akun Roblox (USN) hanya boleh 1 kali submit.`
+        `Roblox account @${duplicateSubmission.roblox_username} is already registered on the runway! Rule: Only 1 outfit submission per Roblox account.`
       );
       return;
     }
@@ -267,7 +267,7 @@ export function UploadSection({ onSuccess, connectedUsername }: UploadSectionPro
       const data = await res.json();
 
       if (!res.ok || data.success === false) {
-        throw new Error(data.message || "Gagal mengunggah outfit. Silakan coba lagi.");
+        throw new Error(data.message || "Failed to submit outfit. Please try again.");
       }
 
       setSuccess(true);
@@ -412,14 +412,14 @@ export function UploadSection({ onSuccess, connectedUsername }: UploadSectionPro
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="font-black text-rose-300 uppercase tracking-wider text-[11px]">
-                      Username Sudah Pernah Terdaftar!
+                      Username Already Registered!
                     </span>
                     <span className="text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/30 px-2 py-0.5 rounded-md font-black uppercase">
-                      1 USN = 1 Submit
+                      1 USN = 1 Entry
                     </span>
                   </div>
                   <p className="text-[11px] text-zinc-300 leading-relaxed">
-                    Akun Roblox <strong className="text-white">@{duplicateSubmission.roblox_username}</strong> sudah memiliki outfit yang terdaftar di runway. Setiap akun Roblox hanya diperbolehkan mengirim <strong>1 model busana</strong>.
+                    Roblox account <strong className="text-white">@{duplicateSubmission.roblox_username}</strong> already has an outfit registered on the runway. Each Roblox account is only allowed to submit <strong>1 outfit look</strong>.
                   </p>
                 </div>
               </div>
@@ -501,7 +501,7 @@ export function UploadSection({ onSuccess, connectedUsername }: UploadSectionPro
                 type="url"
                 value={tiktokUrl}
                 onChange={(e) => setTiktokUrl(e.target.value)}
-                placeholder="https://www.tiktok.com/@username/video/... atau https://vt.tiktok.com/..."
+                placeholder="https://www.tiktok.com/@roblox_treckl/video/... or https://vt.tiktok.com/..."
                 required
                 className={`w-full px-4 py-3 bg-zinc-950/80 border rounded-2xl text-white placeholder-zinc-600 focus:outline-none transition-all font-medium text-sm ${
                   tiktokStatus === "valid"
@@ -578,7 +578,7 @@ export function UploadSection({ onSuccess, connectedUsername }: UploadSectionPro
             ) : duplicateSubmission ? (
               <>
                 <AlertCircle className="w-5 h-5 text-rose-400" />
-                <span>Username Sudah Terdaftar (Batas 1 Outfit)</span>
+                <span>Username Already Registered (1 Outfit Limit)</span>
               </>
             ) : (
               <>
