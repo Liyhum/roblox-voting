@@ -839,7 +839,29 @@ export default function Home() {
           <p className="font-bold text-zinc-400 uppercase tracking-widest">
             TREC KL Fashion Runway &bull; Roblox Avatar &amp; Outfits Awards
           </p>
-          <div className="flex items-center justify-center gap-4 text-xs font-semibold text-zinc-400">
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-semibold text-zinc-400">
+            <a href="/" className="hover:text-white transition-colors">
+              Home
+            </a>
+            <span className="text-zinc-600">&bull;</span>
+            <a
+              href="https://discord.gg/54GEpCZGz"
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-[#5865F2] transition-colors"
+            >
+              Discord Community
+            </a>
+            <span className="text-zinc-600">&bull;</span>
+            <a
+              href="https://sociabuzz.com/treckl/donate"
+              target="_blank"
+              rel="noreferrer"
+              className="hover:text-amber-400 transition-colors"
+            >
+              Donate (SociaBuzz)
+            </a>
+            <span className="text-zinc-600">&bull;</span>
             <a href="/privacy" className="hover:text-white transition-colors underline underline-offset-4">
               Privacy Policy
             </a>

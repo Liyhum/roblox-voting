@@ -98,10 +98,27 @@ export default function LandingPage() {
               </span>
             </Link>
             <a
+              href="https://discord.gg/54GEpCZGz"
+              target="_blank"
+              rel="noreferrer"
+              className="h-9 px-3 flex items-center gap-1.5 rounded-xl text-xs sm:text-sm font-semibold tracking-wide transition-all text-[#5865F2] hover:text-white hover:bg-[#5865F2]/20 whitespace-nowrap shrink-0"
+            >
+              <span>Discord</span>
+            </a>
+            <a
+              href="https://sociabuzz.com/treckl/donate"
+              target="_blank"
+              rel="noreferrer"
+              className="h-9 px-3 flex items-center gap-1.5 rounded-xl text-xs sm:text-sm font-semibold tracking-wide transition-all text-amber-300 hover:text-white hover:bg-amber-500/20 whitespace-nowrap shrink-0"
+            >
+              <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
+              <span>Donate</span>
+            </a>
+            <a
               href="#socials"
               className="h-9 px-3.5 flex items-center gap-2 rounded-xl text-xs sm:text-sm font-semibold tracking-wide transition-all text-zinc-400 hover:text-white hover:bg-white/5 whitespace-nowrap shrink-0"
             >
-              TikTok &amp; Media
+              Media
             </a>
           </nav>
 
@@ -175,12 +192,34 @@ export default function LandingPage() {
                   <ArrowRight className="w-4 h-4 text-[#00f2fe] group-hover:translate-x-1 transition-transform" />
                 </Link>
 
+                <a
+                  href="https://discord.gg/54GEpCZGz"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-5 py-4 rounded-2xl bg-[#5865F2]/20 hover:bg-[#5865F2]/30 text-white border border-[#5865F2]/50 font-bold text-xs sm:text-sm tracking-wider uppercase transition-all flex items-center gap-2 group shadow-lg shadow-[#5865F2]/10"
+                >
+                  <svg className="w-4 h-4 fill-[#5865F2] group-hover:fill-white transition-colors" viewBox="0 0 24 24">
+                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                  </svg>
+                  <span>Discord</span>
+                </a>
+
+                <a
+                  href="https://sociabuzz.com/treckl/donate"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-5 py-4 rounded-2xl bg-gradient-to-r from-amber-500/20 to-yellow-600/20 hover:from-amber-500/30 hover:to-yellow-600/30 text-amber-300 border border-amber-500/40 font-bold text-xs sm:text-sm tracking-wider uppercase transition-all flex items-center gap-2 group shadow-lg shadow-amber-500/10"
+                >
+                  <Heart className="w-4 h-4 text-rose-500 fill-rose-500 group-hover:scale-110 transition-transform" />
+                  <span>Donate</span>
+                </a>
+
                 <Link
                   href="/topup"
-                  className="px-5 py-4 rounded-2xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold text-xs sm:text-sm tracking-wider uppercase transition-all flex items-center gap-2 group"
+                  className="px-4 py-4 rounded-2xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold text-xs sm:text-sm tracking-wider uppercase transition-all flex items-center gap-2 group"
                 >
                   <Coins className="w-4 h-4 text-amber-400" />
-                  <span>Top Up Store</span>
+                  <span>Top Up</span>
                   <span className="px-1.5 py-0.5 text-[8px] font-black uppercase rounded bg-amber-500/30 text-amber-300 border border-amber-400/50">
                     Maint
                   </span>
@@ -459,30 +498,32 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* TIKTOK & MEDIA HUB SECTION */}
+      {/* COMMUNITY, DISCORD & SOCIAL MEDIA HUB */}
       <section id="socials" className="py-20 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+          {/* Main Social Hub Banner */}
           <div className="relative rounded-[36px] overflow-hidden border-2 border-white/15 bg-gradient-to-r from-[#0d0f17] via-[#120f1c] to-[#0a0d14] p-8 sm:p-14 shadow-2xl">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
               <div className="lg:col-span-7 space-y-6">
                 <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-white text-xs font-black uppercase tracking-widest">
                   <Video className="w-4 h-4 text-[#ff007f]" />
-                  TIKTOK &amp; SOCIAL MEDIA SHOWCASE
+                  OFFICIAL COMMUNITY &amp; SOCIAL HUBS
                 </div>
 
                 <h2 className="text-3xl sm:text-5xl font-black uppercase italic tracking-tight text-white leading-tight">
-                  VIRAL RUNWAY CLIPS ON <br />
+                  CONNECT WITH THE <br />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ff007f] via-rose-400 to-[#00f2fe]">
-                    TIKTOK #TRECKL
+                    TREC KL COMMUNITY
                   </span>
                 </h2>
 
                 <p className="text-sm sm:text-base text-zinc-300 leading-relaxed">
-                  Show off your runway walks and creative outfits on TikTok! Use the official TREC KL audio and tag <b>#TRECKL</b>, <b>#RobloxFashion</b>, and <b>#RobloxRunway</b>.
-                  Every contestant who submits an entry in the Fashion Runway voting can link their TikTok video directly for the community to discover and vote!
+                  Stay updated with nightly live DJ sessions, connect with fellow players on Discord, share your TikTok runway clips, and support the project via SociaBuzz!
                 </p>
 
+                {/* Primary Hub Buttons */}
                 <div className="flex flex-wrap items-center gap-3 pt-2">
+                  {/* TikTok Button */}
                   <a
                     href="https://www.tiktok.com/@roblox_treckl?lang=en"
                     target="_blank"
@@ -492,73 +533,112 @@ export default function LandingPage() {
                     <svg className="w-4 h-4 fill-current group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
                       <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.24 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
                     </svg>
-                    <span>Follow @roblox_treckl</span>
+                    <span>TikTok @roblox_treckl</span>
                     <ExternalLink className="w-3.5 h-3.5 opacity-80" />
                   </a>
 
+                  {/* Discord Button */}
                   <a
-                    href="https://www.tiktok.com/tag/treckl"
+                    href="https://discord.gg/54GEpCZGz"
                     target="_blank"
                     rel="noreferrer"
-                    className="px-6 py-3.5 rounded-2xl bg-black/80 hover:bg-zinc-900 border border-white/20 text-white font-black text-xs sm:text-sm tracking-wider uppercase transition-all flex items-center gap-2 shadow-xl"
+                    className="px-6 py-3.5 rounded-2xl bg-[#5865F2] hover:bg-[#4752c4] text-white font-black text-xs sm:text-sm tracking-wider uppercase transition-all flex items-center gap-2.5 shadow-xl shadow-[#5865F2]/25 group"
                   >
-                    <span>Search #TRECKL</span>
-                    <ExternalLink className="w-3.5 h-3.5 opacity-60" />
+                    <svg className="w-4 h-4 fill-current group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
+                      <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                    </svg>
+                    <span>Join Discord</span>
+                    <ExternalLink className="w-3.5 h-3.5 opacity-80" />
                   </a>
 
-                  <Link
-                    href="/voting"
-                    className="px-6 py-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/15 text-zinc-200 hover:text-white font-black text-xs sm:text-sm tracking-wider uppercase transition-all flex items-center gap-2"
+                  {/* SociaBuzz Donate Button */}
+                  <a
+                    href="https://sociabuzz.com/treckl/donate"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-400 hover:to-yellow-500 text-zinc-950 font-black text-xs sm:text-sm tracking-wider uppercase transition-all flex items-center gap-2.5 shadow-xl shadow-amber-500/20 group"
                   >
-                    <Flame className="w-4 h-4 text-[#ff007f]" />
-                    <span>Upload Fit &amp; TikTok</span>
-                  </Link>
+                    <Heart className="w-4 h-4 text-rose-600 fill-rose-600 group-hover:scale-110 transition-transform" />
+                    <span>Support / Donate</span>
+                    <ExternalLink className="w-3.5 h-3.5 opacity-70" />
+                  </a>
                 </div>
               </div>
 
-              {/* Right Column: Visual Mockup */}
-              <div className="lg:col-span-5 relative">
-                <div className="relative rounded-3xl overflow-hidden border border-white/20 bg-black/60 p-4 shadow-2xl backdrop-blur-xl space-y-4">
+              {/* Right Column: Visual Mockup with Live Community Badges */}
+              <div className="lg:col-span-5 relative space-y-3">
+                <div className="relative rounded-3xl overflow-hidden border border-white/20 bg-black/60 p-4 shadow-2xl backdrop-blur-xl space-y-3">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                    <span className="text-[11px] font-black uppercase tracking-wider text-zinc-400">
+                      Official Links
+                    </span>
+                    <span className="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                      Verified Channels
+                    </span>
+                  </div>
+
+                  {/* TikTok Link Card */}
                   <a
                     href="https://www.tiktok.com/@roblox_treckl?lang=en"
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center justify-between border-b border-white/10 pb-3 group/profile hover:bg-white/5 p-1 rounded-xl transition-all"
+                    className="flex items-center justify-between p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all group/tt"
                   >
                     <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#ff007f] to-rose-500 flex items-center justify-center font-black text-xs text-white shadow-md">
-                        T
+                      <div className="w-8 h-8 rounded-lg bg-[#ff007f]/20 border border-[#ff007f]/40 flex items-center justify-center text-[#ff007f] font-black text-xs">
+                        TT
                       </div>
                       <div>
-                        <p className="text-xs font-black text-white group-hover/profile:text-[#00f2fe] transition-colors flex items-center gap-1">
+                        <p className="text-xs font-bold text-white group-hover/tt:text-[#ff007f] transition-colors">
                           @roblox_treckl
-                          <ExternalLink className="w-3 h-3 opacity-60" />
                         </p>
-                        <p className="text-[10px] text-zinc-400">Official TREC KL TikTok</p>
+                        <p className="text-[10px] text-zinc-400">Official TikTok Account</p>
                       </div>
                     </div>
-                    <span className="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                      Official
-                    </span>
+                    <ExternalLink className="w-3.5 h-3.5 text-zinc-400 group-hover/tt:text-white" />
                   </a>
 
-                  <div className="relative aspect-video rounded-2xl overflow-hidden border border-white/10 group cursor-pointer">
-                    <img
-                      src="/trec-kl/thumb2.png"
-                      alt="TREC KL Runway TikTok Preview"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                    />
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                      <div className="w-14 h-14 rounded-full bg-white/90 text-black flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
-                        <Play className="w-6 h-6 fill-current translate-x-0.5" />
+                  {/* Discord Link Card */}
+                  <a
+                    href="https://discord.gg/54GEpCZGz"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center justify-between p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all group/dc"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-[#5865F2]/20 border border-[#5865F2]/40 flex items-center justify-center text-[#5865F2] font-black text-xs">
+                        DC
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-white group-hover/dc:text-[#5865F2] transition-colors">
+                          discord.gg/54GEpCZGz
+                        </p>
+                        <p className="text-[10px] text-zinc-400">Official Community Discord</p>
                       </div>
                     </div>
-                  </div>
+                    <ExternalLink className="w-3.5 h-3.5 text-zinc-400 group-hover/dc:text-white" />
+                  </a>
 
-                  <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-xs text-zinc-300 flex items-center justify-between">
-                    <span className="font-semibold text-zinc-400">Official Hashtags:</span>
-                    <span className="font-bold text-[#00f2fe] font-mono">#TRECKL • #RobloxFashion</span>
-                  </div>
+                  {/* SociaBuzz Link Card */}
+                  <a
+                    href="https://sociabuzz.com/treckl/donate"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center justify-between p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all group/sb"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-black text-xs">
+                        SB
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-white group-hover/sb:text-amber-400 transition-colors">
+                          sociabuzz.com/treckl/donate
+                        </p>
+                        <p className="text-[10px] text-zinc-400">Official Donation &amp; Support</p>
+                      </div>
+                    </div>
+                    <ExternalLink className="w-3.5 h-3.5 text-zinc-400 group-hover/sb:text-white" />
+                  </a>
                 </div>
               </div>
             </div>
@@ -666,6 +746,24 @@ export default function LandingPage() {
                 <span>TikTok @roblox_treckl</span>
                 <ExternalLink className="w-4 h-4 opacity-70" />
               </a>
+              <a
+                href="https://discord.gg/54GEpCZGz"
+                target="_blank"
+                rel="noreferrer"
+                className="px-6 py-4 rounded-2xl bg-[#5865F2] hover:bg-[#4752c4] text-white font-black text-sm uppercase tracking-wider shadow-xl shadow-[#5865F2]/20 transition-all flex items-center gap-2.5"
+              >
+                <span>Join Discord</span>
+                <ExternalLink className="w-4 h-4 opacity-70" />
+              </a>
+              <a
+                href="https://sociabuzz.com/treckl/donate"
+                target="_blank"
+                rel="noreferrer"
+                className="px-6 py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:brightness-110 text-black font-black text-sm uppercase tracking-wider shadow-xl shadow-amber-500/20 transition-all flex items-center gap-2.5"
+              >
+                <Heart className="w-4 h-4 text-rose-600 fill-rose-600" />
+                <span>Donate (SociaBuzz)</span>
+              </a>
             </div>
           </div>
         </div>
@@ -691,6 +789,22 @@ export default function LandingPage() {
                   Maint
                 </span>
               </Link>
+              <a
+                href="https://discord.gg/54GEpCZGz"
+                target="_blank"
+                rel="noreferrer"
+                className="hover:text-[#5865F2] transition-colors flex items-center gap-1"
+              >
+                <span>Discord</span>
+              </a>
+              <a
+                href="https://sociabuzz.com/treckl/donate"
+                target="_blank"
+                rel="noreferrer"
+                className="hover:text-amber-400 transition-colors flex items-center gap-1"
+              >
+                <span>Donate (SociaBuzz)</span>
+              </a>
               <a
                 href="https://www.tiktok.com/@roblox_treckl?lang=en"
                 target="_blank"

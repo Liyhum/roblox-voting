@@ -16,6 +16,8 @@ import {
   Gamepad2,
   Lock,
   ChevronRight,
+  Heart,
+  ExternalLink,
 } from "lucide-react";
 
 interface RobuxPackage {
@@ -93,6 +95,26 @@ export default function TopUpPage() {
           </Link>
 
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+            <a
+              href="https://discord.gg/54GEpCZGz"
+              target="_blank"
+              rel="noreferrer"
+              className="hidden sm:flex h-9 sm:h-10 items-center gap-2 px-3.5 rounded-xl text-xs font-bold text-white bg-[#5865F2]/20 hover:bg-[#5865F2]/30 border border-[#5865F2]/40 transition-all whitespace-nowrap shadow-sm"
+            >
+              <span>Discord</span>
+              <ExternalLink className="w-3.5 h-3.5 opacity-70" />
+            </a>
+
+            <a
+              href="https://sociabuzz.com/treckl/donate"
+              target="_blank"
+              rel="noreferrer"
+              className="hidden sm:flex h-9 sm:h-10 items-center gap-2 px-3.5 rounded-xl text-xs font-bold text-amber-300 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 transition-all whitespace-nowrap shadow-sm"
+            >
+              <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
+              <span>Donate</span>
+            </a>
+
             <Link
               href="/voting"
               className="h-9 sm:h-10 flex items-center gap-2 px-3.5 sm:px-4 rounded-xl text-xs sm:text-sm font-black tracking-wider uppercase text-white bg-gradient-to-r from-[#ff007f] to-rose-600 hover:from-[#ff007f]/90 hover:to-rose-500 shadow-md shadow-[#ff007f]/25 hover:shadow-lg hover:shadow-[#ff007f]/40 transition-all whitespace-nowrap shrink-0"
@@ -181,6 +203,70 @@ export default function TopUpPage() {
                 </form>
               )}
             </div>
+          </div>
+        </div>
+
+        {/* Active Support & Community Options */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* SociaBuzz Donation Card */}
+          <div className="relative rounded-3xl overflow-hidden border border-amber-500/40 bg-gradient-to-br from-amber-500/15 via-[#0e111a] to-[#0c0e14] p-6 sm:p-8 space-y-4 shadow-xl shadow-amber-500/5">
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
+                <Heart className="w-6 h-6 text-rose-500 fill-rose-500" />
+              </div>
+              <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                Active Alternative
+              </span>
+            </div>
+            <div>
+              <h3 className="text-xl font-black text-white uppercase italic">
+                Support &amp; Donate via SociaBuzz
+              </h3>
+              <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed mt-1">
+                Want to support TREC KL developments while our automated shop is being upgraded? You can donate directly through SociaBuzz to help fund game updates, DJ stage lights, and prizes!
+              </p>
+            </div>
+            <a
+              href="https://sociabuzz.com/treckl/donate"
+              target="_blank"
+              rel="noreferrer"
+              className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:brightness-110 text-black font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 active:scale-95"
+            >
+              <Heart className="w-4 h-4 text-rose-600 fill-rose-600" />
+              <span>Donate on SociaBuzz (sociabuzz.com/treckl/donate)</span>
+              <ExternalLink className="w-4 h-4" />
+            </a>
+          </div>
+
+          {/* Discord Community Card */}
+          <div className="relative rounded-3xl overflow-hidden border border-[#5865F2]/40 bg-gradient-to-br from-[#5865F2]/15 via-[#0e111a] to-[#0c0e14] p-6 sm:p-8 space-y-4 shadow-xl shadow-[#5865F2]/5">
+            <div className="flex items-center justify-between">
+              <div className="w-12 h-12 rounded-2xl bg-[#5865F2]/20 border border-[#5865F2]/40 flex items-center justify-center text-[#5865F2]">
+                <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                  <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                </svg>
+              </div>
+              <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#5865F2]/20 text-[#5865F2] border border-[#5865F2]/40">
+                Official Server
+              </span>
+            </div>
+            <div>
+              <h3 className="text-xl font-black text-white uppercase italic">
+                Join Community Discord
+              </h3>
+              <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed mt-1">
+                Get first-hand news, sneak peeks at upcoming game updates, report issues, chat with club regulars, and get notified immediately when top-ups resume!
+              </p>
+            </div>
+            <a
+              href="https://discord.gg/54GEpCZGz"
+              target="_blank"
+              rel="noreferrer"
+              className="w-full py-3.5 px-4 rounded-xl bg-[#5865F2] hover:bg-[#4752c4] text-white font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#5865F2]/25 active:scale-95"
+            >
+              <span>Join Discord (discord.gg/54GEpCZGz)</span>
+              <ExternalLink className="w-4 h-4" />
+            </a>
           </div>
         </div>
 
@@ -311,24 +397,61 @@ export default function TopUpPage() {
             <p className="font-bold text-white">Need assistance or interested in community partnerships?</p>
             <p>Connect with the TREC KL community team via Discord or our social channels.</p>
           </div>
-          <a
-            href="https://www.roblox.com/games/127693451158806/TREC-KL"
-            target="_blank"
-            rel="noreferrer"
-            className="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white font-bold tracking-wide flex items-center gap-2 transition-all shrink-0"
-          >
-            <Gamepad2 className="w-4 h-4 text-[#ff007f]" />
-            <span>Play TREC KL Now</span>
-          </a>
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            <a
+              href="https://discord.gg/54GEpCZGz"
+              target="_blank"
+              rel="noreferrer"
+              className="px-4 py-2.5 rounded-xl bg-[#5865F2] hover:bg-[#4752c4] text-white font-bold tracking-wide flex items-center gap-2 transition-all shadow-md"
+            >
+              <span>Join Discord</span>
+              <ExternalLink className="w-3.5 h-3.5 opacity-80" />
+            </a>
+            <a
+              href="https://sociabuzz.com/treckl/donate"
+              target="_blank"
+              rel="noreferrer"
+              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 hover:brightness-110 text-black font-black tracking-wide flex items-center gap-1.5 transition-all shadow-md"
+            >
+              <Heart className="w-3.5 h-3.5 text-rose-600 fill-rose-600" />
+              <span>Donate</span>
+            </a>
+            <a
+              href="https://www.roblox.com/games/127693451158806/TREC-KL"
+              target="_blank"
+              rel="noreferrer"
+              className="px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-white font-bold tracking-wide flex items-center gap-2 transition-all"
+            >
+              <Gamepad2 className="w-4 h-4 text-[#ff007f]" />
+              <span>Play Game</span>
+            </a>
+          </div>
         </div>
       </main>
 
       {/* Footer */}
       <footer className="border-t border-white/10 bg-[#06070a] py-8 mt-16 text-center text-xs text-zinc-500 relative z-10">
-        <div className="max-w-7xl mx-auto px-4 space-y-2">
+        <div className="max-w-7xl mx-auto px-4 space-y-3">
           <p className="font-bold text-zinc-400 uppercase tracking-widest">
             TREC KL • Official Roblox Nightlife &amp; Fashion Runway
           </p>
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-semibold text-zinc-400">
+            <Link href="/" className="hover:text-white transition-colors">Home</Link>
+            <span className="text-zinc-600">&bull;</span>
+            <Link href="/voting" className="hover:text-[#ff007f] transition-colors">Fashion Runway</Link>
+            <span className="text-zinc-600">&bull;</span>
+            <a href="https://discord.gg/54GEpCZGz" target="_blank" rel="noreferrer" className="hover:text-[#5865F2] transition-colors">
+              Discord Community
+            </a>
+            <span className="text-zinc-600">&bull;</span>
+            <a href="https://sociabuzz.com/treckl/donate" target="_blank" rel="noreferrer" className="hover:text-amber-400 transition-colors">
+              Donate (SociaBuzz)
+            </a>
+            <span className="text-zinc-600">&bull;</span>
+            <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <span className="text-zinc-600">&bull;</span>
+            <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+          </div>
           <p className="text-[11px] text-zinc-600">
             TREC KL is not affiliated with or endorsed by Roblox Corporation.
           </p>

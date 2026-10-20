@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Flame, Trophy, Plus, Gamepad2, ShieldCheck, LogOut, Home as HomeIcon, Coins } from "lucide-react";
+import { Flame, Trophy, Plus, Gamepad2, ShieldCheck, LogOut, Home as HomeIcon, Coins, Heart } from "lucide-react";
 import { ConnectedRobloxUser } from "./RobloxConnectModal";
 
 interface NavbarProps {
@@ -112,6 +112,27 @@ export function Navbar({
                 Maint
               </span>
             </Link>
+
+            <a
+              href="https://discord.gg/54GEpCZGz"
+              target="_blank"
+              rel="noreferrer"
+              className="h-9 px-3 flex items-center gap-1.5 rounded-xl text-xs sm:text-sm font-semibold tracking-wide transition-all text-[#5865F2] hover:text-white hover:bg-[#5865F2]/20 whitespace-nowrap shrink-0"
+              title="Official Discord Server"
+            >
+              <span>Discord</span>
+            </a>
+
+            <a
+              href="https://sociabuzz.com/treckl/donate"
+              target="_blank"
+              rel="noreferrer"
+              className="h-9 px-3 flex items-center gap-1.5 rounded-xl text-xs sm:text-sm font-semibold tracking-wide transition-all text-amber-300 hover:text-white hover:bg-amber-500/20 whitespace-nowrap shrink-0"
+              title="Support & Donate via SociaBuzz"
+            >
+              <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
+              <span>Donate</span>
+            </a>
           </nav>
 
           {/* Right Action Hub: Primary CTA + Profile + Game */}
