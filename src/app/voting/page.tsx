@@ -310,14 +310,14 @@ export default function Home() {
         onDisconnect={handleDisconnect}
       />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 pb-28 sm:pb-14 relative z-10">
         {!isSupabaseConfigured && <SetupGuide />}
 
         {/* Tab 1: Runway Fashion Gallery */}
         {activeTab === "gallery" && (
-          <div className="space-y-10">
+          <div className="space-y-8 sm:space-y-10">
             {/* Cinematic Hero Showcase */}
-            <div className="relative rounded-[32px] overflow-hidden border border-white/10 shadow-2xl bg-[#0c0e14]">
+            <div className="relative rounded-3xl sm:rounded-[32px] overflow-hidden border border-white/10 shadow-2xl bg-[#0c0e14]">
               {/* Background with Cinematic Vignette */}
               <div className="absolute inset-0 z-0">
                 <img
@@ -330,28 +330,28 @@ export default function Home() {
               </div>
 
               {/* Hero Content */}
-              <div className="relative z-10 p-6 sm:p-12 lg:p-16 flex flex-col justify-between min-h-[400px]">
-                <div className="max-w-2xl space-y-4">
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#ff007f]/20 border border-[#ff007f]/40 text-[#ff007f] text-xs font-black uppercase tracking-widest backdrop-blur-md">
+              <div className="relative z-10 p-5 sm:p-12 lg:p-16 flex flex-col justify-between min-h-[360px] sm:min-h-[400px]">
+                <div className="max-w-2xl space-y-3 sm:space-y-4">
+                  <div className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-full bg-[#ff007f]/20 border border-[#ff007f]/40 text-[#ff007f] text-[11px] sm:text-xs font-black uppercase tracking-widest backdrop-blur-md">
                     <Sparkles className="w-3.5 h-3.5" />
                     TREC KL &bull; Runway Fashion Show
                   </div>
 
-                  <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white uppercase italic leading-none">
+                  <h1 className="text-2xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white uppercase italic leading-tight sm:leading-none">
                     VOTE THE BEST AVATAR RUNWAY DRIP!
                   </h1>
 
-                  <p className="text-sm sm:text-base text-zinc-300 leading-relaxed max-w-xl">
+                  <p className="text-xs sm:text-base text-zinc-300 leading-relaxed max-w-xl">
                     The premier fashion show &amp; nightlife hangout on Roblox. Connect your Roblox account, vote for your favorite avatar styles, or submit your outfit to win <b className="text-amber-400">Best Dressed</b>!
                   </p>
                 </div>
 
                 {/* Live Stats & CTA Row */}
-                <div className="pt-8 flex flex-wrap items-center justify-between gap-6 border-t border-white/10 mt-6">
-                  <div className="flex flex-wrap items-center gap-3">
+                <div className="pt-6 sm:pt-8 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-between gap-5 sm:gap-6 border-t border-white/10 mt-6">
+                  <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
                     <button
                       onClick={() => setActiveTab("upload")}
-                      className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#ff007f] to-rose-600 hover:brightness-110 text-white font-black text-xs sm:text-sm tracking-wider uppercase shadow-xl shadow-[#ff007f]/30 transition-all flex items-center gap-2 active:scale-95"
+                      className="flex-1 sm:flex-initial px-5 sm:px-6 py-3 rounded-2xl bg-gradient-to-r from-[#ff007f] to-rose-600 hover:brightness-110 text-white font-black text-xs sm:text-sm tracking-wider uppercase shadow-xl shadow-[#ff007f]/30 transition-all flex items-center justify-center gap-2 active:scale-95 min-h-[44px]"
                     >
                       <Plus className="w-4 h-4 stroke-[3]" />
                       Submit Outfit
@@ -359,7 +359,7 @@ export default function Home() {
 
                     <button
                       onClick={() => setActiveTab("leaderboard")}
-                      className="px-6 py-3 rounded-2xl bg-zinc-900/90 hover:bg-zinc-800 text-zinc-200 border border-white/10 font-black text-xs sm:text-sm tracking-wider uppercase transition-all flex items-center gap-2"
+                      className="px-4 sm:px-6 py-3 rounded-2xl bg-zinc-900/90 hover:bg-zinc-800 text-zinc-200 border border-white/10 font-black text-xs sm:text-sm tracking-wider uppercase transition-all flex items-center justify-center gap-2 active:scale-95 min-h-[44px]"
                     >
                       <Trophy className="w-4 h-4 text-amber-400" />
                       Leaderboard
@@ -371,10 +371,10 @@ export default function Home() {
                           setPendingVoteTarget(null);
                           setIsConnectModalOpen(true);
                         }}
-                        className="px-5 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 font-bold text-xs tracking-wider uppercase transition-all flex items-center gap-2"
+                        className="px-4 sm:px-5 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 font-bold text-xs tracking-wider uppercase transition-all flex items-center justify-center gap-2 active:scale-95 min-h-[44px]"
                       >
                         <ShieldCheck className="w-4 h-4 text-[#00f2fe]" />
-                        <span>Connect Roblox</span>
+                        <span>Connect</span>
                       </button>
                     )}
 
@@ -382,16 +382,16 @@ export default function Home() {
                       href="https://www.roblox.com/games/127693451158806/TREC-KL"
                       target="_blank"
                       rel="noreferrer"
-                      className="px-4 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white border border-white/10 font-bold text-xs tracking-wider uppercase transition-all flex items-center gap-1.5"
+                      className="px-3.5 sm:px-4 py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white border border-white/10 font-bold text-xs tracking-wider uppercase transition-all flex items-center justify-center gap-1.5 active:scale-95 min-h-[44px]"
                     >
                       <Gamepad2 className="w-4 h-4 text-[#00f2fe]" />
-                      <span>Play Game</span>
+                      <span className="hidden sm:inline">Play Game</span>
                       <ExternalLink className="w-3 h-3 text-zinc-500" />
                     </a>
                   </div>
 
                   {/* Counter Badges */}
-                  <div className="flex items-center gap-6 text-right">
+                  <div className="flex items-center justify-around sm:justify-end gap-6 text-center sm:text-right pt-3 sm:pt-0 border-t border-white/5 sm:border-t-0">
                     <div>
                       <div className="text-xl sm:text-2xl font-black text-white font-mono">
                         {submissions.length}
@@ -603,43 +603,43 @@ export default function Home() {
         isOAuthConfigured={isOAuthConfigured}
       />
 
-      {/* Lightbox Modal (2 Media: Foto + Video TikTok) */}
+      {/* Lightbox Modal (2 Media: Photo + Video TikTok) */}
       {zoomModal && (
         <div
-          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-2xl flex items-center justify-center p-4 sm:p-6"
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-2xl flex items-center justify-center p-3 sm:p-6 overflow-y-auto"
           onClick={() => setZoomModal(null)}
         >
           <div
-            className="relative max-w-4xl w-full flex flex-col items-center"
+            className="relative max-w-4xl w-full max-h-[92vh] flex flex-col items-center my-auto overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Top Bar: Close Button + Media Selector if TikTok exists */}
-            <div className="w-full flex items-center justify-between pb-4">
+            <div className="w-full flex items-center justify-between pb-3 sm:pb-4 gap-2">
               {zoomModal.tiktokUrl ? (
                 <div className="flex items-center bg-zinc-900/90 backdrop-blur-md p-1 rounded-2xl border border-white/20 shadow-xl">
                   <button
                     type="button"
                     onClick={() => setModalMediaTab("photo")}
-                    className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                    className={`flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all min-h-[38px] ${
                       modalMediaTab === "photo"
                         ? "bg-white/20 text-white shadow-md"
                         : "text-zinc-400 hover:text-white"
                     }`}
                   >
                     <ImageIcon className="w-3.5 h-3.5" />
-                    <span>📸 Full Photo</span>
+                    <span>Photo</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setModalMediaTab("tiktok")}
-                    className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${
+                    className={`flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all min-h-[38px] ${
                       modalMediaTab === "tiktok"
                         ? "bg-gradient-to-r from-[#ff007f] to-rose-600 text-white shadow-md shadow-[#ff007f]/40"
                         : "text-zinc-400 hover:text-[#00f2fe]"
                     }`}
                   >
                     <TikTokIcon className="w-3.5 h-3.5" />
-                    <span>🎬 TikTok Video</span>
+                    <span>TikTok</span>
                   </button>
                 </div>
               ) : (
@@ -648,8 +648,9 @@ export default function Home() {
 
               <button
                 onClick={() => setZoomModal(null)}
-                className="p-2.5 rounded-full bg-zinc-800 text-white hover:bg-[#ff007f] transition-all hover:scale-105 shadow-xl border border-white/10"
+                className="p-2.5 rounded-full bg-zinc-800 text-white hover:bg-[#ff007f] transition-all hover:scale-105 shadow-xl border border-white/10 min-w-[44px] min-h-[44px] flex items-center justify-center active:scale-95"
                 title="Close"
+                aria-label="Close Preview"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -657,22 +658,22 @@ export default function Home() {
 
             {/* Media Body */}
             {modalMediaTab === "tiktok" && zoomModal.tiktokUrl ? (
-              <div className="w-full max-w-md h-[580px] max-h-[75vh] rounded-3xl overflow-hidden shadow-2xl border border-white/20 bg-zinc-950 flex flex-col items-center justify-center">
+              <div className="w-full max-w-md h-[520px] max-h-[68vh] rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border border-white/20 bg-zinc-950 flex flex-col items-center justify-center">
                 <TikTokPlayer url={zoomModal.tiktokUrl} compact={false} />
               </div>
             ) : (
-              <div className="relative flex items-center justify-center max-h-[75vh]">
+              <div className="relative flex items-center justify-center max-h-[68vh] w-full">
                 <img
                   src={zoomModal.url}
                   alt={zoomModal.title}
-                  className="max-h-[75vh] w-auto rounded-3xl object-contain shadow-2xl border border-white/20"
+                  className="max-h-[68vh] w-auto max-w-full rounded-2xl sm:rounded-3xl object-contain shadow-2xl border border-white/20"
                 />
               </div>
             )}
 
             {/* Title & Quick Action */}
-            <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 w-full max-w-xl text-center sm:text-left">
-              <p className="text-sm font-black uppercase tracking-wider text-zinc-300">
+            <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 w-full max-w-xl text-center sm:text-left">
+              <p className="text-xs sm:text-sm font-black uppercase tracking-wider text-zinc-300">
                 {zoomModal.title}
               </p>
 
@@ -681,10 +682,10 @@ export default function Home() {
                   href={zoomModal.tiktokUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/60 hover:bg-[#ff007f] text-white text-xs font-bold border border-white/20 transition-all shadow-md hover:scale-105"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-black/60 hover:bg-[#ff007f] text-white text-xs font-bold border border-white/20 transition-all shadow-md active:scale-95 min-h-[40px]"
                 >
                   <TikTokIcon className="w-3.5 h-3.5" />
-                  <span>Buka di Aplikasi TikTok &rarr;</span>
+                  <span>Open in TikTok App &rarr;</span>
                 </a>
               )}
             </div>
@@ -695,18 +696,18 @@ export default function Home() {
       {/* English Vote Confirmation Modal (Permanent & Non-refundable) */}
       {confirmVoteTarget && (
         <div
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xl flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200"
           onClick={() => {
             if (!isSubmittingVote) setConfirmVoteTarget(null);
           }}
         >
           <div
-            className="relative w-full max-w-md bg-gradient-to-b from-[#13151f] to-[#0a0b10] border border-white/20 rounded-3xl p-6 sm:p-7 shadow-2xl text-center space-y-5 animate-in zoom-in-95 duration-200"
+            className="relative w-full max-w-md max-h-[90vh] overflow-y-auto bg-gradient-to-b from-[#13151f] to-[#0a0b10] border border-white/20 rounded-3xl p-5 sm:p-7 shadow-2xl text-center space-y-4 sm:space-y-5 animate-in zoom-in-95 duration-200 my-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Top Icon Badge */}
-            <div className="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-tr from-[#ff007f]/20 to-rose-500/10 border border-[#ff007f]/40 flex items-center justify-center text-[#ff007f] shadow-lg shadow-[#ff007f]/20">
-              <Heart className="w-8 h-8 fill-[#ff007f] animate-pulse" />
+            <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto rounded-3xl bg-gradient-to-tr from-[#ff007f]/20 to-rose-500/10 border border-[#ff007f]/40 flex items-center justify-center text-[#ff007f] shadow-lg shadow-[#ff007f]/20">
+              <Heart className="w-7 h-7 sm:w-8 sm:h-8 fill-[#ff007f] animate-pulse" />
             </div>
 
             {/* Header Text */}
@@ -715,19 +716,19 @@ export default function Home() {
                 <AlertTriangle className="w-3.5 h-3.5" />
                 Permanent Vote Notice
               </span>
-              <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight uppercase">
+              <h3 className="text-lg sm:text-2xl font-black text-white tracking-tight uppercase">
                 Confirm Your Vote?
               </h3>
               <p className="text-xs sm:text-sm text-zinc-300">
                 You are about to cast your vote for:
               </p>
-              <div className="py-2.5 px-4 rounded-2xl bg-white/5 border border-white/10 font-black text-[#ff007f] text-base sm:text-lg tracking-wide uppercase">
+              <div className="py-2 px-3 sm:py-2.5 sm:px-4 rounded-2xl bg-white/5 border border-white/10 font-black text-[#ff007f] text-base sm:text-lg tracking-wide uppercase">
                 @{confirmVoteTarget.name}
               </div>
             </div>
 
             {/* Strict Notice Box in English */}
-            <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-left space-y-2">
+            <div className="p-3 sm:p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-left space-y-2">
               <div className="flex items-start gap-2.5">
                 <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                 <div className="text-[11px] sm:text-xs text-amber-200/90 leading-relaxed space-y-1">
@@ -754,12 +755,12 @@ export default function Home() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center gap-3 pt-1">
+            <div className="flex items-center gap-2.5 sm:gap-3 pt-1">
               <button
                 type="button"
                 disabled={isSubmittingVote}
                 onClick={() => setConfirmVoteTarget(null)}
-                className="flex-1 py-3 px-4 rounded-2xl bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white text-xs font-black uppercase tracking-wider transition-all border border-white/10 disabled:opacity-50"
+                className="flex-1 py-3 px-3 sm:px-4 rounded-2xl bg-zinc-800/80 hover:bg-zinc-700 text-zinc-300 hover:text-white text-xs font-black uppercase tracking-wider transition-all border border-white/10 disabled:opacity-50 min-h-[44px] active:scale-95"
               >
                 Cancel
               </button>
@@ -767,7 +768,7 @@ export default function Home() {
                 type="button"
                 disabled={isSubmittingVote}
                 onClick={executeConfirmedVote}
-                className="flex-1 py-3 px-4 rounded-2xl bg-gradient-to-r from-[#ff007f] to-rose-600 hover:brightness-110 text-white text-xs font-black uppercase tracking-wider transition-all shadow-lg shadow-[#ff007f]/30 flex items-center justify-center gap-2 disabled:opacity-50"
+                className="flex-1 py-3 px-3 sm:px-4 rounded-2xl bg-gradient-to-r from-[#ff007f] to-rose-600 hover:brightness-110 text-white text-xs font-black uppercase tracking-wider transition-all shadow-lg shadow-[#ff007f]/30 flex items-center justify-center gap-2 disabled:opacity-50 min-h-[44px] active:scale-95"
               >
                 {isSubmittingVote ? (
                   <>
@@ -777,7 +778,7 @@ export default function Home() {
                 ) : (
                   <>
                     <Heart className="w-3.5 h-3.5 fill-white" />
-                    <span>Yes, Confirm Vote</span>
+                    <span>Yes, Vote</span>
                   </>
                 )}
               </button>
@@ -789,22 +790,22 @@ export default function Home() {
       {/* English Quota Exceeded Modal */}
       {isQuotaModalOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xl flex items-center justify-center p-4 animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xl flex items-center justify-center p-3 sm:p-4 overflow-y-auto animate-in fade-in duration-200"
           onClick={() => setIsQuotaModalOpen(false)}
         >
           <div
-            className="relative w-full max-w-md bg-gradient-to-b from-[#13151f] to-[#0a0b10] border border-white/20 rounded-3xl p-6 sm:p-7 shadow-2xl text-center space-y-5 animate-in zoom-in-95 duration-200"
+            className="relative w-full max-w-md max-h-[90vh] overflow-y-auto bg-gradient-to-b from-[#13151f] to-[#0a0b10] border border-white/20 rounded-3xl p-5 sm:p-7 shadow-2xl text-center space-y-4 sm:space-y-5 animate-in zoom-in-95 duration-200 my-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="w-16 h-16 mx-auto rounded-3xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-lg shadow-amber-500/20">
-              <AlertTriangle className="w-8 h-8" />
+            <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto rounded-3xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-lg shadow-amber-500/20">
+              <AlertTriangle className="w-7 h-7 sm:w-8 sm:h-8" />
             </div>
 
             <div className="space-y-1.5">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[10px] font-black uppercase tracking-widest">
                 Vote Limit Reached
               </span>
-              <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight uppercase">
+              <h3 className="text-lg sm:text-2xl font-black text-white tracking-tight uppercase">
                 Quota Full (2/2 Votes Used)
               </h3>
               <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed pt-1">
@@ -812,7 +813,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 text-xs text-zinc-300 text-left space-y-1.5">
+            <div className="p-3 sm:p-3.5 rounded-2xl bg-white/5 border border-white/10 text-xs text-zinc-300 text-left space-y-1.5">
               <p className="font-bold text-white flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                 Votes are permanent:
@@ -825,7 +826,7 @@ export default function Home() {
             <button
               type="button"
               onClick={() => setIsQuotaModalOpen(false)}
-              className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-[#ff007f] to-rose-600 hover:brightness-110 text-white text-xs font-black uppercase tracking-wider transition-all shadow-lg shadow-[#ff007f]/30"
+              className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#ff007f] to-rose-600 hover:brightness-110 text-white text-xs font-black uppercase tracking-wider transition-all shadow-lg shadow-[#ff007f]/30 min-h-[44px] active:scale-95"
             >
               I Understand
             </button>

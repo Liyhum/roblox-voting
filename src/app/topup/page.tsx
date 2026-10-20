@@ -135,20 +135,20 @@ export default function TopUpPage() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10 space-y-12">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 relative z-10 space-y-8 sm:space-y-12">
         {/* Notice Banner: Under Maintenance */}
-        <div className="relative rounded-3xl overflow-hidden border-2 border-amber-500/40 bg-gradient-to-b from-amber-500/15 via-[#0e111a] to-[#0c0e14] p-6 sm:p-10 shadow-2xl shadow-amber-500/10">
+        <div className="relative rounded-3xl overflow-hidden border-2 border-amber-500/40 bg-gradient-to-b from-amber-500/15 via-[#0e111a] to-[#0c0e14] p-4 sm:p-10 shadow-2xl shadow-amber-500/10">
           <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
             <Wrench className="w-48 h-48 text-amber-400 rotate-12" />
           </div>
 
-          <div className="relative z-10 max-w-3xl space-y-4">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/20 border border-amber-500/50 text-amber-300 text-xs font-black uppercase tracking-widest animate-pulse">
+          <div className="relative z-10 max-w-3xl space-y-3 sm:space-y-4">
+            <div className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1.5 rounded-full bg-amber-500/20 border border-amber-500/50 text-amber-300 text-[10px] sm:text-xs font-black uppercase tracking-widest animate-pulse">
               <ShieldAlert className="w-4 h-4 text-amber-400" />
               TOP UP STORE CURRENTLY UNDER MAINTENANCE
             </div>
 
-            <h1 className="text-3xl sm:text-5xl font-black uppercase italic tracking-tight text-white">
+            <h1 className="text-2xl sm:text-5xl font-black uppercase italic tracking-tight text-white leading-tight sm:leading-none">
               TREC KL TOP UP STORE <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-rose-400 to-[#ff007f]">
                 IS CURRENTLY BEING UPGRADED

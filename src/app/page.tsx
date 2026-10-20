@@ -22,10 +22,13 @@ import {
   Play,
   Layers,
   Sparkle,
+  Menu,
+  X,
 } from "lucide-react";
 
 export default function LandingPage() {
   const [scrollY, setScrollY] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -126,7 +129,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
             <Link
               href="/voting"
-              className="h-9 sm:h-10 flex items-center gap-2 px-3.5 sm:px-4 rounded-xl text-xs sm:text-sm font-black tracking-wider uppercase text-white bg-gradient-to-r from-[#ff007f] to-rose-600 hover:from-[#ff007f]/90 hover:to-rose-500 shadow-md shadow-[#ff007f]/25 hover:shadow-lg hover:shadow-[#ff007f]/40 transition-all whitespace-nowrap shrink-0"
+              className="h-9 sm:h-10 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-black tracking-wider uppercase text-white bg-gradient-to-r from-[#ff007f] to-rose-600 hover:from-[#ff007f]/90 hover:to-rose-500 shadow-md shadow-[#ff007f]/25 hover:shadow-lg hover:shadow-[#ff007f]/40 transition-all whitespace-nowrap shrink-0 active:scale-95"
             >
               <Sparkles className="w-4 h-4" />
               <span className="hidden sm:inline">Fashion Voting</span>
@@ -137,27 +140,117 @@ export default function LandingPage() {
               href="https://www.roblox.com/games/127693451158806/TREC-KL"
               target="_blank"
               rel="noreferrer"
-              className="h-9 sm:h-10 flex items-center gap-2 px-3 sm:px-3.5 rounded-xl text-xs font-black tracking-wider text-white bg-zinc-900/90 hover:bg-zinc-800 border border-white/15 hover:border-[#00f2fe]/60 transition-all group whitespace-nowrap shrink-0 shadow-sm"
+              className="h-9 sm:h-10 flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 rounded-xl text-xs font-black tracking-wider text-white bg-zinc-900/90 hover:bg-zinc-800 border border-white/15 hover:border-[#00f2fe]/60 transition-all group whitespace-nowrap shrink-0 shadow-sm active:scale-95"
             >
               <Gamepad2 className="w-4 h-4 text-[#00f2fe] group-hover:scale-110 transition-transform" />
               <span className="hidden md:inline whitespace-nowrap">PLAY GAME</span>
             </a>
+
+            {/* Mobile Hamburger Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-zinc-300 hover:text-white transition-all min-w-[40px] min-h-[40px] flex items-center justify-center active:scale-95"
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5 text-[#ff007f]" /> : <Menu className="w-5 h-5" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Navigation Drawer */}
+        {mobileMenuOpen && (
+          <div className="md:hidden bg-[#0a0c12]/98 border-b border-white/15 px-4 py-4 space-y-2 backdrop-blur-2xl animate-in slide-in-from-top-2 duration-200">
+            <Link
+              href="/"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between p-3 rounded-xl bg-white/10 text-white font-bold text-sm min-h-[44px]"
+            >
+              <span>Home</span>
+              <ArrowRight className="w-4 h-4 text-zinc-400" />
+            </Link>
+            <Link
+              href="/voting"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 text-zinc-200 font-bold text-sm transition-colors min-h-[44px]"
+            >
+              <div className="flex items-center gap-2">
+                <Flame className="w-4 h-4 text-[#ff007f]" />
+                <span>Fashion Runway Voting</span>
+              </div>
+              <ArrowRight className="w-4 h-4 text-zinc-400" />
+            </Link>
+            <Link
+              href="/topup"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 text-amber-300 font-bold text-sm transition-colors min-h-[44px]"
+            >
+              <div className="flex items-center gap-2">
+                <Coins className="w-4 h-4 text-amber-400" />
+                <span>Top Up Store</span>
+                <span className="px-1.5 py-0.2 text-[8px] font-black uppercase rounded bg-amber-500/20 text-amber-300 border border-amber-400/40">
+                  Maint
+                </span>
+              </div>
+              <ArrowRight className="w-4 h-4 text-zinc-400" />
+            </Link>
+            <a
+              href="https://discord.gg/54GEpCZGz"
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 text-[#5865F2] font-bold text-sm transition-colors min-h-[44px]"
+            >
+              <div className="flex items-center gap-2">
+                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                  <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                </svg>
+                <span>Discord Community</span>
+              </div>
+              <ExternalLink className="w-4 h-4 text-zinc-400" />
+            </a>
+            <a
+              href="https://sociabuzz.com/treckl/donate"
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 text-amber-300 font-bold text-sm transition-colors min-h-[44px]"
+            >
+              <div className="flex items-center gap-2">
+                <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
+                <span>Donate via SociaBuzz</span>
+              </div>
+              <ExternalLink className="w-4 h-4 text-zinc-400" />
+            </a>
+            <a
+              href="https://www.tiktok.com/@roblox_treckl?lang=en"
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 text-[#00f2fe] font-bold text-sm transition-colors min-h-[44px]"
+            >
+              <div className="flex items-center gap-2">
+                <Video className="w-4 h-4 text-[#00f2fe]" />
+                <span>TikTok @roblox_treckl</span>
+              </div>
+              <ExternalLink className="w-4 h-4 text-zinc-400" />
+            </a>
+          </div>
+        )}
       </header>
 
       {/* HERO SECTION */}
-      <section className="relative pt-12 pb-20 sm:pt-20 sm:pb-28 overflow-hidden z-10">
+      <section className="relative pt-8 pb-16 sm:pt-20 sm:pb-28 overflow-hidden z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center">
             {/* Left Column: Headline & Action */}
-            <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#ff007f]/15 border border-[#ff007f]/40 text-[#ff007f] text-xs font-black uppercase tracking-widest backdrop-blur-md shadow-lg shadow-[#ff007f]/10">
+            <div className="lg:col-span-7 space-y-5 sm:space-y-6 text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-[#ff007f]/15 border border-[#ff007f]/40 text-[#ff007f] text-[11px] sm:text-xs font-black uppercase tracking-widest backdrop-blur-md shadow-lg shadow-[#ff007f]/10">
                 <Sparkles className="w-3.5 h-3.5" />
                 TREC KL • BY FEMME'S STUDIO • ROBLOX
               </div>
 
-              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black uppercase italic tracking-tight text-white leading-none">
+              <h1 className="text-3xl sm:text-6xl lg:text-7xl font-black uppercase italic tracking-tight text-white leading-none">
                 THE PREMIER <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ff007f] via-fuchsia-400 to-[#00f2fe]">
                   ROBLOX NIGHTLIFE
@@ -165,18 +258,18 @@ export default function LandingPage() {
                 &amp; SOCIAL HANGOUT.
               </h1>
 
-              <p className="text-base sm:text-lg text-zinc-300 leading-relaxed max-w-2xl mx-auto lg:mx-0">
+              <p className="text-sm sm:text-lg text-zinc-300 leading-relaxed max-w-2xl mx-auto lg:mx-0">
                 Welcome to the official community and information portal for <b>[NEW LAYOUT] TREC KL</b> on Roblox, created by <b>FEMME&apos;S STUDIO</b>. 
                 Modeled after the iconic entertainment and dining hub in Kuala Lumpur, Malaysia—experience a vibrant nightlife lounge, chill with friends, catch nightly live DJ sessions, flex custom streetwear, and take part in community events.
               </p>
 
-              {/* Main Action Buttons */}
-              <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4">
+              {/* Main Action Buttons (Full width stacked on mobile, row on tablet/desktop) */}
+              <div className="pt-2 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-center lg:justify-start gap-2.5 sm:gap-4">
                 <a
                   href="https://www.roblox.com/games/127693451158806/TREC-KL"
                   target="_blank"
                   rel="noreferrer"
-                  className="px-7 py-4 rounded-2xl bg-gradient-to-r from-[#ff007f] to-rose-600 hover:brightness-110 text-white font-black text-sm tracking-wider uppercase shadow-xl shadow-[#ff007f]/30 transition-all flex items-center gap-3 active:scale-95 group"
+                  className="w-full sm:w-auto px-6 sm:px-7 py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-[#ff007f] to-rose-600 hover:brightness-110 text-white font-black text-xs sm:text-sm tracking-wider uppercase shadow-xl shadow-[#ff007f]/30 transition-all flex items-center justify-center gap-3 active:scale-95 group min-h-[44px]"
                 >
                   <Gamepad2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
                   <span>Play TREC KL on Roblox</span>
@@ -185,41 +278,43 @@ export default function LandingPage() {
 
                 <Link
                   href="/voting"
-                  className="px-6 py-4 rounded-2xl bg-zinc-900/90 hover:bg-zinc-800 text-white border border-white/15 hover:border-[#00f2fe] font-black text-xs sm:text-sm tracking-wider uppercase transition-all flex items-center gap-2.5 shadow-xl active:scale-95 group"
+                  className="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 rounded-2xl bg-zinc-900/90 hover:bg-zinc-800 text-white border border-white/15 hover:border-[#00f2fe] font-black text-xs sm:text-sm tracking-wider uppercase transition-all flex items-center justify-center gap-2.5 shadow-xl active:scale-95 group min-h-[44px]"
                 >
                   <Flame className="w-4 h-4 text-[#ff007f] group-hover:scale-110 transition-transform" />
                   <span>Fashion Runway Event</span>
                   <ArrowRight className="w-4 h-4 text-[#00f2fe] group-hover:translate-x-1 transition-transform" />
                 </Link>
 
-                <a
-                  href="https://discord.gg/54GEpCZGz"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-5 py-4 rounded-2xl bg-[#5865F2]/20 hover:bg-[#5865F2]/30 text-white border border-[#5865F2]/50 font-bold text-xs sm:text-sm tracking-wider uppercase transition-all flex items-center gap-2 group shadow-lg shadow-[#5865F2]/10"
-                >
-                  <svg className="w-4 h-4 fill-[#5865F2] group-hover:fill-white transition-colors" viewBox="0 0 24 24">
-                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
-                  </svg>
-                  <span>Discord</span>
-                </a>
+                <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                  <a
+                    href="https://discord.gg/54GEpCZGz"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-4 py-3 sm:py-4 rounded-2xl bg-[#5865F2]/20 hover:bg-[#5865F2]/30 text-white border border-[#5865F2]/50 font-bold text-xs sm:text-sm tracking-wider uppercase transition-all flex items-center justify-center gap-2 group shadow-lg shadow-[#5865F2]/10 min-h-[44px]"
+                  >
+                    <svg className="w-4 h-4 fill-[#5865F2] group-hover:fill-white transition-colors" viewBox="0 0 24 24">
+                      <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.929 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                    </svg>
+                    <span>Discord</span>
+                  </a>
 
-                <a
-                  href="https://sociabuzz.com/treckl/donate"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-5 py-4 rounded-2xl bg-gradient-to-r from-amber-500/20 to-yellow-600/20 hover:from-amber-500/30 hover:to-yellow-600/30 text-amber-300 border border-amber-500/40 font-bold text-xs sm:text-sm tracking-wider uppercase transition-all flex items-center gap-2 group shadow-lg shadow-amber-500/10"
-                >
-                  <Heart className="w-4 h-4 text-rose-500 fill-rose-500 group-hover:scale-110 transition-transform" />
-                  <span>Donate</span>
-                </a>
+                  <a
+                    href="https://sociabuzz.com/treckl/donate"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-4 py-3 sm:py-4 rounded-2xl bg-gradient-to-r from-amber-500/20 to-yellow-600/20 hover:from-amber-500/30 hover:to-yellow-600/30 text-amber-300 border border-amber-500/40 font-bold text-xs sm:text-sm tracking-wider uppercase transition-all flex items-center justify-center gap-1.5 group shadow-lg shadow-amber-500/10 min-h-[44px]"
+                  >
+                    <Heart className="w-4 h-4 text-rose-500 fill-rose-500 group-hover:scale-110 transition-transform" />
+                    <span>Donate</span>
+                  </a>
+                </div>
 
                 <Link
                   href="/topup"
-                  className="px-4 py-4 rounded-2xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold text-xs sm:text-sm tracking-wider uppercase transition-all flex items-center gap-2 group"
+                  className="w-full sm:w-auto px-4 py-3 sm:py-4 rounded-2xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold text-xs sm:text-sm tracking-wider uppercase transition-all flex items-center justify-center gap-2 group min-h-[44px]"
                 >
                   <Coins className="w-4 h-4 text-amber-400" />
-                  <span>Top Up</span>
+                  <span>Top Up Store</span>
                   <span className="px-1.5 py-0.5 text-[8px] font-black uppercase rounded bg-amber-500/30 text-amber-300 border border-amber-400/50">
                     Maint
                   </span>
@@ -227,18 +322,18 @@ export default function LandingPage() {
               </div>
 
               {/* Quick Game Information Highlights */}
-              <div className="pt-6 grid grid-cols-3 gap-3 border-t border-white/10 max-w-lg mx-auto lg:mx-0">
-                <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
-                  <div className="text-lg sm:text-xl font-black text-white font-mono">10PM - 2AM</div>
-                  <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Nightly Live DJ</div>
+              <div className="pt-6 grid grid-cols-3 gap-2 sm:gap-3 border-t border-white/10 max-w-lg mx-auto lg:mx-0">
+                <div className="p-2.5 sm:p-3 rounded-2xl bg-white/5 border border-white/10 text-center sm:text-left">
+                  <div className="text-sm sm:text-xl font-black text-white font-mono">10PM - 2AM</div>
+                  <div className="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Live DJ</div>
                 </div>
-                <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
-                  <div className="text-lg sm:text-xl font-black text-[#ff007f] font-mono">17+ Social</div>
-                  <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Hangout Club</div>
+                <div className="p-2.5 sm:p-3 rounded-2xl bg-white/5 border border-white/10 text-center sm:text-left">
+                  <div className="text-sm sm:text-xl font-black text-[#ff007f] font-mono">17+ Social</div>
+                  <div className="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Hangout Club</div>
                 </div>
-                <div className="p-3 rounded-2xl bg-white/5 border border-white/10">
-                  <div className="text-lg sm:text-xl font-black text-[#00f2fe] font-mono">KL Theme</div>
-                  <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Virtual Recreation</div>
+                <div className="p-2.5 sm:p-3 rounded-2xl bg-white/5 border border-white/10 text-center sm:text-left">
+                  <div className="text-sm sm:text-xl font-black text-[#00f2fe] font-mono">KL Theme</div>
+                  <div className="text-[9px] sm:text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Virtual City</div>
                 </div>
               </div>
             </div>

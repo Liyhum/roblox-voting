@@ -137,11 +137,11 @@ export function Navbar({
 
           {/* Right Action Hub: Primary CTA + Profile + Game */}
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-            {/* Primary Action Button: Submit Outfit */}
+            {/* Primary Action Button: Submit Outfit (Desktop/Tablet; on mobile it's the center bottom bar button) */}
             <button
               type="button"
               onClick={() => setActiveTab("upload")}
-              className={`h-9 sm:h-10 px-3.5 sm:px-4 flex items-center gap-2 rounded-xl text-xs sm:text-sm font-black tracking-wide transition-all whitespace-nowrap shrink-0 ${
+              className={`hidden sm:flex h-9 sm:h-10 px-3.5 sm:px-4 items-center gap-2 rounded-xl text-xs sm:text-sm font-black tracking-wide transition-all whitespace-nowrap shrink-0 active:scale-95 ${
                 activeTab === "upload"
                   ? "bg-gradient-to-r from-[#ff007f] to-rose-600 text-white shadow-lg shadow-[#ff007f]/40 ring-2 ring-white/30"
                   : "bg-gradient-to-r from-[#ff007f] to-rose-600 hover:from-[#ff007f]/90 hover:to-rose-500 text-white shadow-md shadow-[#ff007f]/25 hover:shadow-lg hover:shadow-[#ff007f]/40"
@@ -153,7 +153,7 @@ export function Navbar({
 
             {/* User Profile Pill or Connect Button */}
             {connectedUser ? (
-              <div className="h-9 sm:h-10 flex items-center gap-2 bg-zinc-950/90 border border-emerald-500/40 p-1 pr-2.5 sm:pr-3 rounded-xl sm:rounded-2xl shadow-sm shrink-0">
+              <div className="h-9 sm:h-10 flex items-center gap-1.5 sm:gap-2 bg-zinc-950/90 border border-emerald-500/40 p-1 pr-2 sm:pr-3 rounded-xl sm:rounded-2xl shadow-sm shrink-0">
                 <div className="relative">
                   {connectedUser.avatarUrl ? (
                     <img
@@ -168,7 +168,7 @@ export function Navbar({
                   )}
                   <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-[#06070a] shadow-sm shadow-emerald-500/60" />
                 </div>
-                <div className="hidden xl:block text-left max-w-[110px] truncate">
+                <div className="hidden lg:block text-left max-w-[100px] truncate">
                   <p className="text-xs font-bold text-white leading-tight truncate">
                     {connectedUser.displayName}
                   </p>
@@ -177,8 +177,9 @@ export function Navbar({
                 <button
                   type="button"
                   onClick={onDisconnect}
-                  className="p-1 rounded-lg text-zinc-400 hover:text-rose-400 hover:bg-white/5 transition-colors"
+                  className="p-1 sm:p-1.5 rounded-lg text-zinc-400 hover:text-rose-400 hover:bg-white/5 transition-colors min-w-[32px] min-h-[32px] flex items-center justify-center"
                   title="Switch Roblox Account"
+                  aria-label="Switch Roblox Account"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                 </button>
@@ -187,7 +188,8 @@ export function Navbar({
               <button
                 type="button"
                 onClick={onOpenConnectModal}
-                className="h-9 sm:h-10 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 rounded-xl text-xs font-bold uppercase tracking-wider text-zinc-200 bg-white/5 hover:bg-white/10 border border-white/15 hover:border-[#00f2fe] transition-all whitespace-nowrap shrink-0 shadow-sm"
+                className="h-9 sm:h-10 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 rounded-xl text-xs font-bold uppercase tracking-wider text-zinc-200 bg-white/5 hover:bg-white/10 border border-white/15 hover:border-[#00f2fe] transition-all whitespace-nowrap shrink-0 shadow-sm active:scale-95 min-h-[38px]"
+                aria-label="Set Username"
               >
                 <ShieldCheck className="w-4 h-4 text-[#00f2fe]" />
                 <span className="hidden sm:inline">Set Username</span>
@@ -200,8 +202,9 @@ export function Navbar({
               href="https://www.roblox.com/games/127693451158806/TREC-KL"
               target="_blank"
               rel="noreferrer"
-              className="h-9 sm:h-10 flex items-center gap-2 px-3 sm:px-3.5 rounded-xl text-xs font-black tracking-wider text-white bg-zinc-900/90 hover:bg-zinc-800 border border-white/15 hover:border-[#00f2fe]/60 transition-all group whitespace-nowrap shrink-0 shadow-sm"
+              className="h-9 sm:h-10 flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 rounded-xl text-xs font-black tracking-wider text-white bg-zinc-900/90 hover:bg-zinc-800 border border-white/15 hover:border-[#00f2fe]/60 transition-all group whitespace-nowrap shrink-0 shadow-sm active:scale-95"
               title="Launch TREC KL on Roblox"
+              aria-label="Launch TREC KL on Roblox"
             >
               <Gamepad2 className="w-4 h-4 text-[#00f2fe] group-hover:scale-110 transition-transform" />
               <span className="hidden md:inline whitespace-nowrap">PLAY GAME</span>
@@ -210,11 +213,14 @@ export function Navbar({
         </div>
       </header>
 
-      {/* Mobile Bottom Navigation Bar (For Phones & Tablets) */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#06070a]/95 backdrop-blur-2xl border-t border-white/10 px-3 py-2 flex items-center justify-around shadow-2xl">
+      {/* Mobile Bottom Navigation Bar (Optimized for Touch, Safe-Areas & One-Handed Reach) */}
+      <nav
+        aria-label="Mobile Navigation"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#06070a]/95 backdrop-blur-2xl border-t border-white/10 px-2 pt-2 pb-[max(0.6rem,env(safe-area-inset-bottom))] flex items-center justify-around shadow-2xl"
+      >
         <Link
           href="/"
-          className="flex flex-col items-center gap-1 text-[10px] font-bold text-zinc-400 hover:text-white"
+          className="flex flex-col items-center justify-center gap-1 min-w-[56px] min-h-[44px] text-[10px] font-bold text-zinc-400 hover:text-white active:scale-95 transition-all"
         >
           <HomeIcon className="w-4 h-4 text-[#00f2fe]" />
           <span>Home</span>
@@ -223,14 +229,14 @@ export function Navbar({
         <button
           type="button"
           onClick={() => setActiveTab("gallery")}
-          className={`flex flex-col items-center gap-1 text-[10px] font-bold transition-colors ${
+          className={`flex flex-col items-center justify-center gap-1 min-w-[56px] min-h-[44px] text-[10px] font-bold active:scale-95 transition-all ${
             activeTab === "gallery" ? "text-[#ff007f]" : "text-zinc-400 hover:text-white"
           }`}
         >
           <div className="relative">
             <Flame className="w-4 h-4" />
             {submissionCount > 0 && (
-              <span className="absolute -top-1 -right-2 px-1 text-[8px] font-black bg-[#ff007f] text-white rounded-full">
+              <span className="absolute -top-1.5 -right-2.5 px-1 py-0.2 text-[8px] font-black bg-[#ff007f] text-white rounded-full shadow-sm">
                 {submissionCount}
               </span>
             )}
@@ -241,10 +247,11 @@ export function Navbar({
         <button
           type="button"
           onClick={() => setActiveTab("upload")}
-          className={`-mt-5 p-3 rounded-2xl bg-gradient-to-r from-[#ff007f] to-rose-600 text-white shadow-lg shadow-[#ff007f]/40 border-2 border-[#06070a] transition-transform active:scale-95 ${
+          className={`-mt-6 p-3 rounded-2xl bg-gradient-to-r from-[#ff007f] to-rose-600 text-white shadow-xl shadow-[#ff007f]/40 border-2 border-[#06070a] transition-all active:scale-90 min-w-[48px] min-h-[48px] flex items-center justify-center ${
             activeTab === "upload" ? "ring-2 ring-[#00f2fe]" : ""
           }`}
           title="Submit Outfit"
+          aria-label="Submit Runway Outfit"
         >
           <Plus className="w-5 h-5 stroke-[3]" />
         </button>
@@ -252,7 +259,7 @@ export function Navbar({
         <button
           type="button"
           onClick={() => setActiveTab("leaderboard")}
-          className={`flex flex-col items-center gap-1 text-[10px] font-bold transition-colors ${
+          className={`flex flex-col items-center justify-center gap-1 min-w-[56px] min-h-[44px] text-[10px] font-bold active:scale-95 transition-all ${
             activeTab === "leaderboard" ? "text-amber-400" : "text-zinc-400 hover:text-white"
           }`}
         >
@@ -262,12 +269,12 @@ export function Navbar({
 
         <Link
           href="/topup"
-          className="flex flex-col items-center gap-1 text-[10px] font-bold text-amber-300 hover:text-amber-200"
+          className="flex flex-col items-center justify-center gap-1 min-w-[56px] min-h-[44px] text-[10px] font-bold text-amber-300 hover:text-amber-200 active:scale-95 transition-all"
         >
           <Coins className="w-4 h-4 text-amber-400" />
           <span>Store</span>
         </Link>
-      </div>
+      </nav>
     </>
   );
 }

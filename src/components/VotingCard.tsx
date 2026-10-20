@@ -160,10 +160,10 @@ export function VotingCard({
                   submission.tiktok_url
                 )
               }
-              className="mt-2 text-[11px] font-bold text-zinc-400 hover:text-white flex items-center gap-1.5 p-1 transition-colors"
+              className="mt-2 text-[11px] font-bold text-zinc-400 hover:text-white flex items-center gap-1.5 p-1.5 rounded-lg transition-colors min-h-[36px]"
             >
               <Maximize2 className="w-3 h-3 text-[#00f2fe]" />
-              <span>Buka Layar Penuh</span>
+              <span>View Fullscreen</span>
             </button>
           </div>
         ) : (
@@ -237,8 +237,8 @@ export function VotingCard({
                   href={submission.tiktok_url}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-900 border border-white/10 text-[10px] font-black text-zinc-300 hover:text-white hover:border-[#ff007f] transition-all shrink-0"
-                  title="Lihat di TikTok"
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-zinc-900 border border-white/10 text-[10px] font-black text-zinc-300 hover:text-white hover:border-[#ff007f] transition-all shrink-0 min-h-[28px]"
+                  title="View on TikTok"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <TikTokIcon className="w-2.5 h-2.5 text-[#ff007f]" />
@@ -259,7 +259,7 @@ export function VotingCard({
         </div>
 
         {/* Bottom Vote Row */}
-        <div className="pt-3.5 border-t border-white/10 flex items-center justify-between">
+        <div className="pt-3.5 border-t border-white/10 flex items-center justify-between gap-3">
           <div>
             <div className="flex items-baseline gap-1.5">
               <span className="text-2xl font-black tracking-tight text-white font-mono">
@@ -274,12 +274,12 @@ export function VotingCard({
           <button
             onClick={handleVoteClick}
             disabled={hasVoted}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-black tracking-wider uppercase transition-all duration-300 ${
+            className={`flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-black tracking-wider uppercase transition-all duration-300 min-h-[44px] min-w-[104px] active:scale-95 ${
               hasVoted
                 ? "bg-[#ff007f]/20 text-[#ff007f] border border-[#ff007f]/40 cursor-default opacity-90 shadow-none"
                 : isQuotaFull
-                ? "bg-zinc-900 border border-amber-500/40 text-amber-300 hover:bg-zinc-800 active:scale-95"
-                : "bg-gradient-to-r from-[#ff007f] via-rose-500 to-[#00f2fe] text-white hover:brightness-110 shadow-lg shadow-[#ff007f]/25 active:scale-95"
+                ? "bg-zinc-900 border border-amber-500/40 text-amber-300 hover:bg-zinc-800"
+                : "bg-gradient-to-r from-[#ff007f] via-rose-500 to-[#00f2fe] text-white hover:brightness-110 shadow-lg shadow-[#ff007f]/25"
             }`}
             title={
               hasVoted

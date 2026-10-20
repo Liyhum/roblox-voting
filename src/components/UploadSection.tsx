@@ -290,7 +290,7 @@ export function UploadSection({ onSuccess, connectedUsername }: UploadSectionPro
   };
 
   return (
-    <div className="max-w-2xl mx-auto bg-[#0c0e14]/90 backdrop-blur-2xl border border-white/10 rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden">
+    <div className="max-w-2xl mx-auto bg-[#0c0e14]/90 backdrop-blur-2xl border border-white/10 rounded-2xl sm:rounded-3xl p-4 sm:p-10 shadow-2xl relative overflow-hidden">
       {/* Decorative neon ambient blur */}
       <div className="absolute -top-24 -left-24 w-48 h-48 bg-[#00f2fe]/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-[#ff007f]/10 rounded-full blur-3xl pointer-events-none" />
@@ -388,7 +388,7 @@ export function UploadSection({ onSuccess, connectedUsername }: UploadSectionPro
                 </div>
 
                 {!robloxData.isInGroup && (
-                  <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center justify-between text-xs">
+                  <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
                     <span className="text-amber-300 font-semibold text-[11px]">
                       Must join <b>FEMME'S STUDIO</b> to submit
                     </span>
@@ -396,7 +396,7 @@ export function UploadSection({ onSuccess, connectedUsername }: UploadSectionPro
                       href="https://www.roblox.com/groups/740188661"
                       target="_blank"
                       rel="noreferrer"
-                      className="px-2.5 py-1 rounded-lg bg-gradient-to-r from-[#ff007f] to-rose-600 text-white font-bold text-[10px] uppercase tracking-wider shadow-md hover:brightness-110"
+                      className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-[#ff007f] to-rose-600 text-white font-bold text-[10px] uppercase tracking-wider shadow-md hover:brightness-110 active:scale-95"
                     >
                       Join Group &rarr;
                     </a>
