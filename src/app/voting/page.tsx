@@ -538,17 +538,6 @@ export default function Home() {
                     </p>
                   </div>
                 </div>
-
-                {/* Host Trigger Button */}
-                <div className="flex items-center gap-2 shrink-0">
-                  <button
-                    onClick={() => setIsHostModalOpen(true)}
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-400/40 hover:border-amber-400 text-amber-200 text-xs font-black uppercase tracking-wider transition-all shadow-md hover:brightness-110 active:scale-95"
-                  >
-                    <span>👑</span>
-                    <span>{eventStatusData.status === "active" ? "Host Controls" : "Start Vote (Host)"}</span>
-                  </button>
-                </div>
               </div>
             </div>
 
@@ -740,6 +729,7 @@ export default function Home() {
         onConnected={handleUserConnected}
         pendingVoteContestantName={pendingVoteTarget?.name}
         isOAuthConfigured={isOAuthConfigured}
+        onOpenHostControls={() => setIsHostModalOpen(true)}
       />
 
       {/* Lightbox Modal (2 Media: Photo + Video TikTok) */}

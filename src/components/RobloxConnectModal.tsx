@@ -22,12 +22,15 @@ export interface ConnectedRobloxUser {
   roleName?: string;
 }
 
+const HOST_SECRET_CODES = ["treckl2026", "treckl", "#host", "#admin", "admin2026", "host2026"];
+
 interface RobloxConnectModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConnected: (user: ConnectedRobloxUser) => void;
   pendingVoteContestantName?: string;
   isOAuthConfigured?: boolean;
+  onOpenHostControls?: () => void;
 }
 
 export function RobloxConnectModal({
@@ -36,11 +39,14 @@ export function RobloxConnectModal({
   onConnected,
   pendingVoteContestantName,
   isOAuthConfigured = false,
+  onOpenHostControls,
 }: RobloxConnectModalProps) {
   const [usernameInput, setUsernameInput] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [robloxData, setRobloxData] = useState<ConnectedRobloxUser | null>(null);
   const [error, setError] = useState("");
+
+  const isHostCode = HOST_SECRET_CODES.includes(usernameInput.trim().toLowerCase());
 
   // Reset when modal opens
   useEffect(() => {
@@ -55,6 +61,14 @@ export function RobloxConnectModal({
     if (!trimmed || trimmed.length < 3) {
       setRobloxData(null);
       setError("");
+      return;
+    }
+
+    // Intercept Host Secret Code: Do not look up Roblox API
+    if (HOST_SECRET_CODES.includes(trimmed.toLowerCase())) {
+      setRobloxData(null);
+      setError("");
+      setIsVerifying(false);
       return;
     }
 
@@ -173,79 +187,109 @@ export function RobloxConnectModal({
             </div>
           </div>
 
-          {/* Account Preview Status */}
-          {robloxData && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-3.5 p-3.5 bg-zinc-950/90 border border-emerald-500/40 rounded-2xl shadow-inner">
-                {robloxData.avatarUrl ? (
-                  <img
-                    src={robloxData.avatarUrl}
-                    alt={robloxData.username}
-                    className="w-12 h-12 rounded-xl border border-emerald-500/50 bg-zinc-900 object-cover shadow-md"
-                  />
-                ) : (
-                  <div className="w-12 h-12 rounded-xl bg-zinc-900 border border-white/10 flex items-center justify-center">
-                    <CheckCircle2 className="w-6 h-6 text-emerald-400" />
-                  </div>
-                )}
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-black text-sm text-white truncate">
-                      {robloxData.displayName}
-                    </span>
-                    <span className="px-1.5 py-0.2 text-[9px] font-black uppercase rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                      Found
-                    </span>
-                  </div>
-                  <p className="text-xs text-zinc-400 font-mono">@{robloxData.username}</p>
-                </div>
+          {/* Host Secret Trigger View */}
+          {isHostCode ? (
+            <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500/20 via-yellow-500/10 to-amber-500/20 border border-amber-400/50 text-center space-y-3 shadow-lg shadow-amber-500/10 animate-fadeIn">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-400/40 text-amber-300 flex items-center justify-center mx-auto text-xl shadow-md">
+                👑
+              </div>
+              <div>
+                <h4 className="text-sm font-black text-white uppercase tracking-wider">
+                  Host Secret Code Verified!
+                </h4>
+                <p className="text-xs text-zinc-300 mt-1">
+                  Organizer authorization recognized. You can now start, pause, or end voting for all attendees.
+                </p>
               </div>
 
-              {/* Group status is informative, NOT a blocker */}
-              {robloxData.isInGroup && (
-                <div className="px-3 py-2 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex items-center justify-between text-xs">
-                  <span className="text-emerald-300 font-bold flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    FEMME&apos;S STUDIO Member
-                  </span>
-                  <span className="text-zinc-400 text-[10px]">{robloxData.roleName || "Member"}</span>
-                </div>
-              )}
-            </div>
-          )}
-
-          {error && (
-            <p className="text-xs text-amber-400 flex items-center gap-1.5 font-medium">
-              <AlertCircle className="w-4 h-4 shrink-0" /> {error}
-            </p>
-          )}
-
-          {/* Confirm Button */}
-          <button
-            onClick={handleManualConfirm}
-            disabled={!robloxData}
-            className={`w-full py-3.5 px-6 rounded-2xl font-black text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-2 active:scale-95 ${
-              robloxData
-                ? "bg-gradient-to-r from-[#ff007f] via-rose-600 to-[#00f2fe] text-white hover:brightness-110 shadow-xl shadow-[#ff007f]/25"
-                : "bg-zinc-800 text-zinc-500 cursor-not-allowed border border-white/5"
-            }`}
-          >
-            <CheckCircle2 className="w-4 h-4" />
-            <span>{robloxData ? "Confirm & Cast Vote" : "Type Your Roblox Username"}</span>
-          </button>
-
-          {/* Optional OAuth Login Option */}
-          {isOAuthConfigured && (
-            <div className="pt-2 text-center border-t border-white/10">
               <button
                 type="button"
-                onClick={handleOfficialRobloxLogin}
-                className="text-[11px] text-zinc-400 hover:text-white transition-colors underline flex items-center justify-center gap-1 mx-auto"
+                onClick={() => {
+                  onClose();
+                  if (onOpenHostControls) onOpenHostControls();
+                }}
+                className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 text-zinc-950 font-black text-xs uppercase tracking-wider hover:brightness-110 shadow-xl shadow-amber-400/30 active:scale-95 transition-all flex items-center justify-center gap-2"
               >
-                <span>Or log in with official Roblox OAuth</span>
-                <ExternalLink className="w-3 h-3" />
+                <span>⚡ Open Host Controls (Start / Stop Vote)</span>
               </button>
             </div>
+          ) : (
+            <>
+              {/* Account Preview Status */}
+              {robloxData && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3.5 p-3.5 bg-zinc-950/90 border border-emerald-500/40 rounded-2xl shadow-inner">
+                    {robloxData.avatarUrl ? (
+                      <img
+                        src={robloxData.avatarUrl}
+                        alt={robloxData.username}
+                        className="w-12 h-12 rounded-xl border border-emerald-500/50 bg-zinc-900 object-cover shadow-md"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-xl bg-zinc-900 border border-white/10 flex items-center justify-center">
+                        <CheckCircle2 className="w-6 h-6 text-emerald-400" />
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-black text-sm text-white truncate">
+                          {robloxData.displayName}
+                        </span>
+                        <span className="px-1.5 py-0.2 text-[9px] font-black uppercase rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                          Found
+                        </span>
+                      </div>
+                      <p className="text-xs text-zinc-400 font-mono">@{robloxData.username}</p>
+                    </div>
+                  </div>
+
+                  {/* Group status is informative, NOT a blocker */}
+                  {robloxData.isInGroup && (
+                    <div className="px-3 py-2 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex items-center justify-between text-xs">
+                      <span className="text-emerald-300 font-bold flex items-center gap-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        FEMME&apos;S STUDIO Member
+                      </span>
+                      <span className="text-zinc-400 text-[10px]">{robloxData.roleName || "Member"}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {error && (
+                <p className="text-xs text-amber-400 flex items-center gap-1.5 font-medium">
+                  <AlertCircle className="w-4 h-4 shrink-0" /> {error}
+                </p>
+              )}
+
+              {/* Confirm Button */}
+              <button
+                onClick={handleManualConfirm}
+                disabled={!robloxData}
+                className={`w-full py-3.5 px-6 rounded-2xl font-black text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-2 active:scale-95 ${
+                  robloxData
+                    ? "bg-gradient-to-r from-[#ff007f] via-rose-600 to-[#00f2fe] text-white hover:brightness-110 shadow-xl shadow-[#ff007f]/25"
+                    : "bg-zinc-800 text-zinc-500 cursor-not-allowed border border-white/5"
+                }`}
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                <span>{robloxData ? "Confirm & Cast Vote" : "Type Your Roblox Username"}</span>
+              </button>
+
+              {/* Optional OAuth Login Option */}
+              {isOAuthConfigured && (
+                <div className="pt-2 text-center border-t border-white/10">
+                  <button
+                    type="button"
+                    onClick={handleOfficialRobloxLogin}
+                    className="text-[11px] text-zinc-400 hover:text-white transition-colors underline flex items-center justify-center gap-1 mx-auto"
+                  >
+                    <span>Or log in with official Roblox OAuth</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </button>
+                </div>
+              )}
+            </>
           )}
 
           <p className="text-[10px] text-zinc-500 text-center font-medium">
