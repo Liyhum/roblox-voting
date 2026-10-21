@@ -124,14 +124,14 @@ export default function Home() {
       setVotedIds([]);
     }
 
-    // If Supabase is configured and user is connected, sync from votes_log if available
+    // If Supabase is configured and user is connected, sync from votes_log
     if (isSupabaseConfigured && connectedUser?.id) {
       supabase
         .from("votes_log")
         .select("submission_id")
         .eq("voter_roblox_id", connectedUser.id)
         .then(({ data, error }) => {
-          if (!error && data && data.length > 0) {
+          if (!error && data) {
             const ids = data.map((row: { submission_id: string }) => row.submission_id);
             setVotedIds(ids);
             localStorage.setItem(key, JSON.stringify(ids));
