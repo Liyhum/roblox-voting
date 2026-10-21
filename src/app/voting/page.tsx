@@ -17,6 +17,7 @@ import {
   Image as ImageIcon,
   AlertTriangle,
   Heart,
+  Lock,
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { Navbar } from "@/components/Navbar";
@@ -25,9 +26,11 @@ import { UploadSection } from "@/components/UploadSection";
 import { Leaderboard } from "@/components/Leaderboard";
 import { SetupGuide } from "@/components/SetupGuide";
 import { RobloxConnectModal, ConnectedRobloxUser } from "@/components/RobloxConnectModal";
+import { HostControlModal } from "@/components/HostControlModal";
 import { TikTokPlayer, TikTokIcon } from "@/components/TikTokPlayer";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import { supabase, isSupabaseConfigured, Submission } from "@/lib/supabase";
+import { EventStatusType } from "@/lib/event-status";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<"gallery" | "upload" | "leaderboard">("gallery");
@@ -36,6 +39,20 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"votes" | "newest">("votes");
   const [votedIds, setVotedIds] = useState<string[]>([]);
+
+  // Event Voting Status (Locked / Live / Ended)
+  const [eventStatusData, setEventStatusData] = useState<{
+    status: EventStatusType;
+    startedAt: number | null;
+    durationSeconds: number | null;
+    endsAt: number | null;
+  }>({
+    status: "not_started",
+    startedAt: null,
+    durationSeconds: null,
+    endsAt: null,
+  });
+  const [isHostModalOpen, setIsHostModalOpen] = useState(false);
 
   // Roblox Connect state
   const [connectedUser, setConnectedUser] = useState<ConnectedRobloxUser | null>(null);
@@ -155,8 +172,44 @@ export default function Home() {
     loadSubmissions();
   }, [loadSubmissions]);
 
+  // Polling Event Status (Locked, Live, Ended)
+  const fetchEventStatus = useCallback(async () => {
+    try {
+      const res = await fetch("/api/event-status");
+      const data = await res.json();
+      if (data && data.success) {
+        setEventStatusData({
+          status: data.status,
+          startedAt: data.startedAt,
+          durationSeconds: data.durationSeconds,
+          endsAt: data.endsAt,
+        });
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchEventStatus();
+    // Poll every 3 seconds for instant synchronization across all attendee devices
+    const interval = setInterval(fetchEventStatus, 3000);
+    return () => clearInterval(interval);
+  }, [fetchEventStatus]);
+
   // Handle Vote Request from card or leaderboard
   const handleVoteRequest = (id: string, contestantName: string, avatarUrl?: string) => {
+    // 1. Check if voting has been started by the host
+    if (eventStatusData.status === "not_started") {
+      alert("Voting has not started yet! Please wait for the event host to initiate the voting session.");
+      return;
+    }
+
+    if (eventStatusData.status === "ended") {
+      alert("Voting has concluded. Thank you for participating!");
+      return;
+    }
+
     if (!connectedUser) {
       setPendingVoteTarget({ id, name: contestantName, avatarUrl } as { id: string; name: string });
       setIsConnectModalOpen(true);
@@ -414,6 +467,91 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Dynamic Event Status & Host Trigger Banner */}
+            <div
+              className={`p-4 sm:p-5 rounded-3xl border transition-all duration-300 backdrop-blur-xl relative overflow-hidden ${
+                eventStatusData.status === "active"
+                  ? "bg-gradient-to-r from-emerald-950/40 via-zinc-950/80 to-emerald-950/40 border-emerald-500/40 shadow-xl shadow-emerald-500/10"
+                  : eventStatusData.status === "ended"
+                  ? "bg-gradient-to-r from-rose-950/30 via-zinc-950/80 to-zinc-950/80 border-rose-500/30"
+                  : "bg-gradient-to-r from-amber-950/30 via-zinc-950/80 to-zinc-950/80 border-amber-500/30"
+              }`}
+            >
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-3.5 text-center md:text-left">
+                  <div
+                    className={`w-11 h-11 rounded-2xl flex items-center justify-center text-lg shadow-md shrink-0 border ${
+                      eventStatusData.status === "active"
+                        ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40"
+                        : eventStatusData.status === "ended"
+                        ? "bg-rose-500/20 text-rose-400 border-rose-500/40"
+                        : "bg-amber-500/20 text-amber-400 border-amber-500/40"
+                    }`}
+                  >
+                    {eventStatusData.status === "active" ? (
+                      <span className="relative flex h-3.5 w-3.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500"></span>
+                      </span>
+                    ) : eventStatusData.status === "ended" ? (
+                      <Lock className="w-5 h-5 text-rose-400" />
+                    ) : (
+                      <Lock className="w-5 h-5 text-amber-400 animate-pulse" />
+                    )}
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-center md:justify-start gap-2">
+                      <span
+                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${
+                          eventStatusData.status === "active"
+                            ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-300"
+                            : eventStatusData.status === "ended"
+                            ? "bg-rose-500/15 border-rose-500/40 text-rose-300"
+                            : "bg-amber-500/15 border-amber-500/40 text-amber-300"
+                        }`}
+                      >
+                        {eventStatusData.status === "active"
+                          ? "LIVE VOTING OPEN"
+                          : eventStatusData.status === "ended"
+                          ? "VOTING CONCLUDED"
+                          : "VOTING LOCKED / NOT STARTED"}
+                      </span>
+                      {eventStatusData.status === "active" && (
+                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest hidden sm:inline">
+                          &bull; Real-time synchronized
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="text-base sm:text-lg font-black text-white tracking-wide mt-1">
+                      {eventStatusData.status === "active"
+                        ? "Votes Are Now Being Accepted!"
+                        : eventStatusData.status === "ended"
+                        ? "The voting round has ended"
+                        : "Voting Has Not Begun Yet"}
+                    </h3>
+                    <p className="text-xs text-zinc-400 mt-0.5 max-w-xl">
+                      {eventStatusData.status === "active"
+                        ? "You may now vote for up to 2 models. Browse entries below and hit VOTE!"
+                        : eventStatusData.status === "ended"
+                        ? "Voting is closed. Check the Leaderboard tab to view the winners and rankings."
+                        : "Please wait for the event host to start the voting session. Models are open for preview."}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Host Trigger Button */}
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => setIsHostModalOpen(true)}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-400/40 hover:border-amber-400 text-amber-200 text-xs font-black uppercase tracking-wider transition-all shadow-md hover:brightness-110 active:scale-95"
+                  >
+                    <span>👑</span>
+                    <span>{eventStatusData.status === "active" ? "Host Controls" : "Start Vote (Host)"}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
             {/* Event Countdown Timer */}
             <CountdownTimer />
 
@@ -549,6 +687,7 @@ export default function Home() {
                     submission={sub}
                     hasVoted={votedIds.includes(sub.id)}
                     isQuotaFull={votedIds.length >= 2}
+                    eventStatus={eventStatusData.status}
                     onVote={(id, name, avatarUrl) => handleVoteRequest(id, name, avatarUrl)}
                     onQuotaExceeded={() => setIsQuotaModalOpen(true)}
                     onImageClick={(url, title, tiktokUrl) => {
@@ -833,6 +972,16 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* Host Controls Modal */}
+      <HostControlModal
+        isOpen={isHostModalOpen}
+        onClose={() => setIsHostModalOpen(false)}
+        currentStatus={eventStatusData.status}
+        startedAt={eventStatusData.startedAt}
+        endsAt={eventStatusData.endsAt}
+        onStatusUpdated={fetchEventStatus}
+      />
 
       {/* Footer */}
       <footer className="border-t border-white/10 bg-[#06070a] py-8 mt-16 text-center text-xs text-zinc-500 relative z-10">

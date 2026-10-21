@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSessionFromRequest } from "@/lib/session";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { supabaseServer, isServerSupabaseConfigured } from "@/lib/supabase-server";
+import { getEventStatus } from "@/lib/event-status";
 
 // UUID regex validation
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -97,7 +98,28 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // 5. Validate Voting Deadline
+  // 5. Validate Event Voting Status (Host must initiate voting first)
+  const eventStatus = getEventStatus();
+  if (eventStatus.status === "not_started") {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Voting has not been started yet. Please wait for the event host to start the voting session.",
+      },
+      { status: 400 }
+    );
+  }
+  if (eventStatus.status === "ended") {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Voting session has concluded. Thank you for participating!",
+      },
+      { status: 400 }
+    );
+  }
+
+  // 6. Validate Voting Deadline (if configured)
   const endDateStr = process.env.NEXT_PUBLIC_VOTING_END_DATE;
   if (endDateStr) {
     const endTimestamp = new Date(endDateStr).getTime();

@@ -101,6 +101,12 @@
       "namedRegex": "^/api/auth/roblox/login(?:/)?$"
     },
     {
+      "page": "/api/event-status",
+      "regex": "^/api/event\\-status(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/event\\-status(?:/)?$"
+    },
+    {
       "page": "/api/roblox-avatar",
       "regex": "^/api/roblox\\-avatar(?:/)?$",
       "routeKeys": {},

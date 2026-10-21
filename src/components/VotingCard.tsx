@@ -10,6 +10,7 @@ import {
   Sparkles,
   Shirt,
   Image as ImageIcon,
+  Lock,
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { Submission } from "@/lib/supabase";
@@ -19,6 +20,7 @@ interface VotingCardProps {
   submission: Submission;
   hasVoted: boolean;
   isQuotaFull?: boolean;
+  eventStatus?: "not_started" | "active" | "ended";
   onVote: (id: string, contestantName: string, avatarUrl?: string) => void;
   onImageClick: (url: string, title: string, tiktokUrl?: string | null) => void;
   onRequireConnect: (id: string, contestantName: string) => void;
@@ -31,6 +33,7 @@ export function VotingCard({
   submission,
   hasVoted,
   isQuotaFull,
+  eventStatus = "active",
   onVote,
   onImageClick,
   onRequireConnect,
@@ -45,6 +48,17 @@ export function VotingCard({
 
   const handleVoteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+
+    // Prevent voting if event is not started or has ended
+    if (eventStatus === "not_started") {
+      alert("Voting has not been started yet. Please wait for the event host to initiate voting!");
+      return;
+    }
+
+    if (eventStatus === "ended") {
+      alert("Voting session has officially ended. Thank you for participating!");
+      return;
+    }
 
     // Votes are permanent! Once voted, clicking does nothing
     if (hasVoted) return;
@@ -271,35 +285,56 @@ export function VotingCard({
             </div>
           </div>
 
-          <button
-            onClick={handleVoteClick}
-            disabled={hasVoted}
-            className={`flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-black tracking-wider uppercase transition-all duration-300 min-h-[44px] min-w-[104px] active:scale-95 ${
-              hasVoted
-                ? "bg-[#ff007f]/20 text-[#ff007f] border border-[#ff007f]/40 cursor-default opacity-90 shadow-none"
-                : isQuotaFull
-                ? "bg-zinc-900 border border-amber-500/40 text-amber-300 hover:bg-zinc-800"
-                : "bg-gradient-to-r from-[#ff007f] via-rose-500 to-[#00f2fe] text-white hover:brightness-110 shadow-lg shadow-[#ff007f]/25"
-            }`}
-            title={
-              hasVoted
-                ? "Your vote has been cast and is permanent"
-                : isQuotaFull
-                ? "Quota full: Maximum 2 votes per account reached"
-                : "Vote for this runway outfit"
-            }
-          >
-            <Heart
-              className={`w-4 h-4 transition-all ${
+          {eventStatus === "not_started" ? (
+            <button
+              onClick={handleVoteClick}
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-black tracking-wider uppercase transition-all duration-300 min-h-[44px] min-w-[110px] bg-zinc-900/90 border border-amber-500/30 text-amber-300 hover:bg-zinc-800 shadow-sm active:scale-95"
+              title="Voting is locked. Waiting for host to start voting."
+            >
+              <Lock className="w-3.5 h-3.5 text-amber-400" />
+              <span>LOCKED</span>
+            </button>
+          ) : eventStatus === "ended" ? (
+            <button
+              onClick={handleVoteClick}
+              disabled
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-black tracking-wider uppercase transition-all duration-300 min-h-[44px] min-w-[110px] bg-zinc-950 border border-white/5 text-zinc-500 cursor-not-allowed opacity-80"
+              title="Voting session has concluded"
+            >
+              <Lock className="w-3.5 h-3.5 text-zinc-500" />
+              <span>ENDED</span>
+            </button>
+          ) : (
+            <button
+              onClick={handleVoteClick}
+              disabled={hasVoted}
+              className={`flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-black tracking-wider uppercase transition-all duration-300 min-h-[44px] min-w-[104px] active:scale-95 ${
                 hasVoted
-                  ? "fill-[#ff007f] text-[#ff007f]"
+                  ? "bg-[#ff007f]/20 text-[#ff007f] border border-[#ff007f]/40 cursor-default opacity-90 shadow-none"
                   : isQuotaFull
-                  ? "text-amber-400"
-                  : "text-white group-hover:scale-110"
+                  ? "bg-zinc-900 border border-amber-500/40 text-amber-300 hover:bg-zinc-800"
+                  : "bg-gradient-to-r from-[#ff007f] via-rose-500 to-[#00f2fe] text-white hover:brightness-110 shadow-lg shadow-[#ff007f]/25"
               }`}
-            />
-            <span>{hasVoted ? "VOTED" : isQuotaFull ? "MAX 2/2" : "VOTE"}</span>
-          </button>
+              title={
+                hasVoted
+                  ? "Your vote has been cast and is permanent"
+                  : isQuotaFull
+                  ? "Quota full: Maximum 2 votes per account reached"
+                  : "Vote for this runway outfit"
+              }
+            >
+              <Heart
+                className={`w-4 h-4 transition-all ${
+                  hasVoted
+                    ? "fill-[#ff007f] text-[#ff007f]"
+                    : isQuotaFull
+                    ? "text-amber-400"
+                    : "text-white group-hover:scale-110"
+                }`}
+              />
+              <span>{hasVoted ? "VOTED" : isQuotaFull ? "MAX 2/2" : "VOTE"}</span>
+            </button>
+          )}
         </div>
       </div>
     </div>

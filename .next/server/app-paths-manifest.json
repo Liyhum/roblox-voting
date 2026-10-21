@@ -5,6 +5,7 @@
   "/api/auth/me/route": "app/api/auth/me/route.js",
   "/api/auth/roblox/callback/route": "app/api/auth/roblox/callback/route.js",
   "/api/auth/roblox/login/route": "app/api/auth/roblox/login/route.js",
+  "/api/event-status/route": "app/api/event-status/route.js",
   "/api/roblox-avatar/route": "app/api/roblox-avatar/route.js",
   "/api/submissions/route": "app/api/submissions/route.js",
   "/api/tiktok-resolve/route": "app/api/tiktok-resolve/route.js",
