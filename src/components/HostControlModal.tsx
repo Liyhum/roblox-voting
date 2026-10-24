@@ -13,6 +13,7 @@ import {
   Clock,
   Sparkles,
   Lock,
+  Calendar,
 } from "lucide-react";
 import { EventStatusType } from "@/lib/event-status";
 
@@ -22,6 +23,7 @@ interface HostControlModalProps {
   currentStatus: EventStatusType;
   startedAt: number | null;
   endsAt: number | null;
+  customEndDate?: string | null;
   onStatusUpdated: () => void;
 }
 
@@ -31,6 +33,7 @@ export function HostControlModal({
   currentStatus,
   startedAt,
   endsAt,
+  customEndDate,
   onStatusUpdated,
 }: HostControlModalProps) {
   const [pin, setPin] = useState(() => {
@@ -40,13 +43,23 @@ export function HostControlModal({
     return "";
   });
   const [selectedDuration, setSelectedDuration] = useState<number>(0); // 0 = no time limit
+  const [customEndDateInput, setCustomEndDateInput] = useState<string>(() => {
+    if (customEndDate) {
+      try {
+        return new Date(customEndDate).toISOString().slice(0, 16);
+      } catch {
+        return "";
+      }
+    }
+    return "";
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
-  const handleAction = async (action: "start" | "pause" | "reset" | "end") => {
+  const handleAction = async (action: "start" | "pause" | "reset" | "end" | "set_end_date") => {
     if (!pin.trim()) {
       setErrorMsg("Please enter the Host PIN to proceed.");
       return;
@@ -56,6 +69,16 @@ export function HostControlModal({
     setErrorMsg(null);
     setSuccessMsg(null);
 
+    let formattedEndDate: string | undefined = undefined;
+    if (action === "set_end_date") {
+      if (!customEndDateInput) {
+        setErrorMsg("Please select a valid closing date and time.");
+        setIsSubmitting(false);
+        return;
+      }
+      formattedEndDate = new Date(customEndDateInput).toISOString();
+    }
+
     try {
       const res = await fetch("/api/event-status", {
         method: "POST",
@@ -63,90 +86,97 @@ export function HostControlModal({
         body: JSON.stringify({
           action,
           durationSeconds: action === "start" ? selectedDuration : undefined,
+          customEndDate: formattedEndDate,
           pin: pin.trim(),
         }),
       });
 
       const data = await res.json();
 
-      if (!res.ok || data.success === false) {
-        setErrorMsg(data.message || "Failed to update event status.");
+      if (!res.ok || !data.success) {
+        setErrorMsg(data.message || "Failed to execute host command.");
         return;
       }
 
-      // Save pin locally for organizer convenience
-      localStorage.setItem("trec_host_pin", pin.trim());
-      setSuccessMsg(`Status updated: ${data.status.toUpperCase()}!`);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("trec_host_pin", pin.trim());
+      }
+
+      setSuccessMsg(data.message || "Action executed successfully!");
       onStatusUpdated();
     } catch {
-      setErrorMsg("Network error communicating with the server.");
+      setErrorMsg("Network error occurred. Please check your connection.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
-      <div className="relative w-full max-w-lg bg-[#0c0e14] border border-white/15 rounded-3xl p-6 sm:p-7 shadow-2xl overflow-hidden flex flex-col">
-        {/* Ambient Top Glow */}
-        <div className="absolute -top-20 -right-20 w-48 h-48 bg-[#ff007f]/20 rounded-full blur-3xl pointer-events-none" />
+    <div
+      className="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex items-center justify-center p-4 overflow-y-auto"
+      onClick={onClose}
+    >
+      <div
+        className="relative max-w-lg w-full bg-[#0c0e14] border border-white/15 rounded-3xl p-6 sm:p-8 shadow-2xl overflow-hidden my-8"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Glow ambient background */}
+        <div className="absolute -top-20 -right-20 w-44 h-44 bg-[#00f2fe]/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-20 -left-20 w-44 h-44 bg-[#ff007f]/20 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Modal Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-white/10 relative z-10">
+        {/* Header */}
+        <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-yellow-500 text-zinc-950 flex items-center justify-center shadow-lg font-black text-sm">
-              👑
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#00f2fe] to-[#ff007f] flex items-center justify-center text-white shadow-lg">
+              <Sparkles className="w-5 h-5 fill-white" />
             </div>
             <div>
-              <h3 className="text-base font-black text-white uppercase tracking-wider flex items-center gap-2">
-                <span>Event Host Controls</span>
+              <h3 className="font-black text-white text-base tracking-wider uppercase">
+                Host Event Control
               </h3>
               <p className="text-[11px] text-zinc-400">
-                Control when voting starts, pauses, or ends for all participants
+                Live voting session organizer panel
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white/5 border border-white/10 text-zinc-400 hover:text-white flex items-center justify-center transition-colors"
+            className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-white/10 transition-all"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Current Status Pill */}
-        <div className="my-5 p-4 rounded-2xl bg-zinc-950/80 border border-white/10 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        {/* Live Status Badge */}
+        <div className="flex items-center justify-between p-3.5 rounded-2xl bg-zinc-950 border border-white/10 mb-5">
+          <div className="flex items-center gap-2">
             <div
-              className={`w-3.5 h-3.5 rounded-full ${
+              className={`w-2.5 h-2.5 rounded-full animate-pulse ${
                 currentStatus === "active"
-                  ? "bg-emerald-400 animate-ping"
+                  ? "bg-emerald-400 shadow-[0_0_8px_#34d399]"
                   : currentStatus === "ended"
-                  ? "bg-rose-500"
-                  : "bg-amber-400"
+                  ? "bg-rose-500 shadow-[0_0_8px_#f43f5e]"
+                  : "bg-amber-400 shadow-[0_0_8px_#fbbf24]"
               }`}
             />
-            <div>
-              <div className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
-                Current Voting Status
-              </div>
-              <div className="text-sm font-extrabold text-white uppercase tracking-wider mt-0.5">
-                {currentStatus === "not_started" && "🔒 Voting Locked (Not Started)"}
-                {currentStatus === "active" && "🟢 Live Voting in Progress"}
-                {currentStatus === "ended" && "🏁 Voting Concluded"}
-              </div>
-            </div>
+            <span className="text-xs font-bold text-zinc-300">
+              Current Live Status:
+            </span>
           </div>
           <span
-            className={`px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider border ${
+            className={`px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider border ${
               currentStatus === "active"
-                ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
+                ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
                 : currentStatus === "ended"
-                ? "bg-rose-500/10 border-rose-500/30 text-rose-300"
-                : "bg-amber-500/10 border-amber-500/30 text-amber-300"
+                ? "bg-rose-500/20 text-rose-300 border-rose-500/40"
+                : "bg-amber-500/20 text-amber-300 border-amber-500/40"
             }`}
           >
-            {currentStatus}
+            {currentStatus === "active"
+              ? "🟢 Voting Live (Open)"
+              : currentStatus === "ended"
+              ? "🔴 Voting Ended (Closed)"
+              : "🟡 Not Started (Locked)"}
           </span>
         </div>
 
@@ -168,6 +198,38 @@ export function HostControlModal({
             placeholder="Enter Host PIN..."
             className="w-full px-4 py-2.5 bg-zinc-950 border border-white/15 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-[#00f2fe] transition-all font-mono"
           />
+        </div>
+
+        {/* Set Custom Closing Date & Time (Host Controlled) */}
+        <div className="space-y-2 mb-4 p-3.5 rounded-2xl bg-zinc-950 border border-white/10">
+          <label className="text-xs font-bold text-zinc-300 flex items-center justify-between">
+            <span className="flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5 text-[#00f2fe]" /> Atur Tanggal & Jam Tutup Voting
+            </span>
+            <span className="text-[10px] text-[#00f2fe]">Auto-Sync Countdown</span>
+          </label>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <input
+              type="datetime-local"
+              value={customEndDateInput}
+              onChange={(e) => {
+                setCustomEndDateInput(e.target.value);
+                setErrorMsg(null);
+              }}
+              className="flex-1 px-3 py-2 bg-zinc-900 border border-white/15 rounded-xl text-xs text-white focus:outline-none focus:border-[#00f2fe]"
+            />
+            <button
+              type="button"
+              onClick={() => handleAction("set_end_date")}
+              disabled={isSubmitting || !customEndDateInput}
+              className="px-4 py-2 bg-gradient-to-r from-[#00f2fe] to-[#ff007f] hover:brightness-110 text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all disabled:opacity-50 min-h-[38px] shrink-0"
+            >
+              Simpan Tanggal
+            </button>
+          </div>
+          <p className="text-[10px] text-zinc-500 mt-1">
+            Mengatur batas penutupan global langsung dari browser tanpa perlu edit file .env.
+          </p>
         </div>
 
         {/* Timer Duration Selection (only applicable when starting) */}
@@ -241,17 +303,17 @@ export function HostControlModal({
             className="flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-zinc-900 border border-rose-500/40 text-rose-300 font-black text-xs uppercase tracking-wider hover:bg-zinc-800 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all min-h-[46px]"
           >
             <Square className="w-4 h-4" />
-            <span>End Voting</span>
+            <span>End Voting (Close)</span>
           </button>
 
-          {/* Reset Status */}
+          {/* Reset Session */}
           <button
             onClick={() => handleAction("reset")}
             disabled={isSubmitting}
-            className="flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-zinc-950 border border-white/10 text-zinc-400 font-black text-xs uppercase tracking-wider hover:text-white hover:border-white/20 active:scale-95 disabled:opacity-40 transition-all min-h-[46px]"
+            className="flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-zinc-900 border border-white/15 text-zinc-300 font-black text-xs uppercase tracking-wider hover:bg-zinc-800 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed transition-all min-h-[46px]"
           >
             <RotateCcw className="w-4 h-4" />
-            <span>Reset to Not Started</span>
+            <span>Reset Session</span>
           </button>
         </div>
       </div>

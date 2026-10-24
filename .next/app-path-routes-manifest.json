@@ -5,6 +5,7 @@
   "/api/auth/me/route": "/api/auth/me",
   "/api/auth/roblox/callback/route": "/api/auth/roblox/callback",
   "/api/auth/roblox/login/route": "/api/auth/roblox/login",
+  "/api/bind-device/route": "/api/bind-device",
   "/api/event-status/route": "/api/event-status",
   "/api/roblox-avatar/route": "/api/roblox-avatar",
   "/api/submissions/route": "/api/submissions",

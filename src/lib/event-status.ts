@@ -8,6 +8,7 @@ export interface EventStatusData {
   startedAt: number | null;
   durationSeconds: number | null;
   endsAt: number | null;
+  customEndDate?: string | null;
   updatedAt: number;
 }
 
@@ -19,6 +20,7 @@ const DEFAULT_STATE: EventStatusData = {
   startedAt: null,
   durationSeconds: null,
   endsAt: null,
+  customEndDate: null,
   updatedAt: Date.now(),
 };
 
@@ -41,6 +43,7 @@ export function getEventStatus(): EventStatusData {
             startedAt: parsed.startedAt || null,
             durationSeconds: parsed.durationSeconds || null,
             endsAt: parsed.endsAt || null,
+            customEndDate: parsed.customEndDate || null,
             updatedAt: parsed.updatedAt || now,
           };
         }
@@ -77,8 +80,9 @@ function saveEventStatusToFile(data: EventStatusData) {
 }
 
 export function setEventStatus(
-  action: "start" | "pause" | "reset" | "end",
-  durationSeconds?: number
+  action: "start" | "pause" | "reset" | "end" | "set_end_date",
+  durationSeconds?: number,
+  customEndDate?: string | null
 ): EventStatusData {
   const now = Date.now();
   let updated: EventStatusData;
@@ -88,6 +92,7 @@ export function setEventStatus(
       const dur = durationSeconds && durationSeconds > 0 ? durationSeconds : null;
       const endsAt = dur ? now + dur * 1000 : null;
       updated = {
+        ...memoryCache,
         status: "active",
         startedAt: now,
         durationSeconds: dur,
@@ -106,6 +111,7 @@ export function setEventStatus(
     }
     case "reset": {
       updated = {
+        ...memoryCache,
         status: "not_started",
         startedAt: null,
         durationSeconds: null,
@@ -118,6 +124,14 @@ export function setEventStatus(
       updated = {
         ...memoryCache,
         status: "ended",
+        updatedAt: now,
+      };
+      break;
+    }
+    case "set_end_date": {
+      updated = {
+        ...memoryCache,
+        customEndDate: customEndDate || null,
         updatedAt: now,
       };
       break;

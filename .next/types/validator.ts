@@ -177,6 +177,16 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../src/app/api/bind-device/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/bind-device">> = Specific
+  const handler = {} as typeof import("../../src/app/api/bind-device/route.js")
+  type __Check = __IsExpected<typeof handler>
+  
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../src/app/api/event-status/route.ts
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/event-status">> = Specific

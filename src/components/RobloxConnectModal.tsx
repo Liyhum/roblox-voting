@@ -12,6 +12,7 @@ import {
   Users,
   RefreshCw,
 } from "lucide-react";
+import { generateHardwareFingerprint } from "@/lib/hardware-fingerprint";
 
 export interface ConnectedRobloxUser {
   id: number;
@@ -20,6 +21,8 @@ export interface ConnectedRobloxUser {
   avatarUrl: string;
   isInGroup?: boolean;
   roleName?: string;
+  accountAgeDays?: number;
+  isAccountOldEnough?: boolean;
 }
 
 const HOST_SECRET_CODES = ["#host", "#admin", "#femme", "femme_host99_tr3c$2026"];
@@ -109,8 +112,46 @@ export function RobloxConnectModal({
 
   if (!isOpen) return null;
 
-  const handleManualConfirm = () => {
+  const handleManualConfirm = async () => {
     if (!robloxData) return;
+
+    setIsVerifying(true);
+    setError("");
+
+    try {
+      const hardwareFingerprint = await generateHardwareFingerprint();
+      let deviceId = "";
+      if (typeof window !== "undefined") {
+        deviceId = localStorage.getItem("trec_voter_device_id") || "";
+        if (!deviceId) {
+          deviceId = "dev_" + Math.random().toString(36).substring(2, 12) + "_" + Date.now().toString(36);
+          localStorage.setItem("trec_voter_device_id", deviceId);
+        }
+      }
+
+      const res = await fetch("/api/bind-device", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          voterId: robloxData.id,
+          username: robloxData.username,
+          deviceId,
+          hardwareFingerprint,
+        }),
+      });
+
+      const resData = await res.json();
+      if (!res.ok || resData.success === false) {
+        setError(resData.message || "Perangkat ini sudah terikat dengan akun Roblox lain.");
+        setIsVerifying(false);
+        return;
+      }
+    } catch {
+      // ignore
+    } finally {
+      setIsVerifying(false);
+    }
+
     localStorage.setItem("trec_connected_roblox_user", JSON.stringify(robloxData));
     onConnected(robloxData);
     onClose();
@@ -291,6 +332,19 @@ export function RobloxConnectModal({
                       </div>
                     </div>
                   )}
+
+                  {/* Account Age Gate Check - Anti-Bot clone protection */}
+                  {robloxData.isAccountOldEnough === false && (
+                    <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-start gap-2 text-left">
+                      <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-xs font-bold text-amber-300">Akun Roblox Terlalu Baru</p>
+                        <p className="text-[11px] text-zinc-300 mt-0.5">
+                          Akun ini baru berumur <strong className="text-white">{robloxData.accountAgeDays} hari</strong>. Syarat minimal adalah <strong className="text-white">30 hari</strong> untuk mencegah akun klon / bot.
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -300,12 +354,12 @@ export function RobloxConnectModal({
                 </p>
               )}
 
-              {/* Confirm Button - Strictly blocked if not in group */}
+              {/* Confirm Button - Strictly blocked if not in group or account too young */}
               <button
                 onClick={handleManualConfirm}
-                disabled={!robloxData || !robloxData.isInGroup}
+                disabled={!robloxData || !robloxData.isInGroup || robloxData.isAccountOldEnough === false}
                 className={`w-full py-3.5 px-6 rounded-2xl font-black text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-2 active:scale-95 ${
-                  robloxData && robloxData.isInGroup
+                  robloxData && robloxData.isInGroup && robloxData.isAccountOldEnough !== false
                     ? "bg-gradient-to-r from-[#ff007f] via-rose-600 to-[#00f2fe] text-white hover:brightness-110 shadow-xl shadow-[#ff007f]/25 cursor-pointer"
                     : "bg-zinc-800 text-zinc-500 cursor-not-allowed border border-white/5 opacity-70"
                 }`}
@@ -316,6 +370,8 @@ export function RobloxConnectModal({
                     ? "Type Your Roblox Username"
                     : !robloxData.isInGroup
                     ? "Wajib Join Group FEMME'S STUDIO"
+                    : robloxData.isAccountOldEnough === false
+                    ? "Akun Terlalu Baru (< 30 Hari)"
                     : "Confirm & Cast Vote"}
                 </span>
               </button>

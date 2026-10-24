@@ -29,6 +29,7 @@ import { RobloxConnectModal, ConnectedRobloxUser } from "@/components/RobloxConn
 import { HostControlModal } from "@/components/HostControlModal";
 import { TikTokPlayer, TikTokIcon } from "@/components/TikTokPlayer";
 import { CountdownTimer } from "@/components/CountdownTimer";
+import { generateHardwareFingerprint } from "@/lib/hardware-fingerprint";
 import { supabase, isSupabaseConfigured, Submission } from "@/lib/supabase";
 import { EventStatusType } from "@/lib/event-status";
 
@@ -46,11 +47,13 @@ export default function Home() {
     startedAt: number | null;
     durationSeconds: number | null;
     endsAt: number | null;
+    customEndDate?: string | null;
   }>({
     status: "not_started",
     startedAt: null,
     durationSeconds: null,
     endsAt: null,
+    customEndDate: null,
   });
   const [isHostModalOpen, setIsHostModalOpen] = useState(false);
 
@@ -183,6 +186,7 @@ export default function Home() {
           startedAt: data.startedAt,
           durationSeconds: data.durationSeconds,
           endsAt: data.endsAt,
+          customEndDate: data.customEndDate || null,
         });
       }
     } catch {
@@ -265,11 +269,17 @@ export default function Home() {
 
     // Generate / Retrieve persistent device fingerprint ID
     let deviceId = "";
+    let hardwareFingerprint = "";
     if (typeof window !== "undefined") {
       deviceId = localStorage.getItem("trec_voter_device_id") || "";
       if (!deviceId) {
         deviceId = "dev_" + Math.random().toString(36).substring(2, 12) + "_" + Date.now().toString(36);
         localStorage.setItem("trec_voter_device_id", deviceId);
+      }
+      try {
+        hardwareFingerprint = await generateHardwareFingerprint();
+      } catch {
+        hardwareFingerprint = "";
       }
     }
 
@@ -284,6 +294,7 @@ export default function Home() {
           voterUsername: connectedUser?.username,
           voterId: connectedUser?.id,
           deviceId,
+          hardwareFingerprint,
         }),
       });
 
@@ -558,6 +569,8 @@ export default function Home() {
               targetDate={
                 eventStatusData.status === "active" && eventStatusData.endsAt
                   ? new Date(eventStatusData.endsAt).toISOString()
+                  : eventStatusData.customEndDate
+                  ? eventStatusData.customEndDate
                   : undefined
               }
             />
@@ -988,6 +1001,7 @@ export default function Home() {
         currentStatus={eventStatusData.status}
         startedAt={eventStatusData.startedAt}
         endsAt={eventStatusData.endsAt}
+        customEndDate={eventStatusData.customEndDate}
         onStatusUpdated={fetchEventStatus}
       />
 

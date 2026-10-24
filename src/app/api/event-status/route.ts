@@ -12,8 +12,9 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   let body: {
-    action?: "start" | "pause" | "reset" | "end";
+    action?: "start" | "pause" | "reset" | "end" | "set_end_date";
     durationSeconds?: number;
+    customEndDate?: string;
     pin?: string;
   };
 
@@ -26,7 +27,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { action, durationSeconds, pin } = body;
+  const { action, durationSeconds, customEndDate, pin } = body;
 
   const validPin = (process.env.HOST_ADMIN_PIN || "Femme_Host99_Tr3c$2026").trim();
 
@@ -41,18 +42,20 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (!action || !["start", "pause", "reset", "end"].includes(action)) {
+  if (!action || !["start", "pause", "reset", "end", "set_end_date"].includes(action)) {
     return NextResponse.json(
-      { success: false, message: "Invalid action. Supported: start, pause, reset, end." },
+      { success: false, message: "Invalid action. Supported: start, pause, reset, end, set_end_date." },
       { status: 400 }
     );
   }
 
-  const updated = setEventStatus(action, durationSeconds);
+  const updated = setEventStatus(action, durationSeconds, customEndDate);
 
   return NextResponse.json({
     success: true,
-    message: `Event voting status successfully updated to: ${updated.status}`,
+    message: action === "set_end_date"
+      ? `Voting closing date successfully set to: ${customEndDate || "Default (.env)"}`
+      : `Event voting status successfully updated to: ${updated.status}`,
     ...updated,
     serverTime: Date.now(),
   });

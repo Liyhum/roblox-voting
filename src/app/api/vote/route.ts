@@ -54,6 +54,7 @@ export async function POST(req: NextRequest) {
     voterUsername?: string;
     voterId?: number | string;
     deviceId?: string;
+    hardwareFingerprint?: string;
   };
   try {
     body = await req.json();
@@ -64,7 +65,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { submissionId, voterUsername, voterId, deviceId } = body;
+  const { submissionId, voterUsername, voterId, deviceId, hardwareFingerprint } = body;
   if (!submissionId || !UUID_REGEX.test(submissionId)) {
     return NextResponse.json(
       { success: false, message: "Invalid submission ID parameter." },
@@ -124,7 +125,32 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // 5. Mandatory Community Check: Must be member of FEMME'S STUDIO (740188661)
+  // 5. Anti-Bot Account Age Check: Roblox account must be at least 30 days old
+  try {
+    const userDetailRes = await fetch(`https://users.roblox.com/v1/users/${effectiveVoterId}`, {
+      cache: "no-store",
+    });
+    if (userDetailRes.ok) {
+      const userDetail = await userDetailRes.json();
+      if (userDetail && userDetail.created) {
+        const createdTime = new Date(userDetail.created).getTime();
+        const accountAgeDays = Math.floor((Date.now() - createdTime) / (1000 * 60 * 60 * 24));
+        if (accountAgeDays < 30) {
+          return NextResponse.json(
+            {
+              success: false,
+              message: `Akun Roblox kamu masih terlalu baru (${accountAgeDays} hari). Minimal umur akun adalah 30 hari untuk mencegah bot / akun klon baru.`,
+            },
+            { status: 403 }
+          );
+        }
+      }
+    }
+  } catch (err) {
+    console.error("Roblox user age check error:", err);
+  }
+
+  // 6. Mandatory Community Check: Must be member of FEMME'S STUDIO (740188661)
   const REQUIRED_GROUP_ID = 740188661;
   let isGroupMember = false;
   try {
@@ -153,15 +179,17 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // 6. Anti-Sybil Protection: 1 USN = 1 Device & IP Enforcement
+  // 7. Anti-Sybil Protection: 1 USN = 1 Hardware (GPU/Canvas) + 1 Device & IP Enforcement
   const clientIp = getClientIp(req);
   const effectiveDevice = (deviceId || "").trim();
+  const effectiveHardware = (hardwareFingerprint || "").trim();
 
   const deviceCheck = validateDeviceAndIp(
     effectiveVoterId,
     effectiveVoterName,
     effectiveDevice,
-    clientIp
+    clientIp,
+    effectiveHardware
   );
 
   if (!deviceCheck.allowed) {
@@ -240,7 +268,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Record device and IP binding upon successful vote
-      recordDeviceAndIp(effectiveVoterId, effectiveVoterName, effectiveDevice, clientIp);
+      recordDeviceAndIp(effectiveVoterId, effectiveVoterName, effectiveDevice, clientIp, effectiveHardware);
 
       return NextResponse.json({
         success: true,
@@ -259,7 +287,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Record device and IP binding upon successful vote
-    recordDeviceAndIp(effectiveVoterId, effectiveVoterName, effectiveDevice, clientIp);
+    recordDeviceAndIp(effectiveVoterId, effectiveVoterName, effectiveDevice, clientIp, effectiveHardware);
 
     return NextResponse.json({
       success: true,

@@ -94,6 +94,20 @@ export async function GET(request: Request) {
       console.error("Group check error:", err);
     }
 
+    // 2b. Check Account Creation Date (Anti-Bot Age Gate)
+    let accountAgeDays = 999;
+    try {
+      const detailRes = await fetch(`https://users.roblox.com/v1/users/${userId}`, { cache: "no-store" });
+      if (detailRes.ok) {
+        const detailData = await detailRes.json();
+        if (detailData && detailData.created) {
+          accountAgeDays = Math.floor((Date.now() - new Date(detailData.created).getTime()) / (1000 * 60 * 60 * 24));
+        }
+      }
+    } catch {
+      // ignore
+    }
+
     return NextResponse.json({
       id: userId,
       name: robloxUser.name,
@@ -101,6 +115,8 @@ export async function GET(request: Request) {
       avatarUrl,
       isInGroup,
       roleName,
+      accountAgeDays,
+      isAccountOldEnough: accountAgeDays >= 30,
       groupId: REQUIRED_GROUP_ID,
       groupName: REQUIRED_GROUP_NAME,
       groupUrl: REQUIRED_GROUP_URL,
