@@ -8,6 +8,7 @@ export async function POST(req: NextRequest) {
     username: string;
     deviceId: string;
     hardwareFingerprint?: string;
+    checkOnly?: boolean;
   };
 
   try {
@@ -19,7 +20,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { voterId, username, deviceId, hardwareFingerprint } = body;
+  const { voterId, username, deviceId, hardwareFingerprint, checkOnly } = body;
 
   if (!voterId || !username || !deviceId) {
     return NextResponse.json(
@@ -47,6 +48,14 @@ export async function POST(req: NextRequest) {
       },
       { status: 403 }
     );
+  }
+
+  // If checkOnly is requested, return success without binding
+  if (checkOnly) {
+    return NextResponse.json({
+      success: true,
+      message: "Device is eligible for this voter.",
+    });
   }
 
   // Lock and bind this device to this username immediately upon check-in

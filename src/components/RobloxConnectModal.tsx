@@ -81,6 +81,40 @@ export function RobloxConnectModal({
       const res = await fetch(`/api/roblox-avatar?username=${encodeURIComponent(trimmed)}`);
       const data = await res.json();
       if (res.ok && data.name) {
+        // Real-time check if this device/hardware is already bound to another USN
+        try {
+          const hardwareFingerprint = await generateHardwareFingerprint();
+          let deviceId = "";
+          if (typeof window !== "undefined") {
+            deviceId = localStorage.getItem("trec_voter_device_id") || "";
+            if (!deviceId) {
+              deviceId = "dev_" + Math.random().toString(36).substring(2, 12) + "_" + Date.now().toString(36);
+              localStorage.setItem("trec_voter_device_id", deviceId);
+            }
+          }
+
+          const checkRes = await fetch("/api/bind-device", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              voterId: data.id,
+              username: data.name,
+              deviceId,
+              hardwareFingerprint,
+              checkOnly: true,
+            }),
+          });
+
+          const checkData = await checkRes.json();
+          if (!checkRes.ok || checkData.success === false) {
+            setError(checkData.message || "Perangkat ini sudah terkunci untuk akun Roblox lain.");
+            setRobloxData(null);
+            return;
+          }
+        } catch {
+          // non-blocking if check fails network
+        }
+
         setRobloxData({
           id: data.id,
           username: data.name,

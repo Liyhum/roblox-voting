@@ -24,10 +24,7 @@ let memoryStore: DeviceLimitStore = {
   ipToUsers: {},
 };
 
-let isLoaded = false;
-
 function loadStore() {
-  if (isLoaded) return;
   try {
     if (fs.existsSync(FILE_PATH)) {
       const content = fs.readFileSync(FILE_PATH, "utf-8");
@@ -45,7 +42,6 @@ function loadStore() {
   } catch {
     // ignore
   }
-  isLoaded = true;
 }
 
 function saveStore() {
