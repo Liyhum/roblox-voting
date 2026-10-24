@@ -180,8 +180,11 @@ export function RobloxConnectModal({
         setIsVerifying(false);
         return;
       }
-    } catch {
-      // ignore
+    } catch (err: unknown) {
+      console.error("Device binding error:", err);
+      setError("Gagal memverifikasi keamanan perangkat. Pastikan koneksi stabil.");
+      setIsVerifying(false);
+      return; // STRICT: DO NOT CONNECT IF BINDING FAILS!
     } finally {
       setIsVerifying(false);
     }
