@@ -125,6 +125,7 @@ Jika kamu membeli paket Shared/Cloud Hosting Dewaweb dengan cPanel:
    - `SESSION_SECRET` = `trec-kl-super-secret-session-key-2026-production`
    - `NEXT_PUBLIC_APP_URL` = `https://domainmu.com`
    - `NEXT_PUBLIC_VOTING_END_DATE` = `2026-10-25T23:59:59+08:00`
+   - `HOST_ADMIN_PIN` = `Femme_Host99_Tr3c$2026`
    - `NODE_ENV` = `production`
 6. **Install Dependencies & Jalankan**:
    - Klik **Run NPM Install** di halaman Setup Node.js App.

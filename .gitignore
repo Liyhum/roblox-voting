@@ -37,7 +37,9 @@ yarn-error.log*
 .env*
 
 # vercel
-.vercel
+# runtime local state
+.event-status.json
+.device-voters.json
 
 # typescript
 *.tsbuildinfo

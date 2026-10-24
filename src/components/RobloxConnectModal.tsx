@@ -22,7 +22,7 @@ export interface ConnectedRobloxUser {
   roleName?: string;
 }
 
-const HOST_SECRET_CODES = ["treckl2026", "treckl", "#host", "#admin", "admin2026", "host2026"];
+const HOST_SECRET_CODES = ["#host", "#admin", "#femme", "femme_host99_tr3c$2026"];
 
 interface RobloxConnectModalProps {
   isOpen: boolean;
@@ -243,14 +243,52 @@ export function RobloxConnectModal({
                     </div>
                   </div>
 
-                  {/* Group status is informative, NOT a blocker */}
-                  {robloxData.isInGroup && (
-                    <div className="px-3 py-2 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex items-center justify-between text-xs">
+                  {/* Group Verification - Strict Requirement */}
+                  {robloxData.isInGroup ? (
+                    <div className="px-3.5 py-2.5 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl flex items-center justify-between text-xs shadow-inner">
                       <span className="text-emerald-300 font-bold flex items-center gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        FEMME&apos;S STUDIO Member
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                        <span>FEMME&apos;S STUDIO Member Verified</span>
                       </span>
-                      <span className="text-zinc-400 text-[10px]">{robloxData.roleName || "Member"}</span>
+                      <span className="text-emerald-400 font-mono text-[10px] uppercase font-black px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/40">
+                        {robloxData.roleName || "Member"}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="p-3.5 bg-rose-500/10 border border-rose-500/40 rounded-2xl text-left space-y-2.5 shadow-md">
+                      <div className="flex items-start gap-2.5">
+                        <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-xs font-black text-white uppercase tracking-wider">
+                            Wajib Gabung Roblox Group
+                          </p>
+                          <p className="text-[11px] text-zinc-300 leading-relaxed mt-0.5">
+                            Akun <strong className="text-white">@{robloxData.username}</strong> belum bergabung ke grup resmi <strong className="text-amber-400">FEMME&apos;S STUDIO</strong>. Kamu wajib join grup terlebih dahulu untuk bisa voting!
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                        <a
+                          href="https://www.roblox.com/groups/740188661"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#ff007f] to-rose-600 hover:brightness-110 text-white font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md shadow-[#ff007f]/25 text-center min-h-[38px]"
+                        >
+                          <span>Join FEMME&apos;S STUDIO</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+
+                        <button
+                          type="button"
+                          onClick={() => verifyUser(usernameInput)}
+                          disabled={isVerifying}
+                          className="py-2.5 px-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-white/15 text-zinc-200 font-extrabold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 min-h-[38px] active:scale-95"
+                        >
+                          <RefreshCw className={`w-3.5 h-3.5 ${isVerifying ? "animate-spin text-[#00f2fe]" : ""}`} />
+                          <span>{isVerifying ? "Mengecek..." : "Cek Ulang Status"}</span>
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -262,18 +300,24 @@ export function RobloxConnectModal({
                 </p>
               )}
 
-              {/* Confirm Button */}
+              {/* Confirm Button - Strictly blocked if not in group */}
               <button
                 onClick={handleManualConfirm}
-                disabled={!robloxData}
+                disabled={!robloxData || !robloxData.isInGroup}
                 className={`w-full py-3.5 px-6 rounded-2xl font-black text-xs sm:text-sm tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-2 active:scale-95 ${
-                  robloxData
-                    ? "bg-gradient-to-r from-[#ff007f] via-rose-600 to-[#00f2fe] text-white hover:brightness-110 shadow-xl shadow-[#ff007f]/25"
-                    : "bg-zinc-800 text-zinc-500 cursor-not-allowed border border-white/5"
+                  robloxData && robloxData.isInGroup
+                    ? "bg-gradient-to-r from-[#ff007f] via-rose-600 to-[#00f2fe] text-white hover:brightness-110 shadow-xl shadow-[#ff007f]/25 cursor-pointer"
+                    : "bg-zinc-800 text-zinc-500 cursor-not-allowed border border-white/5 opacity-70"
                 }`}
               >
                 <CheckCircle2 className="w-4 h-4" />
-                <span>{robloxData ? "Confirm & Cast Vote" : "Type Your Roblox Username"}</span>
+                <span>
+                  {!robloxData
+                    ? "Type Your Roblox Username"
+                    : !robloxData.isInGroup
+                    ? "Wajib Join Group FEMME'S STUDIO"
+                    : "Confirm & Cast Vote"}
+                </span>
               </button>
 
               {/* Optional OAuth Login Option */}

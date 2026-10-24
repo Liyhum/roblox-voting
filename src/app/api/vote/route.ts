@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionFromRequest } from "@/lib/session";
-import { checkRateLimit } from "@/lib/rate-limit";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { supabaseServer, isServerSupabaseConfigured } from "@/lib/supabase-server";
 import { getEventStatus } from "@/lib/event-status";
+import { validateDeviceAndIp, recordDeviceAndIp } from "@/lib/device-limiter";
 
 // UUID regex validation
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -48,7 +49,12 @@ export async function POST(req: NextRequest) {
   }
 
   // 3. Parse and Validate Request Body
-  let body: { submissionId?: string; voterUsername?: string; voterId?: number | string };
+  let body: {
+    submissionId?: string;
+    voterUsername?: string;
+    voterId?: number | string;
+    deviceId?: string;
+  };
   try {
     body = await req.json();
   } catch {
@@ -58,7 +64,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { submissionId, voterUsername, voterId } = body;
+  const { submissionId, voterUsername, voterId, deviceId } = body;
   if (!submissionId || !UUID_REGEX.test(submissionId)) {
     return NextResponse.json(
       { success: false, message: "Invalid submission ID parameter." },
@@ -79,14 +85,24 @@ export async function POST(req: NextRequest) {
     if (voterId && Number(voterId) > 0) {
       effectiveVoterId = Number(voterId);
     } else {
-      // Deterministic numeric hash from username
-      let hash = 0;
-      const lower = effectiveVoterName.toLowerCase();
-      for (let i = 0; i < lower.length; i++) {
-        hash = (hash << 5) - hash + lower.charCodeAt(i);
-        hash |= 0;
+      // Lookup authentic Roblox User ID
+      try {
+        const uRes = await fetch("https://users.roblox.com/v1/usernames/users", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ usernames: [effectiveVoterName], excludeBannedUsers: false }),
+          cache: "no-store",
+        });
+        if (uRes.ok) {
+          const uData = await uRes.json();
+          if (uData.data && uData.data.length > 0) {
+            effectiveVoterId = uData.data[0].id;
+            effectiveVoterName = uData.data[0].name;
+          }
+        }
+      } catch (err) {
+        console.error("Roblox user lookup error:", err);
       }
-      effectiveVoterId = Math.abs(hash) || 1;
     }
   } else {
     return NextResponse.json(
@@ -95,6 +111,66 @@ export async function POST(req: NextRequest) {
         message: "Please enter your Roblox username to cast a vote.",
       },
       { status: 400 }
+    );
+  }
+
+  if (!effectiveVoterId || effectiveVoterId <= 0) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Akun Roblox tidak ditemukan. Pastikan username kamu terdaftar resmi di Roblox.",
+      },
+      { status: 400 }
+    );
+  }
+
+  // 5. Mandatory Community Check: Must be member of FEMME'S STUDIO (740188661)
+  const REQUIRED_GROUP_ID = 740188661;
+  let isGroupMember = false;
+  try {
+    const groupRes = await fetch(
+      `https://groups.roblox.com/v1/users/${effectiveVoterId}/groups/roles`,
+      { cache: "no-store" }
+    );
+    if (groupRes.ok) {
+      const groupData = await groupRes.json();
+      isGroupMember = groupData.data?.some(
+        (g: { group?: { id?: number } }) => g.group?.id === REQUIRED_GROUP_ID
+      ) || false;
+    }
+  } catch (err) {
+    console.error("Group verification error in /api/vote:", err);
+  }
+
+  if (!isGroupMember) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Akun kamu belum bergabung ke grup resmi 'FEMME'S STUDIO'. Wajib join komunitas terlebih dahulu untuk voting!",
+        joinUrl: `https://www.roblox.com/groups/${REQUIRED_GROUP_ID}`,
+      },
+      { status: 403 }
+    );
+  }
+
+  // 6. Anti-Sybil Protection: 1 USN = 1 Device & IP Enforcement
+  const clientIp = getClientIp(req);
+  const effectiveDevice = (deviceId || "").trim();
+
+  const deviceCheck = validateDeviceAndIp(
+    effectiveVoterId,
+    effectiveVoterName,
+    effectiveDevice,
+    clientIp
+  );
+
+  if (!deviceCheck.allowed) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: deviceCheck.reason || "Batas voting per perangkat atau IP tercapai.",
+      },
+      { status: 403 }
     );
   }
 
@@ -163,6 +239,9 @@ export async function POST(req: NextRequest) {
         );
       }
 
+      // Record device and IP binding upon successful vote
+      recordDeviceAndIp(effectiveVoterId, effectiveVoterName, effectiveDevice, clientIp);
+
       return NextResponse.json({
         success: true,
         message: "Vote berhasil tercatat!",
@@ -178,6 +257,9 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Record device and IP binding upon successful vote
+    recordDeviceAndIp(effectiveVoterId, effectiveVoterName, effectiveDevice, clientIp);
 
     return NextResponse.json({
       success: true,

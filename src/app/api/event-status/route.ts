@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
 
   const { action, durationSeconds, pin } = body;
 
-  const validPin = (process.env.HOST_ADMIN_PIN || "treckl2026").trim();
+  const validPin = (process.env.HOST_ADMIN_PIN || "Femme_Host99_Tr3c$2026").trim();
 
   // Validate Host PIN
   if (!pin || pin.trim() !== validPin) {

@@ -57,6 +57,10 @@ create table if not exists public.votes_log (
 create index if not exists idx_votes_log_user on public.votes_log(voter_roblox_id);
 create index if not exists idx_votes_log_sub on public.votes_log(submission_id);
 
+-- MIGRATION: Tambahan kolom pelacak IP & Perangkat Anti-Tuyul/Multi-Account
+alter table public.votes_log add column if not exists voter_ip text;
+alter table public.votes_log add column if not exists voter_device_id text;
+
 alter table public.votes_log enable row level security;
 
 drop policy if exists "Allow public read votes_log" on public.votes_log;

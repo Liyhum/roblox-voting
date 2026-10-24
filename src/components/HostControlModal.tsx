@@ -156,7 +156,7 @@ export function HostControlModal({
             <span className="flex items-center gap-1.5">
               <KeyRound className="w-3.5 h-3.5 text-[#00f2fe]" /> Host Secret PIN
             </span>
-            <span className="text-[10px] text-zinc-500">Default: treckl2026</span>
+            <span className="text-[10px] text-zinc-500 italic">Confidential</span>
           </label>
           <input
             type="password"

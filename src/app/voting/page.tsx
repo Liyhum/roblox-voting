@@ -210,7 +210,8 @@ export default function Home() {
       return;
     }
 
-    if (!connectedUser) {
+    // 2. Strict Check: Must connect and must be member of FEMME'S STUDIO group
+    if (!connectedUser || !connectedUser.isInGroup) {
       setPendingVoteTarget({ id, name: contestantName, avatarUrl } as { id: string; name: string });
       setIsConnectModalOpen(true);
       return;
@@ -262,6 +263,16 @@ export default function Home() {
       colors: ["#ff007f", "#00f2fe", "#ffbe0b", "#a855f7"],
     });
 
+    // Generate / Retrieve persistent device fingerprint ID
+    let deviceId = "";
+    if (typeof window !== "undefined") {
+      deviceId = localStorage.getItem("trec_voter_device_id") || "";
+      if (!deviceId) {
+        deviceId = "dev_" + Math.random().toString(36).substring(2, 12) + "_" + Date.now().toString(36);
+        localStorage.setItem("trec_voter_device_id", deviceId);
+      }
+    }
+
     try {
       const res = await fetch("/api/vote", {
         method: "POST",
@@ -272,6 +283,7 @@ export default function Home() {
           submissionId: id,
           voterUsername: connectedUser?.username,
           voterId: connectedUser?.id,
+          deviceId,
         }),
       });
 
@@ -542,7 +554,13 @@ export default function Home() {
             </div>
 
             {/* Event Countdown Timer */}
-            <CountdownTimer />
+            <CountdownTimer
+              targetDate={
+                eventStatusData.status === "active" && eventStatusData.endsAt
+                  ? new Date(eventStatusData.endsAt).toISOString()
+                  : undefined
+              }
+            />
 
             {/* Account Quota Status Banner */}
             {connectedUser && (
