@@ -74,6 +74,7 @@ export function validateDeviceAndIp(
   const cleanHardware = (hardwareFingerprint || "").trim();
 
   // 1. HARDWARE FINGERPRINT CHECK (GPU, Canvas, Audio, Screen) - Anti-Incognito & Anti-ClearCache
+  // Strictly guarantees 1 Physical Machine can NEVER be used by more than 1 Roblox account
   if (cleanHardware && cleanHardware !== "server-side-stub" && cleanHardware.length > 10) {
     if (memoryStore.hardwareToUser[cleanHardware]) {
       const bound = memoryStore.hardwareToUser[cleanHardware];
@@ -84,35 +85,16 @@ export function validateDeviceAndIp(
         };
       }
     }
-
-    if (memoryStore.userToHardware[voterKey]) {
-      const boundHardware = memoryStore.userToHardware[voterKey];
-      if (boundHardware !== cleanHardware) {
-        return {
-          allowed: false,
-          reason: `Akun @${username} sudah terdaftar pada perangkat fisik lain. 1 Akun Roblox hanya dapat voting dari 1 HP / Komputer.`,
-        };
-      }
-    }
   }
 
   // 2. Software Device UUID Check
+  // Strictly guarantees 1 Browser Device Token can NEVER be used by more than 1 Roblox account
   if (cleanDevice && memoryStore.deviceToUser[cleanDevice]) {
     const bound = memoryStore.deviceToUser[cleanDevice];
     if (bound.voterId !== voterId) {
       return {
         allowed: false,
         reason: `Perangkat (Device) ini sudah digunakan oleh akun @${bound.username}. Sistem membatasi 1 Perangkat hanya untuk 1 Akun Roblox.`,
-      };
-    }
-  }
-
-  if (cleanDevice && memoryStore.userToDevice[voterKey]) {
-    const boundDevice = memoryStore.userToDevice[voterKey];
-    if (boundDevice !== cleanDevice) {
-      return {
-        allowed: false,
-        reason: `Akun @${username} sudah terdaftar pada perangkat lain. 1 Akun hanya diizinkan voting dari 1 perangkat.`,
       };
     }
   }
