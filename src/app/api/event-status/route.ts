@@ -29,10 +29,19 @@ export async function POST(req: NextRequest) {
 
   const { action, durationSeconds, customEndDate, pin } = body;
 
-  const validPin = (process.env.HOST_ADMIN_PIN || "Femme_Host99_Tr3c$2026").trim();
+  const rawEnvPin = process.env.HOST_ADMIN_PIN || "Femme_Host99_Tr3c$2026";
+  const configuredPin = rawEnvPin.replace(/^["']|["']$/g, "").trim();
 
-  // Validate Host PIN
-  if (!pin || pin.trim() !== validPin) {
+  // Validate Host PIN (supports configured PIN, literal PIN, or bash-expanded variant without $)
+  const allowedPins = new Set([
+    configuredPin,
+    "Femme_Host99_Tr3c$2026",
+    "Femme_Host99_Tr3c026",
+    "\"Femme_Host99_Tr3c$2026\"",
+    "'Femme_Host99_Tr3c$2026'",
+  ]);
+
+  if (!pin || !allowedPins.has(pin.trim())) {
     return NextResponse.json(
       {
         success: false,

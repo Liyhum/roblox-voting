@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import React, { useState, useEffect, useCallback } from "react";
 import {
   Search,
@@ -110,7 +112,7 @@ export default function Home() {
           localStorage.setItem("trec_connected_roblox_user", JSON.stringify(data.user));
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   // Sync votes whenever connected user changes
@@ -492,24 +494,22 @@ export default function Home() {
 
             {/* Dynamic Event Status & Host Trigger Banner */}
             <div
-              className={`p-4 sm:p-5 rounded-3xl border transition-all duration-300 backdrop-blur-xl relative overflow-hidden ${
-                eventStatusData.status === "active"
+              className={`p-4 sm:p-5 rounded-3xl border transition-all duration-300 backdrop-blur-xl relative overflow-hidden ${eventStatusData.status === "active"
                   ? "bg-gradient-to-r from-emerald-950/40 via-zinc-950/80 to-emerald-950/40 border-emerald-500/40 shadow-xl shadow-emerald-500/10"
                   : eventStatusData.status === "ended"
-                  ? "bg-gradient-to-r from-rose-950/30 via-zinc-950/80 to-zinc-950/80 border-rose-500/30"
-                  : "bg-gradient-to-r from-amber-950/30 via-zinc-950/80 to-zinc-950/80 border-amber-500/30"
-              }`}
+                    ? "bg-gradient-to-r from-rose-950/30 via-zinc-950/80 to-zinc-950/80 border-rose-500/30"
+                    : "bg-gradient-to-r from-amber-950/30 via-zinc-950/80 to-zinc-950/80 border-amber-500/30"
+                }`}
             >
               <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-3.5 text-center md:text-left">
                   <div
-                    className={`w-11 h-11 rounded-2xl flex items-center justify-center text-lg shadow-md shrink-0 border ${
-                      eventStatusData.status === "active"
+                    className={`w-11 h-11 rounded-2xl flex items-center justify-center text-lg shadow-md shrink-0 border ${eventStatusData.status === "active"
                         ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40"
                         : eventStatusData.status === "ended"
-                        ? "bg-rose-500/20 text-rose-400 border-rose-500/40"
-                        : "bg-amber-500/20 text-amber-400 border-amber-500/40"
-                    }`}
+                          ? "bg-rose-500/20 text-rose-400 border-rose-500/40"
+                          : "bg-amber-500/20 text-amber-400 border-amber-500/40"
+                      }`}
                   >
                     {eventStatusData.status === "active" ? (
                       <span className="relative flex h-3.5 w-3.5">
@@ -525,19 +525,18 @@ export default function Home() {
                   <div>
                     <div className="flex items-center justify-center md:justify-start gap-2">
                       <span
-                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${
-                          eventStatusData.status === "active"
+                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest border ${eventStatusData.status === "active"
                             ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-300"
                             : eventStatusData.status === "ended"
-                            ? "bg-rose-500/15 border-rose-500/40 text-rose-300"
-                            : "bg-amber-500/15 border-amber-500/40 text-amber-300"
-                        }`}
+                              ? "bg-rose-500/15 border-rose-500/40 text-rose-300"
+                              : "bg-amber-500/15 border-amber-500/40 text-amber-300"
+                          }`}
                       >
                         {eventStatusData.status === "active"
                           ? "LIVE VOTING OPEN"
                           : eventStatusData.status === "ended"
-                          ? "VOTING CONCLUDED"
-                          : "VOTING LOCKED / NOT STARTED"}
+                            ? "VOTING CONCLUDED"
+                            : "VOTING LOCKED / NOT STARTED"}
                       </span>
                       {eventStatusData.status === "active" && (
                         <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest hidden sm:inline">
@@ -549,15 +548,15 @@ export default function Home() {
                       {eventStatusData.status === "active"
                         ? "Votes Are Now Being Accepted!"
                         : eventStatusData.status === "ended"
-                        ? "The voting round has ended"
-                        : "Voting Has Not Begun Yet"}
+                          ? "The voting round has ended"
+                          : "Voting Has Not Begun Yet"}
                     </h3>
                     <p className="text-xs text-zinc-400 mt-0.5 max-w-xl">
                       {eventStatusData.status === "active"
                         ? "You may now vote for up to 2 models. Browse entries below and hit VOTE!"
                         : eventStatusData.status === "ended"
-                        ? "Voting is closed. Check the Leaderboard tab to view the winners and rankings."
-                        : "Please wait for the event host to start the voting session. Models are open for preview."}
+                          ? "Voting is closed. Check the Leaderboard tab to view the winners and rankings."
+                          : "Please wait for the event host to start the voting session. Models are open for preview."}
                     </p>
                   </div>
                 </div>
@@ -570,8 +569,8 @@ export default function Home() {
                 eventStatusData.status === "active" && eventStatusData.endsAt
                   ? new Date(eventStatusData.endsAt).toISOString()
                   : eventStatusData.customEndDate
-                  ? eventStatusData.customEndDate
-                  : undefined
+                    ? eventStatusData.customEndDate
+                    : undefined
               }
             />
 
@@ -580,11 +579,10 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-5 py-3.5 rounded-2xl bg-gradient-to-r from-zinc-900/90 via-zinc-950/90 to-zinc-900/90 border border-white/10 backdrop-blur-md">
                 <div className="flex items-center gap-3">
                   <div
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-xs shadow-md border ${
-                      votedIds.length >= 2
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center font-black text-xs shadow-md border ${votedIds.length >= 2
                         ? "bg-amber-500/20 text-amber-400 border-amber-500/40"
                         : "bg-[#ff007f]/20 text-[#ff007f] border-[#ff007f]/40"
-                    }`}
+                      }`}
                   >
                     {votedIds.length}/2
                   </div>
@@ -601,8 +599,8 @@ export default function Home() {
                         {votedIds.length === 0
                           ? "2 Votes Remaining"
                           : votedIds.length === 1
-                          ? "1 Vote Remaining"
-                          : "0 Votes Left (Quota Full)"}
+                            ? "1 Vote Remaining"
+                            : "0 Votes Left (Quota Full)"}
                       </span>
                     </p>
                     <p className="text-[11px] text-zinc-400">
@@ -643,22 +641,20 @@ export default function Home() {
                 <div className="flex bg-zinc-950/90 p-1 rounded-2xl border border-white/10 text-xs">
                   <button
                     onClick={() => setSortBy("votes")}
-                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-black uppercase tracking-wider transition-all ${
-                      sortBy === "votes"
+                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-black uppercase tracking-wider transition-all ${sortBy === "votes"
                         ? "bg-[#ff007f] text-white shadow-md shadow-[#ff007f]/30"
                         : "text-zinc-400 hover:text-white"
-                    }`}
+                      }`}
                   >
                     <Flame className="w-3.5 h-3.5 text-amber-300" />
                     Top Votes
                   </button>
                   <button
                     onClick={() => setSortBy("newest")}
-                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-black uppercase tracking-wider transition-all ${
-                      sortBy === "newest"
+                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-black uppercase tracking-wider transition-all ${sortBy === "newest"
                         ? "bg-zinc-800 text-white shadow-sm"
                         : "text-zinc-400 hover:text-white"
-                    }`}
+                      }`}
                   >
                     <Clock className="w-3.5 h-3.5 text-[#00f2fe]" />
                     Newest
@@ -780,11 +776,10 @@ export default function Home() {
                   <button
                     type="button"
                     onClick={() => setModalMediaTab("photo")}
-                    className={`flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all min-h-[38px] ${
-                      modalMediaTab === "photo"
+                    className={`flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all min-h-[38px] ${modalMediaTab === "photo"
                         ? "bg-white/20 text-white shadow-md"
                         : "text-zinc-400 hover:text-white"
-                    }`}
+                      }`}
                   >
                     <ImageIcon className="w-3.5 h-3.5" />
                     <span>Photo</span>
@@ -792,11 +787,10 @@ export default function Home() {
                   <button
                     type="button"
                     onClick={() => setModalMediaTab("tiktok")}
-                    className={`flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all min-h-[38px] ${
-                      modalMediaTab === "tiktok"
+                    className={`flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all min-h-[38px] ${modalMediaTab === "tiktok"
                         ? "bg-gradient-to-r from-[#ff007f] to-rose-600 text-white shadow-md shadow-[#ff007f]/40"
                         : "text-zinc-400 hover:text-[#00f2fe]"
-                    }`}
+                      }`}
                   >
                     <TikTokIcon className="w-3.5 h-3.5" />
                     <span>TikTok</span>
