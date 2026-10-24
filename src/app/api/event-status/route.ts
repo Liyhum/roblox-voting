@@ -7,6 +7,7 @@ export async function GET() {
     success: true,
     ...status,
     serverTime: Date.now(),
+    cwd: process.cwd(),
   });
 }
 
