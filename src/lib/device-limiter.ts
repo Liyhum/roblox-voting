@@ -37,6 +37,26 @@ function loadStore() {
           userToHardware: parsed.userToHardware || {},
           ipToUsers: parsed.ipToUsers || {},
         };
+
+        // Migration: release legacy unsalted iOS generic hardware collision for AraaCute02
+        let cleaned = false;
+        for (const [hwHash, bound] of Object.entries(memoryStore.hardwareToUser)) {
+          if (bound && bound.username && bound.username.toLowerCase() === "araacute02") {
+            delete memoryStore.hardwareToUser[hwHash];
+            cleaned = true;
+          }
+        }
+        if (memoryStore.userToHardware) {
+          for (const [vId, hwHash] of Object.entries(memoryStore.userToHardware)) {
+            if (!memoryStore.hardwareToUser[hwHash]) {
+              delete memoryStore.userToHardware[vId];
+              cleaned = true;
+            }
+          }
+        }
+        if (cleaned) {
+          saveStore();
+        }
       }
     }
   } catch {

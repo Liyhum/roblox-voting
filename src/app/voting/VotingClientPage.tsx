@@ -31,7 +31,7 @@ import { RobloxConnectModal, ConnectedRobloxUser } from "@/components/RobloxConn
 import { HostControlModal } from "@/components/HostControlModal";
 import { TikTokPlayer, TikTokIcon } from "@/components/TikTokPlayer";
 import { CountdownTimer } from "@/components/CountdownTimer";
-import { generateHardwareFingerprint } from "@/lib/hardware-fingerprint";
+import { generateHardwareFingerprint, getOrCreateDeviceId } from "@/lib/hardware-fingerprint";
 import { supabase, isSupabaseConfigured, Submission } from "@/lib/supabase";
 import { EventStatusType } from "@/lib/event-status";
 
@@ -273,13 +273,9 @@ export default function Home() {
     let deviceId = "";
     let hardwareFingerprint = "";
     if (typeof window !== "undefined") {
-      deviceId = localStorage.getItem("trec_voter_device_id") || "";
-      if (!deviceId) {
-        deviceId = "dev_" + Math.random().toString(36).substring(2, 12) + "_" + Date.now().toString(36);
-        localStorage.setItem("trec_voter_device_id", deviceId);
-      }
+      deviceId = getOrCreateDeviceId();
       try {
-        hardwareFingerprint = await generateHardwareFingerprint();
+        hardwareFingerprint = await generateHardwareFingerprint(deviceId);
       } catch {
         hardwareFingerprint = "";
       }

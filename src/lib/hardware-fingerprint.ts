@@ -4,10 +4,54 @@
  * PERSISTENT ACROSS INCOGNITO MODE AND LOCALSTORAGE CLEARING.
  */
 
-export async function generateHardwareFingerprint(): Promise<string> {
+export function getOrCreateDeviceId(): string {
+  if (typeof window === "undefined") return "";
+  let id = "";
+  try {
+    id = localStorage.getItem("trec_voter_device_id") || "";
+  } catch {
+    // ignore
+  }
+
+  if (!id) {
+    try {
+      const match = document.cookie.match(/(?:^|;\s*)trec_voter_device_id=([^;]+)/);
+      if (match && match[1]) {
+        id = decodeURIComponent(match[1]);
+        try {
+          localStorage.setItem("trec_voter_device_id", id);
+        } catch {
+          // ignore
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  if (!id) {
+    id = "dev_" + Math.random().toString(36).substring(2, 12) + "_" + Date.now().toString(36);
+    try {
+      localStorage.setItem("trec_voter_device_id", id);
+    } catch {
+      // ignore
+    }
+  }
+
+  try {
+    document.cookie = `trec_voter_device_id=${encodeURIComponent(id)}; path=/; max-age=31536000; SameSite=Lax`;
+  } catch {
+    // ignore
+  }
+
+  return id;
+}
+
+export async function generateHardwareFingerprint(passedDeviceId?: string): Promise<string> {
   if (typeof window === "undefined") return "server-side-stub";
 
   const components: string[] = [];
+  const deviceId = passedDeviceId || getOrCreateDeviceId();
 
   // 1. Screen & Display Properties
   components.push(`screen:${window.screen.width}x${window.screen.height}x${window.screen.colorDepth}`);
@@ -21,6 +65,8 @@ export async function generateHardwareFingerprint(): Promise<string> {
   components.push(`tz:${Intl.DateTimeFormat().resolvedOptions().timeZone}`);
 
   // 3. WebGL GPU Unmasked Renderer & Vendor (Unique per GPU hardware/driver)
+  let gpuVendor = "";
+  let gpuRenderer = "";
   try {
     const canvas = document.createElement("canvas");
     const gl =
@@ -29,9 +75,9 @@ export async function generateHardwareFingerprint(): Promise<string> {
     if (gl) {
       const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
       if (debugInfo) {
-        const vendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) || "";
-        const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) || "";
-        components.push(`gpu:${vendor}~${renderer}`);
+        gpuVendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) || "";
+        gpuRenderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) || "";
+        components.push(`gpu:${gpuVendor}~${gpuRenderer}`);
       }
     }
   } catch {
@@ -85,6 +131,21 @@ export async function generateHardwareFingerprint(): Promise<string> {
     }
   } catch {
     components.push("audio:unavailable");
+  }
+
+  // 6. iOS / Apple Hardware Isolation
+  // Apple devices (iPhone/iPad/Safari) deliberately mask GPU & hardware nuances for privacy,
+  // returning identical "Apple GPU", 4 cores, and uniform canvas pixels for ALL users of the same model.
+  // Without isolation, one iPhone user (e.g. AraaCute02) unintentionally locks out ALL other iPhone users.
+  // By salting with the unique per-device token, each iPhone gets a strictly isolated hardware profile.
+  const isApple =
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) ||
+    gpuVendor.toLowerCase().includes("apple") ||
+    gpuRenderer.toLowerCase().includes("apple");
+
+  if (isApple && deviceId) {
+    components.push(`apple_device_token:${deviceId}`);
   }
 
   // Combine and hash into a clean 64-char hex string

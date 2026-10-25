@@ -12,7 +12,7 @@ import {
   Users,
   RefreshCw,
 } from "lucide-react";
-import { generateHardwareFingerprint } from "@/lib/hardware-fingerprint";
+import { generateHardwareFingerprint, getOrCreateDeviceId } from "@/lib/hardware-fingerprint";
 
 export interface ConnectedRobloxUser {
   id: number;
@@ -83,15 +83,8 @@ export function RobloxConnectModal({
       if (res.ok && data.name) {
         // Real-time check if this device/hardware is already bound to another USN
         try {
-          const hardwareFingerprint = await generateHardwareFingerprint();
-          let deviceId = "";
-          if (typeof window !== "undefined") {
-            deviceId = localStorage.getItem("trec_voter_device_id") || "";
-            if (!deviceId) {
-              deviceId = "dev_" + Math.random().toString(36).substring(2, 12) + "_" + Date.now().toString(36);
-              localStorage.setItem("trec_voter_device_id", deviceId);
-            }
-          }
+          const deviceId = getOrCreateDeviceId();
+          const hardwareFingerprint = await generateHardwareFingerprint(deviceId);
 
           const checkRes = await fetch("/api/bind-device", {
             method: "POST",
@@ -153,15 +146,8 @@ export function RobloxConnectModal({
     setError("");
 
     try {
-      const hardwareFingerprint = await generateHardwareFingerprint();
-      let deviceId = "";
-      if (typeof window !== "undefined") {
-        deviceId = localStorage.getItem("trec_voter_device_id") || "";
-        if (!deviceId) {
-          deviceId = "dev_" + Math.random().toString(36).substring(2, 12) + "_" + Date.now().toString(36);
-          localStorage.setItem("trec_voter_device_id", deviceId);
-        }
-      }
+      const deviceId = getOrCreateDeviceId();
+      const hardwareFingerprint = await generateHardwareFingerprint(deviceId);
 
       const res = await fetch("/api/bind-device", {
         method: "POST",
