@@ -47,8 +47,6 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  // Standalone output produces a self-contained bundle for Dewaweb VPS / Node.js
-  output: "standalone",
   poweredByHeader: false,
   images: {
     remotePatterns: [
