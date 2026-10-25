@@ -75,12 +75,16 @@ function saveStore() {
 /**
  * Validates strict 1 USN = 1 Physical Device (Hardware/Canvas), 1 Software Device, and 1 IP limit
  */
+/**
+ * Validates strict 1 USN = 1 Physical Device (Hardware/Canvas), 1 Software Device, and 1 IP limit
+ */
 export function validateDeviceAndIp(
   voterId: number,
   username: string,
   deviceId: string,
   clientIp: string,
-  hardwareFingerprint?: string
+  hardwareFingerprint?: string,
+  userAgent?: string
 ): { allowed: boolean; reason?: string } {
   loadStore();
 
@@ -88,10 +92,14 @@ export function validateDeviceAndIp(
   const cleanIp = (clientIp || "unknown").trim();
   const cleanDevice = (deviceId || "").trim();
   const cleanHardware = (hardwareFingerprint || "").trim();
+  const isApple = /iPad|iPhone|iPod/i.test(userAgent || "");
 
-  // 1. HARDWARE FINGERPRINT CHECK (GPU, Canvas, Audio, Screen) - Anti-Incognito & Anti-ClearCache
-  // Strictly guarantees 1 Physical Machine can NEVER be used by more than 1 Roblox account
-  if (cleanHardware && cleanHardware !== "server-side-stub" && cleanHardware.length > 10) {
+  // 1. HARDWARE FINGERPRINT CHECK (GPU, Canvas, Audio, Screen)
+  // Apple devices (iPhone/iPad/Safari) intentionally mask GPU & hardware nuances for privacy,
+  // returning identical "Apple GPU", 4 cores, and uniform canvas for all users of the same model.
+  // We do NOT block Apple users with generic hardware hashes because different iPhone users share identical specs.
+  // Anti-multi-account on iPhone is strictly enforced by check #2 (deviceToUser: 1 device token = 1 account).
+  if (!isApple && cleanHardware && cleanHardware !== "server-side-stub" && cleanHardware.length > 10) {
     if (memoryStore.hardwareToUser[cleanHardware]) {
       const bound = memoryStore.hardwareToUser[cleanHardware];
       if (bound.voterId !== voterId) {
@@ -105,6 +113,7 @@ export function validateDeviceAndIp(
 
   // 2. Software Device UUID Check
   // Strictly guarantees 1 Browser Device Token can NEVER be used by more than 1 Roblox account
+  // (Both on PC, Android, and iPhone/iPad)
   if (cleanDevice && memoryStore.deviceToUser[cleanDevice]) {
     const bound = memoryStore.deviceToUser[cleanDevice];
     if (bound.voterId !== voterId) {
@@ -137,7 +146,8 @@ export function recordDeviceAndIp(
   username: string,
   deviceId: string,
   clientIp: string,
-  hardwareFingerprint?: string
+  hardwareFingerprint?: string,
+  userAgent?: string
 ) {
   loadStore();
 
@@ -145,13 +155,15 @@ export function recordDeviceAndIp(
   const cleanIp = (clientIp || "unknown").trim();
   const cleanDevice = (deviceId || "").trim();
   const cleanHardware = (hardwareFingerprint || "").trim();
+  const isApple = /iPad|iPhone|iPod/i.test(userAgent || "");
 
   if (cleanDevice) {
     memoryStore.deviceToUser[cleanDevice] = { voterId, username };
     memoryStore.userToDevice[voterKey] = cleanDevice;
   }
 
-  if (cleanHardware && cleanHardware !== "server-side-stub" && cleanHardware.length > 10) {
+  // Only record hardware fingerprint for non-Apple devices to avoid poisoning the store with generic "Apple GPU" hashes
+  if (!isApple && cleanHardware && cleanHardware !== "server-side-stub" && cleanHardware.length > 10) {
     memoryStore.hardwareToUser[cleanHardware] = { voterId, username };
     memoryStore.userToHardware[voterKey] = cleanHardware;
   }

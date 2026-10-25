@@ -181,6 +181,7 @@ export async function POST(req: NextRequest) {
 
   // 7. Anti-Sybil Protection: 1 USN = 1 Hardware (GPU/Canvas) + 1 Device & IP Enforcement
   const clientIp = getClientIp(req);
+  const userAgent = req.headers.get("user-agent") || "";
   const effectiveDevice = (deviceId || "").trim();
   const effectiveHardware = (hardwareFingerprint || "").trim();
 
@@ -189,7 +190,8 @@ export async function POST(req: NextRequest) {
     effectiveVoterName,
     effectiveDevice,
     clientIp,
-    effectiveHardware
+    effectiveHardware,
+    userAgent
   );
 
   if (!deviceCheck.allowed) {
@@ -287,7 +289,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Record device and IP binding upon successful vote
-    recordDeviceAndIp(effectiveVoterId, effectiveVoterName, effectiveDevice, clientIp, effectiveHardware);
+    recordDeviceAndIp(effectiveVoterId, effectiveVoterName, effectiveDevice, clientIp, effectiveHardware, userAgent);
 
     return NextResponse.json({
       success: true,

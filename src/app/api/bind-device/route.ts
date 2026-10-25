@@ -30,6 +30,7 @@ export async function POST(req: NextRequest) {
   }
 
   const clientIp = getClientIp(req);
+  const userAgent = req.headers.get("user-agent") || "";
 
   // Validate if this device/hardware is already locked to another username
   const check = validateDeviceAndIp(
@@ -37,7 +38,8 @@ export async function POST(req: NextRequest) {
     username.trim(),
     deviceId.trim(),
     clientIp,
-    (hardwareFingerprint || "").trim()
+    (hardwareFingerprint || "").trim(),
+    userAgent
   );
 
   if (!check.allowed) {
@@ -64,7 +66,8 @@ export async function POST(req: NextRequest) {
     username.trim(),
     deviceId.trim(),
     clientIp,
-    (hardwareFingerprint || "").trim()
+    (hardwareFingerprint || "").trim(),
+    userAgent
   );
 
   return NextResponse.json({
