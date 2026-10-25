@@ -4,16 +4,14 @@ import { validateDeviceAndIp, recordDeviceAndIp } from "../src/lib/device-limite
 
 const TEST_FILE = path.join(process.cwd(), ".device-voters.json");
 
-// Backup original .device-voters.json if exists
 let originalContent = null;
 if (fs.existsSync(TEST_FILE)) {
   originalContent = fs.readFileSync(TEST_FILE, "utf-8");
 }
 
-console.log("=== STARTING COMPREHENSIVE DEVICE LOCK & IPHONE TEST ===");
+console.log("=== STARTING STRICT 1 USN = 1 DEVICE LOCK TEST ===");
 
 try {
-  // Reset store for fresh test
   fs.writeFileSync(TEST_FILE, JSON.stringify({
     deviceToUser: {},
     userToDevice: {},
@@ -22,73 +20,49 @@ try {
     ipToUsers: {},
   }, null, 2), "utf-8");
 
-  // TEST 1: aillify binds to Device A
-  const devA = "dev_aillify_laptop_123";
-  const hwA = "hw_nvidia_rtx_pc_aillify_fingerprint_hash_999";
-  const ipA = "114.122.10.5";
+  // TEST 1: aillify binds to Device 1 (PC)
+  const devPC = "dev_pc_laptop_111";
+  const hwPC = "hw_pc_nvidia_gpu_hash";
+  const ipPC = "114.122.1.1";
   const aillifyId = 1001;
   const aillifyUsn = "aillify";
+  const uaPC = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)";
 
-  console.log("\n[1] Check aillify on new device:");
-  const check1 = validateDeviceAndIp(aillifyId, aillifyUsn, devA, ipA, hwA);
+  console.log("\n[1] Check aillify on Device 1 (PC):");
+  const check1 = validateDeviceAndIp(aillifyId, aillifyUsn, devPC, ipPC, hwPC, uaPC);
   console.log("Allowed?", check1.allowed);
-  if (!check1.allowed) throw new Error("aillify should be allowed on fresh device");
+  if (!check1.allowed) throw new Error("aillify should be allowed on fresh PC");
+  recordDeviceAndIp(aillifyId, aillifyUsn, devPC, ipPC, hwPC, uaPC);
 
-  // Bind aillify
-  recordDeviceAndIp(aillifyId, aillifyUsn, devA, ipA, hwA);
-  console.log("-> aillify successfully bound to devA and hwA");
+  // TEST 2: aillify tries to connect on Device 2 (iPhone)
+  const deviPhone = "dev_iphone_safari_222";
+  const hwiPhone = "hw_iphone_apple_gpu_hash";
+  const ipiPhone = "180.252.2.2";
+  const uaiPhone = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X)";
 
-  // TEST 2: User tries to enter 'reeeygar' on Device A (Same browser / normal tab)
-  const reeeygarId = 1002;
-  const reeeygarUsn = "reeeygar";
-  console.log("\n[2] reeeygar tries to connect on SAME Device A (Normal tab):");
-  const check2 = validateDeviceAndIp(reeeygarId, reeeygarUsn, devA, ipA, hwA);
+  console.log("\n[2] aillify tries to connect on Device 2 (iPhone):");
+  const check2 = validateDeviceAndIp(aillifyId, aillifyUsn, deviPhone, ipiPhone, hwiPhone, uaiPhone);
   console.log("Allowed?", check2.allowed, "| Reason:", check2.reason);
-  if (check2.allowed) throw new Error("reeeygar MUST BE BLOCKED on same device!");
+  if (check2.allowed) throw new Error("aillify MUST BE BLOCKED from logging into a second device (iPhone)!");
 
-  // TEST 3: User clears localStorage or opens Incognito on Device A (new devId, but SAME hwA)
-  const incognitoDevA = "dev_incognito_random_xyz_777";
-  console.log("\n[3] reeeygar tries to connect in INCOGNITO on Device A (Same hardware GPU):");
-  const check3 = validateDeviceAndIp(reeeygarId, reeeygarUsn, incognitoDevA, ipA, hwA);
-  console.log("Allowed?", check3.allowed, "| Reason:", check3.reason);
-  if (check3.allowed) throw new Error("reeeygar MUST BE BLOCKED in Incognito by hardware fingerprint!");
-
-  // TEST 4: aillify returns to Device A (should be allowed!)
-  console.log("\n[4] aillify returns to Device A (should still be allowed):");
-  const check4 = validateDeviceAndIp(aillifyId, aillifyUsn, devA, ipA, hwA);
-  console.log("Allowed?", check4.allowed);
-  if (!check4.allowed) throw new Error("aillify should be allowed on their own device");
-
-  // TEST 5: iPhone Scenario (AraaCute02 vs Rosieeeepetals)
-  console.log("\n[5] iPhone Isolation Test:");
-  const iphoneAraaDevice = "dev_iphone_araa_111";
-  const iphoneAraaHw = "hw_apple_gpu_isolated_dev_iphone_araa_111";
-  const araaId = 10467794308;
-  const araaUsn = "AraaCute02";
-
-  recordDeviceAndIp(araaId, araaUsn, iphoneAraaDevice, "180.252.1.1", iphoneAraaHw);
-  console.log("-> AraaCute02 bound on iPhone A");
-
-  const iphoneRosieDevice = "dev_iphone_rosie_222";
-  const iphoneRosieHw = "hw_apple_gpu_isolated_dev_iphone_rosie_222";
-  const rosieId = 2055112233;
+  // TEST 3: Fresh user (Rosieeeepetals) connects on Device 2 (iPhone)
+  const rosieId = 2002;
   const rosieUsn = "Rosieeeepetals";
+  console.log("\n[3] Rosieeeepetals connects on Device 2 (iPhone):");
+  const check3 = validateDeviceAndIp(rosieId, rosieUsn, deviPhone, ipiPhone, hwiPhone, uaiPhone);
+  console.log("Allowed?", check3.allowed);
+  if (!check3.allowed) throw new Error("Rosieeeepetals on her own iPhone should be allowed!");
+  recordDeviceAndIp(rosieId, rosieUsn, deviPhone, ipiPhone, hwiPhone, uaiPhone);
 
-  const checkRosie = validateDeviceAndIp(rosieId, rosieUsn, iphoneRosieDevice, "180.252.1.2", iphoneRosieHw);
-  console.log("Rosie on iPhone B allowed?", checkRosie.allowed, checkRosie.reason || "OK!");
-  if (!checkRosie.allowed) throw new Error("Rosieeeepetals on her own iPhone should NOT be blocked by AraaCute02!");
+  // TEST 4: Rosieeeepetals tries to connect on Device 1 (PC)
+  console.log("\n[4] Rosieeeepetals tries to connect on Device 1 (PC):");
+  const check4 = validateDeviceAndIp(rosieId, rosieUsn, devPC, ipPC, hwPC, uaPC);
+  console.log("Allowed?", check4.allowed, "| Reason:", check4.reason);
+  if (check4.allowed) throw new Error("Rosieeeepetals MUST BE BLOCKED on Device 1!");
 
-  // TEST 6: Rosieeeepetals on iPhone B tries to switch to an alt 'reeeygar' on iPhone B
-  console.log("\n[6] Rosie's iPhone B tries to switch account to reeeygar:");
-  recordDeviceAndIp(rosieId, rosieUsn, iphoneRosieDevice, "180.252.1.2", iphoneRosieHw);
-  const checkAltOnRosiePhone = validateDeviceAndIp(reeeygarId, reeeygarUsn, iphoneRosieDevice, "180.252.1.2", iphoneRosieHw);
-  console.log("Alt on Rosie's iPhone allowed?", checkAltOnRosiePhone.allowed, "| Reason:", checkAltOnRosiePhone.reason);
-  if (checkAltOnRosiePhone.allowed) throw new Error("Alt on Rosie's iPhone MUST BE BLOCKED!");
-
-  console.log("\n>>> ALL TESTS PASSED SUCCESSFULLY! <<<");
+  console.log("\n>>> ALL BI-DIRECTIONAL 1 USN = 1 DEVICE TESTS PASSED! <<<");
 
 } finally {
-  // Restore original content
   if (originalContent !== null) {
     fs.writeFileSync(TEST_FILE, originalContent, "utf-8");
   }

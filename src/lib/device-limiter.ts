@@ -111,9 +111,8 @@ export function validateDeviceAndIp(
     }
   }
 
-  // 2. Software Device UUID Check
+  // 2. Software Device UUID Check: 1 Device = 1 Roblox Account
   // Strictly guarantees 1 Browser Device Token can NEVER be used by more than 1 Roblox account
-  // (Both on PC, Android, and iPhone/iPad)
   if (cleanDevice && memoryStore.deviceToUser[cleanDevice]) {
     const bound = memoryStore.deviceToUser[cleanDevice];
     if (bound.voterId !== voterId) {
@@ -124,7 +123,29 @@ export function validateDeviceAndIp(
     }
   }
 
-  // 3. IP Address Check (Max 2 accounts per IP to prevent proxy/bot networks)
+  // 3. Strict 1 USN = 1 Device Check (Akun tidak boleh pindah ke HP/PC lain)
+  // Strictly guarantees 1 Roblox Account can ONLY be used on the 1 device where it first registered
+  if (cleanDevice) {
+    // Check if voterId is already bound to a different device
+    if (memoryStore.userToDevice[voterKey] && memoryStore.userToDevice[voterKey] !== cleanDevice) {
+      return {
+        allowed: false,
+        reason: `Akun Roblox @${username} sudah terdaftar di perangkat lain. Sistem membatasi 1 Akun hanya boleh digunakan pada 1 perangkat.`,
+      };
+    }
+
+    // Check if username is already bound to a different device
+    for (const [dId, bound] of Object.entries(memoryStore.deviceToUser)) {
+      if (bound && bound.username && bound.username.toLowerCase() === username.toLowerCase() && dId !== cleanDevice) {
+        return {
+          allowed: false,
+          reason: `Akun Roblox @${username} sudah terdaftar di perangkat lain. Sistem membatasi 1 Akun hanya boleh digunakan pada 1 perangkat.`,
+        };
+      }
+    }
+  }
+
+  // 4. IP Address Check (Max 2 accounts per IP to prevent proxy/bot networks)
   if (cleanIp && cleanIp !== "127.0.0.1" && cleanIp !== "unknown") {
     const existingUsersOnIp = memoryStore.ipToUsers[cleanIp] || [];
     if (!existingUsersOnIp.includes(voterId) && existingUsersOnIp.length >= 2) {

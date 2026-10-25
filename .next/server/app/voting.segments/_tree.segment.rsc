@@ -4,4 +4,4 @@
 :HL["/_next/static/media/caa3a2e1cccd8315-s.p.0wgildi0cnwt9.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
 2:[["children",{"s":"__PAGE__","h":160}]]
 1:[["children",{"s":"voting","h":96,"c":"$Q2"}]]
-0:{"b":"DLBZK-Hi1_4X9EZAahoL8","t":{"t":{"s":"","h":80,"c":"$Q1"}}}
+0:{"b":"abWwPlm27Pv-gx_x2zi3k","t":{"t":{"s":"","h":80,"c":"$Q1"}}}
