@@ -225,10 +225,30 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // 6. Validate Voting Deadline (if configured)
-  const endDateStr = process.env.NEXT_PUBLIC_VOTING_END_DATE;
-  if (endDateStr) {
-    const endTimestamp = new Date(endDateStr).getTime();
+  // 6. Validate Voting Deadline (Host dynamic customEndDate & endsAt takes precedence)
+  if (eventStatus.customEndDate) {
+    const endTimestamp = new Date(eventStatus.customEndDate).getTime();
+    if (!isNaN(endTimestamp) && Date.now() >= endTimestamp) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Voting has officially closed. Thank you for participating!",
+        },
+        { status: 400 }
+      );
+    }
+  } else if (eventStatus.endsAt) {
+    if (Date.now() >= eventStatus.endsAt) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Voting has officially closed. Thank you for participating!",
+        },
+        { status: 400 }
+      );
+    }
+  } else if (process.env.NEXT_PUBLIC_VOTING_END_DATE) {
+    const endTimestamp = new Date(process.env.NEXT_PUBLIC_VOTING_END_DATE).getTime();
     if (!isNaN(endTimestamp) && Date.now() >= endTimestamp) {
       return NextResponse.json(
         {

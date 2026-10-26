@@ -14,7 +14,7 @@ export function CountdownTimer({ targetDate, onExpire, compact = false }: Countd
   const finalTargetDateString =
     targetDate ||
     process.env.NEXT_PUBLIC_VOTING_END_DATE ||
-    "2026-10-25T23:59:59+08:00";
+    "2026-10-31T23:59:59+08:00";
 
   const [timeLeft, setTimeLeft] = useState<{
     days: number;
