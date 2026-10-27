@@ -290,7 +290,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Record device and IP binding upon successful vote
-      recordDeviceAndIp(effectiveVoterId, effectiveVoterName, effectiveDevice, clientIp, effectiveHardware);
+      recordDeviceAndIp(effectiveVoterId, effectiveVoterName, effectiveDevice, clientIp, effectiveHardware, userAgent);
 
       return NextResponse.json({
         success: true,

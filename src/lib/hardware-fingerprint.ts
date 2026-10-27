@@ -133,19 +133,21 @@ export async function generateHardwareFingerprint(passedDeviceId?: string): Prom
     components.push("audio:unavailable");
   }
 
-  // 6. iOS / Apple Hardware Isolation
-  // Apple devices (iPhone/iPad/Safari) deliberately mask GPU & hardware nuances for privacy,
-  // returning identical "Apple GPU", 4 cores, and uniform canvas pixels for ALL users of the same model.
-  // Without isolation, one iPhone user (e.g. AraaCute02) unintentionally locks out ALL other iPhone users.
-  // By salting with the unique per-device token, each iPhone gets a strictly isolated hardware profile.
-  const isApple =
-    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+  // 6. Mobile & Tablet Hardware Isolation (iOS & Android)
+  // Mobile devices (iOS & Android) share identical mass-manufactured hardware, screen resolutions,
+  // 8-core CPUs, and generic GPUs (ARM Mali, Qualcomm Adreno, Apple GPU).
+  // Without isolation, one user with a Samsung/Xiaomi/Infinix/iPhone locks out all other users with the same model.
+  // By salting with the unique per-device token, each physical mobile device gets a strictly isolated hardware profile.
+  const isMobile =
+    /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent) ||
     (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) ||
     gpuVendor.toLowerCase().includes("apple") ||
-    gpuRenderer.toLowerCase().includes("apple");
+    gpuRenderer.toLowerCase().includes("apple") ||
+    gpuRenderer.toLowerCase().includes("mali") ||
+    gpuRenderer.toLowerCase().includes("adreno");
 
-  if (isApple && deviceId) {
-    components.push(`apple_device_token:${deviceId}`);
+  if (isMobile && deviceId) {
+    components.push(`mobile_device_token:${deviceId}`);
   }
 
   // Combine and hash into a clean 64-char hex string

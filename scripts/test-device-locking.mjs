@@ -60,7 +60,42 @@ try {
   console.log("Allowed?", check4.allowed, "| Reason:", check4.reason);
   if (check4.allowed) throw new Error("Rosieeeepetals MUST BE BLOCKED on Device 1!");
 
-  console.log("\n>>> ALL BI-DIRECTIONAL 1 USN = 1 DEVICE TESTS PASSED! <<<");
+  // TEST 5: Android User A (Samsung/Xiaomi with generic Mali GPU) connects on Phone A
+  const devAndroidA = "dev_android_phone_aaa";
+  const hwGenericMali = "hw_generic_mali_g57_hash";
+  const ipAndroidA = "114.124.50.1";
+  const androidUserAId = 3001;
+  const androidUserAUsn = "BudiAndroid";
+  const uaAndroidA = "Mozilla/5.0 (Linux; Android 14; SM-A155F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36";
+
+  console.log("\n[5] Android User A (BudiAndroid) on Phone A:");
+  const check5 = validateDeviceAndIp(androidUserAId, androidUserAUsn, devAndroidA, ipAndroidA, hwGenericMali, uaAndroidA);
+  console.log("Allowed?", check5.allowed);
+  if (!check5.allowed) throw new Error("BudiAndroid should be allowed on fresh Android phone");
+  recordDeviceAndIp(androidUserAId, androidUserAUsn, devAndroidA, ipAndroidA, hwGenericMali, uaAndroidA);
+
+  // TEST 6: Android User B on Phone B with SAME generic Mali GPU (different person, same phone model)
+  const devAndroidB = "dev_android_phone_bbb";
+  const ipAndroidB = "114.124.70.2";
+  const androidUserBId = 3002;
+  const androidUserBUsn = "SitiAndroid";
+  const uaAndroidB = "Mozilla/5.0 (Linux; Android 14; SM-A155F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36";
+
+  console.log("\n[6] Android User B (SitiAndroid) on Phone B with SAME Mali GPU model:");
+  const check6 = validateDeviceAndIp(androidUserBId, androidUserBUsn, devAndroidB, ipAndroidB, hwGenericMali, uaAndroidB);
+  console.log("Allowed?", check6.allowed);
+  if (!check6.allowed) throw new Error("SitiAndroid MUST NOT be blocked by generic Mali GPU collision!");
+  recordDeviceAndIp(androidUserBId, androidUserBUsn, devAndroidB, ipAndroidB, hwGenericMali, uaAndroidB);
+
+  // TEST 7: Alt account tries to use Phone A (deviceToUser check)
+  const altUserId = 3003;
+  const altUserUsn = "BudiAltTuyul";
+  console.log("\n[7] Alt account (BudiAltTuyul) tries to use Phone A:");
+  const check7 = validateDeviceAndIp(altUserId, altUserUsn, devAndroidA, ipAndroidA, hwGenericMali, uaAndroidA);
+  console.log("Allowed?", check7.allowed, "| Reason:", check7.reason);
+  if (check7.allowed) throw new Error("Alt account on Phone A MUST BE BLOCKED by deviceToUser!");
+
+  console.log("\n>>> ALL BI-DIRECTIONAL (PC + IPHONE + ANDROID) TESTS PASSED! <<<");
 
 } finally {
   if (originalContent !== null) {
