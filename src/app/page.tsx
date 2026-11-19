@@ -70,7 +70,7 @@ export default function LandingPage() {
                 </span>
               </div>
               <p className="text-[11px] font-semibold text-zinc-400 tracking-wide">
-                Roblox Nightlife &amp; Runway Club
+                Roblox Nightlife &amp; Social Club
               </p>
             </div>
           </Link>
@@ -82,13 +82,6 @@ export default function LandingPage() {
               className="h-9 px-3.5 flex items-center gap-2 rounded-xl text-xs sm:text-sm font-semibold tracking-wide transition-all bg-white/10 text-white shadow-sm border border-white/15 whitespace-nowrap shrink-0"
             >
               Home
-            </Link>
-            <Link
-              href="/voting"
-              className="h-9 px-3.5 flex items-center gap-2 rounded-xl text-xs sm:text-sm font-semibold tracking-wide transition-all text-zinc-400 hover:text-white hover:bg-white/5 whitespace-nowrap shrink-0"
-            >
-              <Flame className="w-4 h-4 text-[#ff007f]" />
-              <span>Fashion Runway</span>
             </Link>
             <Link
               href="/topup"
@@ -127,23 +120,14 @@ export default function LandingPage() {
 
           {/* Action CTAs */}
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-            <Link
-              href="/voting"
-              className="h-9 sm:h-10 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-black tracking-wider uppercase text-white bg-gradient-to-r from-[#ff007f] to-rose-600 hover:from-[#ff007f]/90 hover:to-rose-500 shadow-md shadow-[#ff007f]/25 hover:shadow-lg hover:shadow-[#ff007f]/40 transition-all whitespace-nowrap shrink-0 active:scale-95"
-            >
-              <Sparkles className="w-4 h-4" />
-              <span className="hidden sm:inline">Fashion Voting</span>
-              <span className="sm:hidden">Voting</span>
-            </Link>
-
             <a
               href="https://www.roblox.com/games/127693451158806/TREC-KL"
               target="_blank"
               rel="noreferrer"
-              className="h-9 sm:h-10 flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 rounded-xl text-xs font-black tracking-wider text-white bg-zinc-900/90 hover:bg-zinc-800 border border-white/15 hover:border-[#00f2fe]/60 transition-all group whitespace-nowrap shrink-0 shadow-sm active:scale-95"
+              className="h-9 sm:h-10 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 rounded-xl text-xs sm:text-sm font-black tracking-wider uppercase text-white bg-gradient-to-r from-[#ff007f] to-rose-600 hover:from-[#ff007f]/90 hover:to-rose-500 shadow-md shadow-[#ff007f]/25 hover:shadow-lg hover:shadow-[#ff007f]/40 transition-all whitespace-nowrap shrink-0 active:scale-95 group"
             >
-              <Gamepad2 className="w-4 h-4 text-[#00f2fe] group-hover:scale-110 transition-transform" />
-              <span className="hidden md:inline whitespace-nowrap">PLAY GAME</span>
+              <Gamepad2 className="w-4 h-4 text-white group-hover:scale-110 transition-transform" />
+              <span>PLAY GAME</span>
             </a>
 
             {/* Mobile Hamburger Toggle Button */}
@@ -167,17 +151,6 @@ export default function LandingPage() {
               className="flex items-center justify-between p-3 rounded-xl bg-white/10 text-white font-bold text-sm min-h-[44px]"
             >
               <span>Home</span>
-              <ArrowRight className="w-4 h-4 text-zinc-400" />
-            </Link>
-            <Link
-              href="/voting"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 text-zinc-200 font-bold text-sm transition-colors min-h-[44px]"
-            >
-              <div className="flex items-center gap-2">
-                <Flame className="w-4 h-4 text-[#ff007f]" />
-                <span>Fashion Runway Voting</span>
-              </div>
               <ArrowRight className="w-4 h-4 text-zinc-400" />
             </Link>
             <Link
@@ -276,15 +249,6 @@ export default function LandingPage() {
                   <ExternalLink className="w-4 h-4 opacity-75" />
                 </a>
 
-                <Link
-                  href="/voting"
-                  className="w-full sm:w-auto px-5 sm:px-6 py-3.5 sm:py-4 rounded-2xl bg-zinc-900/90 hover:bg-zinc-800 text-white border border-white/15 hover:border-[#00f2fe] font-black text-xs sm:text-sm tracking-wider uppercase transition-all flex items-center justify-center gap-2.5 shadow-xl active:scale-95 group min-h-[44px]"
-                >
-                  <Flame className="w-4 h-4 text-[#ff007f] group-hover:scale-110 transition-transform" />
-                  <span>Fashion Runway Event</span>
-                  <ArrowRight className="w-4 h-4 text-[#00f2fe] group-hover:translate-x-1 transition-transform" />
-                </Link>
-
                 <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
                   <a
                     href="https://discord.gg/54GEpCZGz"
@@ -368,7 +332,7 @@ export default function LandingPage() {
                       [NEW LAYOUT] TREC KL
                     </h3>
                     <p className="text-xs text-zinc-300 line-clamp-2">
-                      Social club lounge, live DJ stage, dance floors, VIP sections, and avatar fashion spotlight.
+                      Social club lounge, live DJ stage, dance floors, VIP sections, and community hangout.
                     </p>
                     <div className="pt-2">
                       <a
@@ -469,33 +433,35 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Card 3: Fashion Runway Sub-Menu */}
+            {/* Card 3: VIP Lounge & Social Hangout */}
             <div className="relative rounded-3xl p-6 bg-[#0c0e14] border border-[#ff007f]/30 hover:border-[#ff007f] transition-all flex flex-col justify-between group shadow-xl shadow-[#ff007f]/5 hover:-translate-y-1 duration-300">
               <div className="space-y-4">
                 <div className="w-14 h-14 rounded-2xl bg-[#ff007f]/15 border border-[#ff007f]/40 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Flame className="w-7 h-7 text-[#ff007f]" />
+                  <Sparkles className="w-7 h-7 text-[#ff007f]" />
                 </div>
                 <div>
                   <span className="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-[#ff007f]/20 text-[#ff007f] border border-[#ff007f]/30">
-                    Community Event
+                    VIP &amp; Hangout
                   </span>
                   <h3 className="text-xl font-black text-white uppercase italic mt-2">
-                    Fashion Runway &amp; Votes
+                    VIP Lounge &amp; Club Hangout
                   </h3>
                 </div>
                 <p className="text-xs text-zinc-400 leading-relaxed">
-                  An exclusive community feature! Contestants can showcase their avatar fashion, link their TikTok runway clips, and compete for community votes.
+                  Hang out with friends in exclusive luxury VIP zones, stylish lounge sofas, bottle service areas, and atmospheric city view spots.
                 </p>
               </div>
 
               <div className="pt-6 border-t border-white/10 mt-6">
-                <Link
-                  href="/voting"
+                <a
+                  href="https://www.roblox.com/games/127693451158806/TREC-KL"
+                  target="_blank"
+                  rel="noreferrer"
                   className="w-full py-3 rounded-2xl bg-gradient-to-r from-[#ff007f] to-rose-600 hover:brightness-110 text-white font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#ff007f]/20"
                 >
-                  <span>Open Runway Event</span>
+                  <span>Enter VIP Lounge</span>
                   <ArrowRight className="w-4 h-4" />
-                </Link>
+                </a>
               </div>
             </div>
 
@@ -613,7 +579,7 @@ export default function LandingPage() {
                 </h2>
 
                 <p className="text-sm sm:text-base text-zinc-300 leading-relaxed">
-                  Stay updated with nightly live DJ sessions, connect with fellow players on Discord, share your TikTok runway clips, and support the project via SociaBuzz!
+                  Stay updated with nightly live DJ sessions, connect with fellow players on Discord, share your TikTok gameplay clips, and support the project via SociaBuzz!
                 </p>
 
                 {/* Primary Hub Buttons */}
@@ -777,13 +743,13 @@ export default function LandingPage() {
                 02
               </div>
               <div className="w-12 h-12 rounded-2xl bg-[#00f2fe]/10 border border-[#00f2fe]/30 flex items-center justify-center text-[#00f2fe] font-black text-lg">
-                <Flame className="w-6 h-6" />
+                <Music className="w-6 h-6" />
               </div>
               <h3 className="text-lg font-black text-white uppercase italic">
-                Vote &amp; Flaunt Outfits
+                Experience Nightly Live DJs
               </h3>
               <p className="text-xs text-zinc-400 leading-relaxed">
-                Open the <b>Fashion Runway Voting</b> sub-menu, cast your 2 votes for top models, or submit your own avatar outfit.
+                Catch resident DJs playing live club tracks every night from 10 PM to 2 AM, dance with friends, and enjoy custom club laser shows.
               </p>
             </div>
 
@@ -798,7 +764,7 @@ export default function LandingPage() {
                 Hit the Club in Roblox
               </h3>
               <p className="text-xs text-zinc-400 leading-relaxed">
-                Hop into <b>TREC KL</b> on Roblox to strut down the catwalk under live spotlights and celebrate with the crowd!
+                Hop into <b>TREC KL</b> on Roblox to chill in VIP lounges, flex your avatar streetwear, and celebrate with the crowd!
               </p>
             </div>
           </div>
@@ -813,7 +779,7 @@ export default function LandingPage() {
               STEP INTO KUALA LUMPUR&apos;S NIGHTLIFE ON ROBLOX
             </h2>
             <p className="text-sm sm:text-base text-zinc-300 max-w-2xl mx-auto">
-              Join thousands of players exploring the new layout of <b>TREC KL</b>. Catch live resident DJs nightly, hang out in the VIP lounge, rock custom streetwear, and take part in community runway events!
+              Join thousands of players exploring the new layout of <b>TREC KL</b>. Catch live resident DJs nightly, hang out in the VIP lounge, rock custom streetwear, and connect with our social nightlife community!
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
               <a
@@ -825,13 +791,6 @@ export default function LandingPage() {
                 <Gamepad2 className="w-5 h-5 text-[#ff007f]" />
                 <span>Launch TREC KL on Roblox</span>
               </a>
-              <Link
-                href="/voting"
-                className="px-8 py-4 rounded-2xl bg-gradient-to-r from-[#ff007f] to-rose-600 hover:brightness-110 text-white font-black text-sm uppercase tracking-wider shadow-xl shadow-[#ff007f]/30 transition-all flex items-center gap-2.5 active:scale-95"
-              >
-                <Flame className="w-5 h-5" />
-                <span>Explore Runway Event</span>
-              </Link>
               <a
                 href="https://www.tiktok.com/@roblox_treckl?lang=en"
                 target="_blank"
@@ -877,7 +836,6 @@ export default function LandingPage() {
 
             <div className="flex flex-wrap items-center justify-center gap-6 font-bold text-zinc-400">
               <Link href="/" className="hover:text-white transition-colors">Home</Link>
-              <Link href="/voting" className="hover:text-[#ff007f] transition-colors">Fashion Runway Voting</Link>
               <Link href="/topup" className="hover:text-amber-400 transition-colors flex items-center gap-1.5">
                 <span>Top Up Store</span>
                 <span className="px-1.5 py-0.2 text-[8px] font-black uppercase rounded bg-amber-500/20 text-amber-300 border border-amber-400/40">
@@ -915,7 +873,7 @@ export default function LandingPage() {
 
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-zinc-500 text-center sm:text-left">
             <p>
-              TREC KL • Official Roblox Avatar &amp; Fashion Runway Awards. All rights reserved.
+              TREC KL • Official Roblox Nightlife &amp; Social Hangout. All rights reserved.
             </p>
             <p>
               Official Roblox Game:{" "}

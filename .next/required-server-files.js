@@ -359,7 +359,14 @@ self.__SERVER_FILES_MANIFEST={
       "root": "D:\\ZeerutRoblox\\roblox-voting-web"
     },
     "repoRoot": "D:\\ZeerutRoblox\\roblox-voting-web",
-    "distDirRoot": ".next"
+    "distDirRoot": ".next",
+    "_originalRedirects": [
+      {
+        "source": "/voting",
+        "destination": "/",
+        "permanent": false
+      }
+    ]
   },
   "appDir": "D:\\ZeerutRoblox\\roblox-voting-web",
   "relativeAppDir": "",

@@ -12,6 +12,12 @@
       "priority": true,
       "statusCode": 308,
       "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    },
+    {
+      "source": "/voting",
+      "destination": "/",
+      "statusCode": 307,
+      "regex": "^(?!/_next)/voting(?:/)?$"
     }
   ],
   "headers": [

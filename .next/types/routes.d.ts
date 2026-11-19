@@ -5,7 +5,7 @@ type AppRoutes = "/" | "/privacy" | "/terms" | "/topup" | "/voting"
 type AppRouteHandlerRoutes = "/api/auth/logout" | "/api/auth/me" | "/api/auth/roblox/callback" | "/api/auth/roblox/login" | "/api/bind-device" | "/api/event-status" | "/api/roblox-avatar" | "/api/submissions" | "/api/tiktok-resolve" | "/api/vote"
 type PageRoutes = never
 type LayoutRoutes = "/"
-type RedirectRoutes = never
+type RedirectRoutes = "/voting"
 type RewriteRoutes = never
 type Routes = AppRoutes | PageRoutes | LayoutRoutes | RedirectRoutes | RewriteRoutes | AppRouteHandlerRoutes
 

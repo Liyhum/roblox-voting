@@ -19,8 +19,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "TREC KL Fashion Show - Roblox Avatar & Runway Awards",
-  description: "Official Voting Platform for TREC KL Roblox Fashion Show. Vote for the best runway outfits and avatar drip!",
+  title: "TREC KL - Roblox Nightlife & Social Hangout",
+  description: "Official Community & Portal for TREC KL on Roblox by FEMME'S STUDIO. Nightlife club lounge, live DJ sessions, VIP sections, and social hangout.",
   icons: {
     icon: "/trec-kl/icon.png",
   },

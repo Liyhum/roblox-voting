@@ -5,7 +5,7 @@
       "routeType": "page",
       "response": "complete",
       "compute": "static",
-      "htmlSize": 62879,
+      "htmlSize": 59774,
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -62,7 +62,7 @@
       "routeType": "page",
       "response": "complete",
       "compute": "static",
-      "htmlSize": 9481,
+      "htmlSize": 9549,
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -178,7 +178,7 @@
       "routeType": "page",
       "response": "complete",
       "compute": "static",
-      "htmlSize": 41419,
+      "htmlSize": 41487,
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -201,41 +201,13 @@
         "x-next-revalidated-tags",
         "x-next-revalidate-tag-token"
       ]
-    },
-    "/voting": {
-      "routeType": "page",
-      "response": "complete",
-      "compute": "static",
-      "htmlSize": 34648,
-      "experimentalBypassFor": [
-        {
-          "type": "header",
-          "key": "next-action"
-        },
-        {
-          "type": "header",
-          "key": "content-type",
-          "value": "multipart/form-data;.*"
-        }
-      ],
-      "initialRevalidateSeconds": false,
-      "srcRoute": "/voting",
-      "dataRoute": "/voting.rsc",
-      "allowHeader": [
-        "host",
-        "x-matched-path",
-        "x-prerender-revalidate",
-        "x-prerender-revalidate-if-generated",
-        "x-next-revalidated-tags",
-        "x-next-revalidate-tag-token"
-      ]
     }
   },
   "dynamicRoutes": {},
   "notFoundRoutes": [],
   "preview": {
-    "previewModeId": "7ec896738a97392da5ce702f30829848",
-    "previewModeSigningKey": "c899e62d9b06298c3923498976d4dbd09b2eb81f1f74ab4f3c7971891beced96",
-    "previewModeEncryptionKey": "ba7710e55b78c8ea83d13c21dbf67fa9094a269b40c0171caad2af78fc0069d3"
+    "previewModeId": "8a58ef238a93722543a668e32871580f",
+    "previewModeSigningKey": "511f581503decffd968e471ebd977043fb96449b3c640b8392457adfdcdac54d",
+    "previewModeEncryptionKey": "e536389ae3526bb284c0f81f610490d5bc28e2d74d054f43fda99e953e7053f6"
   }
 }
