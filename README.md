@@ -1,3 +1,13 @@
+# TREC KL - Roblox Nightlife & Social Hangout Web
+
+Official community website for **[NEW LAYOUT] TREC KL** on Roblox.
+
+> 📖 **PENTING UNTUK DEVELOPER / HOSTING DEWAWEB:**  
+> Jika hendak melakukan update atau terjadi kendala saat `git pull` / restart di server Dewaweb, baca panduan lengkap solusinya di:  
+> 👉 [DEWAWEB_DEPLOYMENT_TROUBLESHOOTING.md](./DEWAWEB_DEPLOYMENT_TROUBLESHOOTING.md)
+
+---
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
