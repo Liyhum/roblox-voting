@@ -318,7 +318,7 @@ export default function LandingPage() {
               <div className="relative rounded-[32px] overflow-hidden border-2 border-white/15 shadow-2xl bg-gradient-to-b from-[#121520] to-[#0a0c12] p-2 group">
                 <div className="relative rounded-[26px] overflow-hidden aspect-[4/5] sm:aspect-square lg:aspect-[4/5]">
                   <img
-                    src="/trec-kl/thumb1.png"
+                    src="/trec-kl/hero-thumb-v2.png"
                     alt="TREC KL Roblox Experience"
                     className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
                   />

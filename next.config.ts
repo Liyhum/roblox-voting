@@ -93,6 +93,15 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        source: "/trec-kl/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+          },
+        ],
+      },
+      {
         source: "/:path*",
         headers: securityHeaders,
       },
