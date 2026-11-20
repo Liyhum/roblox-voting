@@ -38,10 +38,21 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[#06070a] text-zinc-100 flex flex-col font-sans selection:bg-[#ff007f] selection:text-white relative overflow-x-hidden">
+      {/* Background Image with Ambient Glows */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <img
+          src="/trec-kl/bg.jpg"
+          alt="TREC KL Atmosphere"
+          className="w-full h-full object-cover object-center opacity-35 brightness-75 scale-105 transition-transform duration-1000"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#06070a]/90 via-[#06070a]/80 to-[#06070a]" />
+        <div className="absolute inset-0 bg-radial-gradient from-transparent via-[#06070a]/40 to-[#06070a]" />
+      </div>
+
       {/* Dynamic Ambient Background Glows */}
-      <div className="fixed top-0 left-1/4 w-[600px] h-[600px] bg-[#ff007f]/10 rounded-full blur-[160px] pointer-events-none" />
-      <div className="fixed top-1/3 right-1/4 w-[600px] h-[600px] bg-[#00f2fe]/10 rounded-full blur-[160px] pointer-events-none" />
-      <div className="fixed bottom-10 left-1/3 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[160px] pointer-events-none" />
+      <div className="fixed top-0 left-1/4 w-[600px] h-[600px] bg-[#ff007f]/15 rounded-full blur-[160px] pointer-events-none z-0" />
+      <div className="fixed top-1/3 right-1/4 w-[600px] h-[600px] bg-[#00f2fe]/10 rounded-full blur-[160px] pointer-events-none z-0" />
+      <div className="fixed bottom-10 left-1/3 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[160px] pointer-events-none z-0" />
 
       {/* Navigation Header */}
       <header className="sticky top-0 z-50 w-full backdrop-blur-2xl bg-[#06070a]/90 border-b border-white/10 transition-all">
@@ -52,7 +63,7 @@ export default function LandingPage() {
             <div className="relative">
               <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl overflow-hidden border-2 border-white/20 p-0.5 group-hover:border-[#ff007f] transition-all duration-300 shadow-lg shadow-[#ff007f]/20 bg-zinc-950">
                 <img
-                  src="/trec-kl/icon.png"
+                  src="/trec-kl/logo.png"
                   alt="TREC KL"
                   className="w-full h-full object-cover rounded-[14px] group-hover:scale-105 transition-transform"
                 />
@@ -232,7 +243,7 @@ export default function LandingPage() {
               </h1>
 
               <p className="text-sm sm:text-lg text-zinc-300 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-                Welcome to the official community and information portal for <b>[NEW LAYOUT] TREC KL</b> on Roblox, created by <b>FEMME&apos;S STUDIO</b>. 
+                Welcome to the official community and information portal for <b>[NEW] TREC KL</b> on Roblox, created by <b>FEMME&apos;S STUDIO</b>. 
                 Modeled after the iconic entertainment and dining hub in Kuala Lumpur, Malaysia—experience a vibrant nightlife lounge, chill with friends, catch nightly live DJ sessions, flex custom streetwear, and take part in community events.
               </p>
 
@@ -329,10 +340,10 @@ export default function LandingPage() {
                       Kuala Lumpur Nightlife Simulation
                     </p>
                     <h3 className="text-2xl font-black text-white uppercase italic leading-tight">
-                      [NEW LAYOUT] TREC KL
+                      [NEW] TREC KL
                     </h3>
                     <p className="text-xs text-zinc-300 line-clamp-2">
-                      Social club lounge, live DJ stage, dance floors, VIP sections, and community hangout.
+                      DJ SESSION EVERYNIGHT 10 PM - 2 AM MYT • Social club lounge, live DJ stage, and community hangout.
                     </p>
                     <div className="pt-2">
                       <a
@@ -505,7 +516,7 @@ export default function LandingPage() {
                   Official Game Info
                 </span>
                 <h3 className="text-2xl sm:text-3xl font-black uppercase italic text-white mt-2">
-                  [NEW LAYOUT] TREC KL • ROBLOX
+                  [NEW] TREC KL • ROBLOX
                 </h3>
                 <p className="text-xs sm:text-sm text-zinc-400 mt-1">
                   Developer: <span className="text-white font-bold">FEMME&apos;S STUDIO</span> • Genre: <span className="text-white font-bold">Social Hangout / Nightlife Simulation</span>
@@ -829,7 +840,7 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-white/10 pb-8">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl overflow-hidden border border-white/20 p-0.5">
-                <img src="/trec-kl/icon.png" alt="TREC KL" className="w-full h-full object-cover rounded-[8px]" />
+                <img src="/trec-kl/logo.png" alt="TREC KL" className="w-full h-full object-cover rounded-[8px]" />
               </div>
               <span className="font-black text-lg text-white uppercase italic">TREC KL</span>
             </div>

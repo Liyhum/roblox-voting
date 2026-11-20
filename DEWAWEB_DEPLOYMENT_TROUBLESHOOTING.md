@@ -35,7 +35,7 @@ Dokumen ini mencatat kendala teknis yang pernah terjadi saat deploy/update aplik
   1. **Di Codebase:**
      - Pasang `export const dynamic = "force-dynamic";` dan `export const revalidate = 0;` di `src/app/layout.tsx` dan halaman utama agar Next.js **selalu server-rendered** dan tidak pernah mengunci HTML statis.
      - Pasang header anti-cache di `next.config.ts`: `Cache-Control: no-store, no-cache, must-revalidate, max-age=0`.
-     - Mirror file CSS ke `public/_next/static/chunks/` dan pertahankan nama CSS lama sebagai fallback agar client berkas lama tidak pernah 404.
+     - Simpan alias nama CSS lama di dalam `.next/static/chunks/` sebagai fallback agar jika ada browser/cache yang masih meminta nama CSS lama tidak pernah error 404. *(Catatan: Jangan gunakan folder `public/_next` karena Next.js melarang folder internal `_next` di dalam `public`).*
   2. **Di Server Dewaweb:**
      - Selalu bersihkan cache Next.js dengan perintah:
        ```bash
@@ -79,3 +79,4 @@ cd ~/roblox-voting && git -c pack.threads=1 pull origin main && rm -rf .next/cac
 | `mkdir -p tmp && touch tmp/restart.txt` | Mengirim sinyal restart resmi ke Phusion Passenger cPanel |
 
 Setelah perintah selesai, cukup tekan **Restart** di menu cPanel **Setup Node.js App** dan refresh browser Anda (`Ctrl + F5`). Website dijamin 100% langsung terupdate dengan rapi tanpa error!
+

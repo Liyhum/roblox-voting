@@ -38,7 +38,7 @@ export function Navbar({
             <div className="relative">
               <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl overflow-hidden border-2 border-white/20 p-0.5 group-hover:border-[#ff007f] transition-all duration-300 shadow-lg shadow-[#ff007f]/20 bg-zinc-950">
                 <img
-                  src="/trec-kl/icon.png"
+                  src="/trec-kl/logo.png"
                   alt="TREC KL"
                   className="w-full h-full object-cover rounded-[14px] group-hover:scale-105 transition-transform"
                 />
